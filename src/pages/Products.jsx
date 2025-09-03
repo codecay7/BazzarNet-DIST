@@ -25,6 +25,11 @@ const Products = () => {
     loadData();
   }, [searchTerm, selectedStore, sortBy, simulateLoading, allAppProducts]); // Re-run loading when allAppProducts changes
 
+  const calculateDiscount = (price, originalPrice) => {
+    if (!originalPrice || originalPrice <= price) return 0;
+    return ((originalPrice - price) / originalPrice) * 100;
+  };
+
   const filteredAndSortedProducts = useMemo(() => {
     let products = allAppProducts; // Use allAppProducts
 
@@ -48,8 +53,13 @@ const Products = () => {
         case 'name-desc':
           return b.name.localeCompare(a.name);
         case 'name-asc':
-        default:
           return a.name.localeCompare(b.name);
+        case 'discount-desc':
+          const discountA = calculateDiscount(a.price, a.originalPrice);
+          const discountB = calculateDiscount(b.price, b.originalPrice);
+          return discountB - discountA; // Sort by discount percentage, high to low
+        default:
+          return 0;
       }
     });
 
@@ -72,11 +82,6 @@ const Products = () => {
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, selectedStore, sortBy]);
-
-  const calculateDiscount = (price, originalPrice) => {
-    if (!originalPrice || originalPrice <= price) return 0;
-    return Math.round(((originalPrice - price) / originalPrice) * 100);
-  };
 
   return (
     <section className="w-full max-w-[1200px] my-10">
@@ -124,6 +129,7 @@ const Products = () => {
               <option value="name-desc">Sort by Name (Z-A)</option>
               <option value="price-asc">Sort by Price (Low to High)</option>
               <option value="price-desc">Sort by Price (High to Low)</option>
+              <option value="discount-desc">Sort by Discount (High to Low)</option>
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-[var(--text)]" aria-hidden="true"><ChevronDown size={20} /></div>
           </div>
@@ -150,7 +156,7 @@ const Products = () => {
                         className="w-full h-48 object-cover"
                       />
                       {discount > 0 && (
-                        <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded" aria-label={`${discount} percent off`}>{discount}% OFF</span>
+                        <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded" aria-label={`${Math.round(discount)} percent off`}>{Math.round(discount)}% OFF</span>
                       )}
                     </div>
                     <div className="p-4 flex-grow flex flex-col">
