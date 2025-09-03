@@ -4,6 +4,7 @@ import { faSignInAlt } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import toast from 'react-hot-toast';
 
 const Login = () => {
   const { loginAsUser, loginAsVendor } = useContext(AppContext);
@@ -12,20 +13,55 @@ const Login = () => {
 
   const [userName, setUserName] = useState('');
   const [userUsername, setUserUsername] = useState('');
+  const [userErrors, setUserErrors] = useState({});
+
   const [vendorName, setVendorName] = useState('');
   const [vendorStore, setVendorStore] = useState('');
+  const [vendorErrors, setVendorErrors] = useState({});
+
+  const validateUserLogin = () => {
+    let newErrors = {};
+    if (!userName.trim()) {
+      newErrors.name = 'Name is required.';
+    }
+    if (!userUsername.trim()) {
+      newErrors.username = 'Username is required.';
+    }
+    setUserErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
+  const validateVendorLogin = () => {
+    let newErrors = {};
+    if (!vendorName.trim()) {
+      newErrors.name = 'Vendor Name is required.';
+    }
+    if (!vendorStore.trim()) {
+      newErrors.store = 'Store Name is required.';
+    }
+    setVendorErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
 
   const handleUserLogin = (e) => {
     e.preventDefault();
-    if (loginAsUser(userName, userUsername)) {
-      navigate('/dashboard');
+    if (validateUserLogin()) {
+      if (loginAsUser(userName, userUsername)) {
+        navigate('/dashboard');
+      }
+    } else {
+      toast.error('Please fill in all required fields.');
     }
   };
 
   const handleVendorLogin = (e) => {
     e.preventDefault();
-    if (loginAsVendor(vendorName, vendorStore)) {
-      navigate('/dashboard');
+    if (validateVendorLogin()) {
+      if (loginAsVendor(vendorName, vendorStore)) {
+        navigate('/dashboard');
+      }
+    } else {
+      toast.error('Please fill in all required fields.');
     }
   };
 
@@ -34,6 +70,8 @@ const Login = () => {
     visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
     exit: { opacity: 0, y: -20, transition: { duration: 0.3 } },
   };
+
+  const inputClasses = "w-full p-3 my-2 text-[var(--text)] border border-white/30 rounded-lg bg-white/10 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]";
 
   return (
     <div className="min-h-screen flex flex-col justify-center items-center bg-[var(--bg-body)] p-4">
@@ -71,17 +109,19 @@ const Login = () => {
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}
                 placeholder="Name"
-                className="w-full p-3 my-2 text-[var(--text)] border border-white/30 rounded-lg bg-white/10 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                className={inputClasses}
                 aria-label="User Name"
               />
+              {userErrors.name && <p className="text-red-400 text-xs text-left -mt-1 mb-2">{userErrors.name}</p>}
               <input
                 type="text"
                 value={userUsername}
                 onChange={(e) => setUserUsername(e.target.value)}
                 placeholder="Username"
-                className="w-full p-3 my-2 text-[var(--text)] border border-white/30 rounded-lg bg-white/10 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                className={inputClasses}
                 aria-label="User Username"
               />
+              {userErrors.username && <p className="text-red-400 text-xs text-left -mt-1 mb-2">{userErrors.username}</p>}
               <button
                 type="submit"
                 className="bg-[var(--accent)] text-white border-none py-3 px-6 rounded-lg flex items-center justify-center w-full gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300 mt-4"
@@ -104,17 +144,19 @@ const Login = () => {
                 value={vendorName}
                 onChange={(e) => setVendorName(e.target.value)}
                 placeholder="Vendor Name"
-                className="w-full p-3 my-2 text-[var(--text)] border border-white/30 rounded-lg bg-white/10 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                className={inputClasses}
                 aria-label="Vendor Name"
               />
+              {vendorErrors.name && <p className="text-red-400 text-xs text-left -mt-1 mb-2">{vendorErrors.name}</p>}
               <input
                 type="text"
                 value={vendorStore}
                 onChange={(e) => setVendorStore(e.target.value)}
                 placeholder="Store Name"
-                className="w-full p-3 my-2 text-[var(--text)] border border-white/30 rounded-lg bg-white/10 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
+                className={inputClasses}
                 aria-label="Store Name"
               />
+              {vendorErrors.store && <p className="text-red-400 text-xs text-left -mt-1 mb-2">{vendorErrors.store}</p>}
               <button
                 type="submit"
                 className="bg-[var(--accent)] text-white border-none py-3 px-6 rounded-lg flex items-center justify-center w-full gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300 mt-4"

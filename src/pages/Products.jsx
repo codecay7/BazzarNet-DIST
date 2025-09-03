@@ -1,16 +1,27 @@
-import React, { useState, useMemo, useContext } from 'react';
+import React, { useState, useMemo, useContext, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCartPlus, faHeart, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
 import { Link } from 'react-router-dom';
 import { stores, allProducts } from '../data/mockData';
 import { ChevronDown } from 'lucide-react';
+import SkeletonCard from '../components/SkeletonCard'; // Import SkeletonCard
 
 const Products = () => {
-  const { addToCart, addToWishlist } = useContext(AppContext);
+  const { addToCart, addToWishlist, simulateLoading } = useContext(AppContext);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStore, setSelectedStore] = useState('all');
   const [sortBy, setSortBy] = useState('name-asc');
+  const [loading, setLoading] = useState(true); // Add loading state
+
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      await simulateLoading(800); // Simulate a network request
+      setLoading(false);
+    };
+    loadData();
+  }, [searchTerm, selectedStore, sortBy, simulateLoading]); // Re-run loading when filters change
 
   const filteredAndSortedProducts = useMemo(() => {
     let products = allProducts;
@@ -93,7 +104,13 @@ const Products = () => {
         </div>
 
         {/* Products Grid */}
-        {filteredAndSortedProducts.length > 0 ? (
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[...Array(6)].map((_, index) => ( // Show 6 skeleton cards while loading
+              <SkeletonCard key={index} />
+            ))}
+          </div>
+        ) : filteredAndSortedProducts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {filteredAndSortedProducts.map((product) => (
               <div key={product.id} className="bg-black/10 border border-white/10 rounded-2xl p-6 hover:-translate-y-1 transition-transform duration-300 flex flex-col shadow-lg">

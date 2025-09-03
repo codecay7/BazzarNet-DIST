@@ -1,12 +1,25 @@
-import React, { useState } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStore } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 import { stores } from '../data/mockData';
+import { AppContext } from '../context/AppContext'; // Import AppContext
+import SkeletonCard from '../components/SkeletonCard'; // Import SkeletonCard
 
 const Stores = () => {
   const navigate = useNavigate();
+  const { simulateLoading } = useContext(AppContext); // Use simulateLoading
   const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(true); // Add loading state
+
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      await simulateLoading(800); // Simulate a network request
+      setLoading(false);
+    };
+    loadData();
+  }, [searchTerm, simulateLoading]); // Re-run loading when search term changes
 
   const filteredStores = stores.filter(store =>
     store.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -28,7 +41,13 @@ const Stores = () => {
           />
         </div>
 
-        {filteredStores.length > 0 ? (
+        {loading ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+            {[...Array(4)].map((_, index) => ( // Show 4 skeleton cards while loading
+              <SkeletonCard key={index} />
+            ))}
+          </div>
+        ) : filteredStores.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {filteredStores.map((store) => (
               <div key={store.id} className="bg-black/10 border border-white/10 rounded-2xl p-6 hover:-translate-y-1 transition-transform duration-300 flex flex-col shadow-lg">

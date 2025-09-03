@@ -32,6 +32,11 @@ export const AppProvider = ({ children }) => {
     setSidebarOpen(!sidebarOpen);
   };
 
+  // Simulate Loading
+  const simulateLoading = (delay = 1000) => {
+    return new Promise(resolve => setTimeout(resolve, delay));
+  };
+
   // Login Functions
   const loginAsUser = (name, username) => {
     if (!name || !username) {
@@ -192,6 +197,7 @@ export const AppProvider = ({ children }) => {
     deleteVendorProduct,
     orders,
     updateOrderStatus,
+    simulateLoading, // Expose simulateLoading
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

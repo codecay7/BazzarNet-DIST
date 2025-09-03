@@ -1,15 +1,26 @@
-import React, { useContext, useState, useMemo } from 'react';
+import React, { useContext, useState, useMemo, useEffect } from 'react';
 import { AppContext } from '../context/AppContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faEdit, faTrash, faBoxOpen } from '@fortawesome/free-solid-svg-icons';
 import Modal from '../components/Modal';
 import ProductForm from '../components/ProductForm';
+import SkeletonCard from '../components/SkeletonCard'; // Import SkeletonCard
 
 const ManageProducts = () => {
-  const { vendorProducts, addVendorProduct, editVendorProduct, deleteVendorProduct } = useContext(AppContext);
+  const { vendorProducts, addVendorProduct, editVendorProduct, deleteVendorProduct, simulateLoading } = useContext(AppContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
+  const [loading, setLoading] = useState(true); // Add loading state
+
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      await simulateLoading(800); // Simulate a network request
+      setLoading(false);
+    };
+    loadData();
+  }, [searchTerm, vendorProducts.length, simulateLoading]); // Re-run loading when filters or product count changes
 
   const handleOpenModal = (product = null) => {
     setEditingProduct(product);
@@ -67,7 +78,13 @@ const ManageProducts = () => {
             </div>
           </div>
 
-          {filteredProducts.length > 0 ? (
+          {loading ? (
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {[...Array(3)].map((_, index) => ( // Show 3 skeleton cards while loading
+                <SkeletonCard key={index} />
+              ))}
+            </div>
+          ) : filteredProducts.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {filteredProducts.map((product, index) => {
                 const discount = calculateDiscount(product.price, product.originalPrice);
