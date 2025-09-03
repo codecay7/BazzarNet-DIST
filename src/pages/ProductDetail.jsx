@@ -24,10 +24,10 @@ const ProductDetail = () => {
     const halfStar = rating % 1 !== 0;
     const stars = [];
     for (let i = 0; i < fullStars; i++) {
-      stars.push(<FontAwesomeIcon key={`full-${i}`} icon={faStar} className="text-yellow-400" />);
+      stars.push(<FontAwesomeIcon key={`full-${i}`} icon={faStar} className="text-yellow-400" aria-hidden="true" />);
     }
     if (halfStar) {
-      stars.push(<FontAwesomeIcon key="half" icon={faStarHalfAlt} className="text-yellow-400" />);
+      stars.push(<FontAwesomeIcon key="half" icon={faStarHalfAlt} className="text-yellow-400" aria-hidden="true" />);
     }
     return stars;
   };
@@ -41,7 +41,7 @@ const ProductDetail = () => {
           </div>
           <div>
             <h2 className="text-3xl md:text-4xl font-bold mb-2">{product.name}</h2>
-            <div className="flex items-center gap-2 mb-4">
+            <div className="flex items-center gap-2 mb-4" aria-label={`Rating: ${product.rating} out of 5 stars, based on ${product.reviews} reviews`}>
               <div className="flex">{renderStars(product.rating)}</div>
               <span className="text-sm text-[var(--text)] opacity-80">({product.reviews} reviews)</span>
             </div>
@@ -51,14 +51,16 @@ const ProductDetail = () => {
               <button
                 className="bg-[var(--accent)] text-white border-none py-3 px-6 rounded-lg flex items-center gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300"
                 onClick={() => addToCart(product)}
+                aria-label={`Add ${product.name} to cart`}
               >
-                <FontAwesomeIcon icon={faCartPlus} /> Add to Cart
+                <FontAwesomeIcon icon={faCartPlus} aria-hidden="true" /> Add to Cart
               </button>
               <button
                 className="bg-gray-200 text-gray-800 border-none py-3 px-6 rounded-lg flex items-center gap-2 font-medium hover:bg-gray-300 transition-all duration-300"
                 onClick={() => addToWishlist(product)}
+                aria-label={`Add ${product.name} to wishlist`}
               >
-                <FontAwesomeIcon icon={faHeart} /> Add to Wishlist
+                <FontAwesomeIcon icon={faHeart} aria-hidden="true" /> Add to Wishlist
               </button>
             </div>
           </div>

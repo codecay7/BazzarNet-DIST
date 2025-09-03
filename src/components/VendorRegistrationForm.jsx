@@ -103,60 +103,148 @@ const VendorRegistrationForm = () => {
       exit="exit"
       onSubmit={handleRegistration}
       className="flex flex-col text-left gap-2"
+      aria-label="Vendor Registration Form"
     >
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="text-sm font-medium">Full Name</label>
-          <input type="text" name="fullName" value={formData.fullName} onChange={handleChange} className={inputClasses} />
-          {errors.fullName && <p className="text-red-400 text-xs mt-1">{errors.fullName}</p>}
+          <label htmlFor="vendorFullName" className="text-sm font-medium">Full Name</label>
+          <input 
+            type="text" 
+            id="vendorFullName"
+            name="fullName" 
+            value={formData.fullName} 
+            onChange={handleChange} 
+            className={inputClasses} 
+            aria-invalid={!!errors.fullName}
+            aria-describedby={errors.fullName ? "vendorFullName-error" : undefined}
+          />
+          {errors.fullName && <p id="vendorFullName-error" className="text-red-400 text-xs mt-1">{errors.fullName}</p>}
         </div>
         <div>
-          <label className="text-sm font-medium">Business Name</label>
-          <input type="text" name="businessName" value={formData.businessName} onChange={handleChange} className={inputClasses} />
-          {errors.businessName && <p className="text-red-400 text-xs mt-1">{errors.businessName}</p>}
+          <label htmlFor="businessName" className="text-sm font-medium">Business Name</label>
+          <input 
+            type="text" 
+            id="businessName"
+            name="businessName" 
+            value={formData.businessName} 
+            onChange={handleChange} 
+            className={inputClasses} 
+            aria-invalid={!!errors.businessName}
+            aria-describedby={errors.businessName ? "businessName-error" : undefined}
+          />
+          {errors.businessName && <p id="businessName-error" className="text-red-400 text-xs mt-1">{errors.businessName}</p>}
         </div>
         <div>
-          <label className="text-sm font-medium">Email</label>
-          <input type="email" name="email" value={formData.email} onChange={handleChange} className={inputClasses} />
-          {errors.email && <p className="text-red-400 text-xs mt-1">{errors.email}</p>}
+          <label htmlFor="vendorEmail" className="text-sm font-medium">Email</label>
+          <input 
+            type="email" 
+            id="vendorEmail"
+            name="email" 
+            value={formData.email} 
+            onChange={handleChange} 
+            className={inputClasses} 
+            aria-invalid={!!errors.email}
+            aria-describedby={errors.email ? "vendorEmail-error" : undefined}
+          />
+          {errors.email && <p id="vendorEmail-error" className="text-red-400 text-xs mt-1">{errors.email}</p>}
         </div>
         <div>
-          <label className="text-sm font-medium">Phone</label>
-          <input type="tel" name="phone" value={formData.phone} onChange={handleChange} className={inputClasses} />
-          {errors.phone && <p className="text-red-400 text-xs mt-1">{errors.phone}</p>}
+          <label htmlFor="vendorPhone" className="text-sm font-medium">Phone</label>
+          <input 
+            type="tel" 
+            id="vendorPhone"
+            name="phone" 
+            value={formData.phone} 
+            onChange={handleChange} 
+            className={inputClasses} 
+            aria-invalid={!!errors.phone}
+            aria-describedby={errors.phone ? "vendorPhone-error" : undefined}
+          />
+          {errors.phone && <p id="vendorPhone-error" className="text-red-400 text-xs mt-1">{errors.phone}</p>}
         </div>
         <div>
-          <label className="text-sm font-medium">PAN</label>
-          <input type="text" name="pan" value={formData.pan} onChange={handleChange} className={inputClasses} />
-          {errors.pan && <p className="text-red-400 text-xs mt-1">{errors.pan}</p>}
+          <label htmlFor="vendorPan" className="text-sm font-medium">PAN</label>
+          <input 
+            type="text" 
+            id="vendorPan"
+            name="pan" 
+            value={formData.pan} 
+            onChange={handleChange} 
+            className={inputClasses} 
+            aria-invalid={!!errors.pan}
+            aria-describedby={errors.pan ? "vendorPan-error" : undefined}
+          />
+          {errors.pan && <p id="vendorPan-error" className="text-red-400 text-xs mt-1">{errors.pan}</p>}
         </div>
         <div>
-          <label className="text-sm font-medium">GST (optional)</label>
-          <input type="text" name="gst" value={formData.gst} onChange={handleChange} className={inputClasses} />
+          <label htmlFor="vendorGst" className="text-sm font-medium">GST (optional)</label>
+          <input 
+            type="text" 
+            id="vendorGst"
+            name="gst" 
+            value={formData.gst} 
+            onChange={handleChange} 
+            className={inputClasses} 
+          />
         </div>
       </div>
       <div>
-        <label className="text-sm font-medium">Address</label>
-        <input type="text" name="address" value={formData.address} onChange={handleChange} className={inputClasses} />
-        {errors.address && <p className="text-red-400 text-xs mt-1">{errors.address}</p>}
+        <label htmlFor="vendorAddress" className="text-sm font-medium">Address</label>
+        <input 
+          type="text" 
+          id="vendorAddress"
+          name="address" 
+          value={formData.address} 
+          onChange={handleChange} 
+          className={inputClasses} 
+          aria-invalid={!!errors.address}
+          aria-describedby={errors.address ? "vendorAddress-error" : undefined}
+        />
+        {errors.address && <p id="vendorAddress-error" className="text-red-400 text-xs mt-1">{errors.address}</p>}
       </div>
       <div>
-        <label className="text-sm font-medium">Business Description</label>
-        <textarea name="description" rows="2" value={formData.description} onChange={handleChange} className={inputClasses}></textarea>
-        {errors.description && <p className="text-red-400 text-xs mt-1">{errors.description}</p>}
+        <label htmlFor="vendorDescription" className="text-sm font-medium">Business Description</label>
+        <textarea 
+          name="description" 
+          id="vendorDescription"
+          rows="2" 
+          value={formData.description} 
+          onChange={handleChange} 
+          className={inputClasses}
+          aria-invalid={!!errors.description}
+          aria-describedby={errors.description ? "vendorDescription-error" : undefined}
+        ></textarea>
+        {errors.description && <p id="vendorDescription-error" className="text-red-400 text-xs mt-1">{errors.description}</p>}
       </div>
       <div className="relative">
-        <label className="text-sm font-medium">Category</label>
-        <select name="category" value={formData.category} onChange={handleChange} className={`${inputClasses} appearance-none pr-8`}>
+        <label htmlFor="vendorCategory" className="text-sm font-medium">Category</label>
+        <select 
+          name="category" 
+          id="vendorCategory"
+          value={formData.category} 
+          onChange={handleChange} 
+          className={`${inputClasses} appearance-none pr-8`}
+          aria-invalid={!!errors.category}
+          aria-describedby={errors.category ? "vendorCategory-error" : undefined}
+        >
           {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
         </select>
-        <div className="pointer-events-none absolute inset-y-0 right-0 top-5 flex items-center px-2 text-[var(--text)]"><ChevronDown size={20} /></div>
-        {errors.category && <p className="text-red-400 text-xs mt-1">{errors.category}</p>}
+        <div className="pointer-events-none absolute inset-y-0 right-0 top-5 flex items-center px-2 text-[var(--text)]" aria-hidden="true"><ChevronDown size={20} /></div>
+        {errors.category && <p id="vendorCategory-error" className="text-red-400 text-xs mt-1">{errors.category}</p>}
       </div>
       <div>
-        <label className="text-sm font-medium">Password</label>
-        <input type="password" name="password" value={formData.password} onChange={handleChange} className={inputClasses} />
-        {errors.password && <p className="text-red-400 text-xs mt-1">{errors.password}</p>}
+        <label htmlFor="vendorPassword" className="text-sm font-medium">Password</label>
+        <input 
+          type="password" 
+          id="vendorPassword"
+          name="password" 
+          value={formData.password} 
+          onChange={handleChange} 
+          className={inputClasses} 
+          aria-invalid={!!errors.password}
+          aria-describedby={errors.password ? "vendorPassword-error" : undefined}
+        />
+        {errors.password && <p id="vendorPassword-error" className="text-red-400 text-xs mt-1">{errors.password}</p>}
       </div>
       <button type="submit" className="bg-[var(--accent)] text-white border-none py-3 px-6 rounded-lg flex items-center justify-center w-full gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300 mt-4">
         Register Business

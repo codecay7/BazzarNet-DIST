@@ -53,6 +53,9 @@ const MobileNav = () => {
             exit="exit"
             variants={menuVariants}
             className="absolute top-full left-0 w-full bg-[var(--card-bg)] backdrop-blur-[5px] shadow-lg z-[999] p-5 border-t border-white/10"
+            role="dialog"
+            aria-modal="true"
+            aria-label="Mobile Navigation Menu"
           >
             <nav className="flex flex-col items-center">
               {links.map((link) => (
@@ -61,8 +64,9 @@ const MobileNav = () => {
                   to={link.path}
                   onClick={toggleSidebar}
                   className="flex items-center text-[var(--text)] w-full justify-center my-2 p-3 no-underline text-lg font-medium hover:bg-white/10 rounded-lg transition-colors duration-200"
+                  aria-label={link.name}
                 >
-                  <FontAwesomeIcon icon={link.icon} className="mr-3 w-5 text-center" />
+                  <FontAwesomeIcon icon={link.icon} className="mr-3 w-5 text-center" aria-hidden="true" />
                   {link.name}
                 </Link>
               ))}
@@ -72,7 +76,7 @@ const MobileNav = () => {
                 onClick={(e) => { e.preventDefault(); handleLogout(); }}
                 aria-label="Logout"
               >
-                <FontAwesomeIcon icon={faSignOutAlt} className="mr-3 w-5 text-center" />
+                <FontAwesomeIcon icon={faSignOutAlt} className="mr-3 w-5 text-center" aria-hidden="true" />
                 Logout
               </a>
             </nav>
@@ -80,6 +84,7 @@ const MobileNav = () => {
           <div
             className="fixed inset-0 bg-black/50 z-[998] mt-[72px]"
             onClick={toggleSidebar}
+            aria-hidden="true"
           ></div>
         </>
       )}

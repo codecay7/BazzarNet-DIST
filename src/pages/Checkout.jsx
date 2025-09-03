@@ -110,16 +110,24 @@ const Checkout = () => {
       <div className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-8 mx-4">
         <h2 className="text-3xl font-bold mb-5 md:text-4xl text-center">Checkout</h2>
         
-        <div className="flex justify-center bg-black/10 rounded-lg p-1 mb-6 max-w-sm mx-auto">
+        <div className="flex justify-center bg-black/10 rounded-lg p-1 mb-6 max-w-sm mx-auto" role="tablist">
           <button
             onClick={() => setPaymentMethod('card')}
             className={`w-1/2 py-2 rounded-md font-semibold transition-colors duration-300 ${paymentMethod === 'card' ? 'bg-[var(--accent)] text-white' : 'text-[var(--text)]'}`}
+            role="tab"
+            aria-selected={paymentMethod === 'card'}
+            aria-controls="card-payment-panel"
+            id="card-payment-tab"
           >
             Card Payment
           </button>
           <button
             onClick={() => setPaymentMethod('upi')}
             className={`w-1/2 py-2 rounded-md font-semibold transition-colors duration-300 ${paymentMethod === 'upi' ? 'bg-[var(--accent)] text-white' : 'text-[var(--text)]'}`}
+            role="tab"
+            aria-selected={paymentMethod === 'upi'}
+            aria-controls="upi-payment-panel"
+            id="upi-payment-tab"
           >
             UPI
           </button>
@@ -134,17 +142,67 @@ const Checkout = () => {
               animate="visible"
               exit="exit"
               className="flex flex-col gap-4 max-w-[500px] mx-auto"
+              role="tabpanel"
+              id="card-payment-panel"
+              aria-labelledby="card-payment-tab"
             >
-              <input type="text" name="shippingAddress" value={cardFormData.shippingAddress} onChange={handleCardChange} placeholder="Shipping Address" className={inputClasses} />
-              {cardErrors.shippingAddress && <p className="text-red-400 text-xs -mt-3">{cardErrors.shippingAddress}</p>}
-              <input type="text" name="cardNumber" value={cardFormData.cardNumber} onChange={handleCardChange} placeholder="Credit Card Number" className={inputClasses} />
-              {cardErrors.cardNumber && <p className="text-red-400 text-xs -mt-3">{cardErrors.cardNumber}</p>}
-              <input type="text" name="expiryDate" value={cardFormData.expiryDate} onChange={handleCardChange} placeholder="Expiration Date (MM/YY)" className={inputClasses} />
-              {cardErrors.expiryDate && <p className="text-red-400 text-xs -mt-3">{cardErrors.expiryDate}</p>}
-              <input type="text" name="cvv" value={cardFormData.cvv} onChange={handleCardChange} placeholder="CVV" className={inputClasses} />
-              {cardErrors.cvv && <p className="text-red-400 text-xs -mt-3">{cardErrors.cvv}</p>}
+              <label htmlFor="cardShippingAddress" className="sr-only">Shipping Address</label>
+              <input 
+                type="text" 
+                id="cardShippingAddress"
+                name="shippingAddress" 
+                value={cardFormData.shippingAddress} 
+                onChange={handleCardChange} 
+                placeholder="Shipping Address" 
+                className={inputClasses} 
+                aria-invalid={!!cardErrors.shippingAddress}
+                aria-describedby={cardErrors.shippingAddress ? "cardShippingAddress-error" : undefined}
+              />
+              {cardErrors.shippingAddress && <p id="cardShippingAddress-error" className="text-red-400 text-xs -mt-3">{cardErrors.shippingAddress}</p>}
+              
+              <label htmlFor="cardNumber" className="sr-only">Credit Card Number</label>
+              <input 
+                type="text" 
+                id="cardNumber"
+                name="cardNumber" 
+                value={cardFormData.cardNumber} 
+                onChange={handleCardChange} 
+                placeholder="Credit Card Number" 
+                className={inputClasses} 
+                aria-invalid={!!cardErrors.cardNumber}
+                aria-describedby={cardErrors.cardNumber ? "cardNumber-error" : undefined}
+              />
+              {cardErrors.cardNumber && <p id="cardNumber-error" className="text-red-400 text-xs -mt-3">{cardErrors.cardNumber}</p>}
+              
+              <label htmlFor="expiryDate" className="sr-only">Expiration Date (MM/YY)</label>
+              <input 
+                type="text" 
+                id="expiryDate"
+                name="expiryDate" 
+                value={cardFormData.expiryDate} 
+                onChange={handleCardChange} 
+                placeholder="Expiration Date (MM/YY)" 
+                className={inputClasses} 
+                aria-invalid={!!cardErrors.expiryDate}
+                aria-describedby={cardErrors.expiryDate ? "expiryDate-error" : undefined}
+              />
+              {cardErrors.expiryDate && <p id="expiryDate-error" className="text-red-400 text-xs -mt-3">{cardErrors.expiryDate}</p>}
+              
+              <label htmlFor="cvv" className="sr-only">CVV</label>
+              <input 
+                type="text" 
+                id="cvv"
+                name="cvv" 
+                value={cardFormData.cvv} 
+                onChange={handleCardChange} 
+                placeholder="CVV" 
+                className={inputClasses} 
+                aria-invalid={!!cardErrors.cvv}
+                aria-describedby={cardErrors.cvv ? "cvv-error" : undefined}
+              />
+              {cardErrors.cvv && <p id="cvv-error" className="text-red-400 text-xs -mt-3">{cardErrors.cvv}</p>}
               <button type="button" onClick={handleCheckout} className="bg-[var(--accent)] text-white border-none py-2 px-6 rounded-lg flex items-center justify-center gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300">
-                <FontAwesomeIcon icon={faCreditCard} /> Pay Now
+                <FontAwesomeIcon icon={faCreditCard} aria-hidden="true" /> Pay Now
               </button>
             </motion.form>
           ) : (
@@ -155,11 +213,37 @@ const Checkout = () => {
               animate="visible"
               exit="exit"
               className="flex flex-col gap-4 max-w-[500px] mx-auto"
+              role="tabpanel"
+              id="upi-payment-panel"
+              aria-labelledby="upi-payment-tab"
             >
-              <input type="text" name="shippingAddress" value={upiFormData.shippingAddress} onChange={handleUpiChange} placeholder="Shipping Address" className={inputClasses} />
-              {upiErrors.shippingAddress && <p className="text-red-400 text-xs -mt-3">{upiErrors.shippingAddress}</p>}
-              <input type="text" name="upiId" value={upiFormData.upiId} onChange={handleUpiChange} placeholder="Enter your UPI ID" className={inputClasses} />
-              {upiErrors.upiId && <p className="text-red-400 text-xs -mt-3">{upiErrors.upiId}</p>}
+              <label htmlFor="upiShippingAddress" className="sr-only">Shipping Address</label>
+              <input 
+                type="text" 
+                id="upiShippingAddress"
+                name="shippingAddress" 
+                value={upiFormData.shippingAddress} 
+                onChange={handleUpiChange} 
+                placeholder="Shipping Address" 
+                className={inputClasses} 
+                aria-invalid={!!upiErrors.shippingAddress}
+                aria-describedby={upiErrors.shippingAddress ? "upiShippingAddress-error" : undefined}
+              />
+              {upiErrors.shippingAddress && <p id="upiShippingAddress-error" className="text-red-400 text-xs -mt-3">{upiErrors.shippingAddress}</p>}
+              
+              <label htmlFor="upiId" className="sr-only">UPI ID</label>
+              <input 
+                type="text" 
+                id="upiId"
+                name="upiId" 
+                value={upiFormData.upiId} 
+                onChange={handleUpiChange} 
+                placeholder="Enter your UPI ID" 
+                className={inputClasses} 
+                aria-invalid={!!upiErrors.upiId}
+                aria-describedby={upiErrors.upiId ? "upiId-error" : undefined}
+              />
+              {upiErrors.upiId && <p id="upiId-error" className="text-red-400 text-xs -mt-3">{upiErrors.upiId}</p>}
               <p className="text-xs text-center opacity-70">e.g., yourname@okhdfcbank</p>
               <button type="button" onClick={handleCheckout} className="bg-[var(--accent)] text-white border-none py-2 px-6 rounded-lg flex items-center justify-center gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300">
                 Pay with UPI

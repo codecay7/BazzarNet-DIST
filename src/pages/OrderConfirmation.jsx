@@ -25,19 +25,19 @@ const OrderConfirmation = () => {
   return (
     <section className="w-full max-w-[1200px] my-10">
       <div className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-8 mx-4 text-center">
-        <FontAwesomeIcon icon={faCheckCircle} className="text-6xl text-green-500 mb-4" />
+        <FontAwesomeIcon icon={faCheckCircle} className="text-6xl text-green-500 mb-4" aria-hidden="true" />
         <h2 className="text-3xl font-bold mb-2">Thank You for Your Order, {user?.name}!</h2>
         <p className="text-lg mb-6">Your order has been placed successfully.</p>
         
-        <div className="text-left max-w-md mx-auto bg-black/10 p-6 rounded-lg">
-            <h3 className="text-xl font-semibold mb-4 border-b border-white/20 pb-2">Order Summary</h3>
+        <div className="text-left max-w-md mx-auto bg-black/10 p-6 rounded-lg" aria-labelledby="order-summary-heading">
+            <h3 id="order-summary-heading" className="text-xl font-semibold mb-4 border-b border-white/20 pb-2">Order Summary</h3>
             <p className="mb-2"><strong>Order ID:</strong> #{orderId}</p>
             <p className="mb-4"><strong>Total:</strong> ₹{total.toFixed(2)}</p>
             <div className="mb-4">
                 <h4 className="font-semibold">Items:</h4>
-                <ul>
+                <ul role="list">
                     {cart.map(item => (
-                        <li key={item.id} className="flex justify-between py-1">
+                        <li key={item.id} className="flex justify-between py-1" role="listitem">
                             <span>{item.name} x {item.quantity}</span>
                             <span>₹{(item.price * item.quantity).toFixed(2)}</span>
                         </li>

@@ -30,10 +30,10 @@ const StorePage = () => {
         </div>
         
         <h3 className="text-2xl font-bold mb-6">Products</h3>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8" role="list">
           {store.products.map((product) => (
-            <div key={product.id} className="bg-black/10 border border-white/10 rounded-2xl p-6 hover:-translate-y-1 transition-transform duration-300 flex flex-col shadow-lg">
-              <Link to={`/products/${product.id}`} className="flex-grow">
+            <div key={product.id} className="bg-black/10 border border-white/10 rounded-2xl p-6 hover:-translate-y-1 transition-transform duration-300 flex flex-col shadow-lg" role="listitem">
+              <Link to={`/products/${product.id}`} className="flex-grow" aria-label={`View details for ${product.name}`}>
                 <img src={product.image} alt={product.name} className="w-full h-48 object-cover rounded-lg mb-4" />
                 <h3 className="text-xl font-semibold mb-2">{product.name}</h3>
                 <p className="text-lg font-bold text-[var(--accent)]">₹{product.price.toFixed(2)}</p>
@@ -42,14 +42,16 @@ const StorePage = () => {
                 <button
                   className="flex-1 bg-[var(--accent)] text-white border-none py-2 px-4 rounded-lg flex items-center justify-center gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300"
                   onClick={() => addToCart(product)}
+                  aria-label={`Add ${product.name} to cart`}
                 >
-                  <FontAwesomeIcon icon={faCartPlus} /> Cart
+                  <FontAwesomeIcon icon={faCartPlus} aria-hidden="true" /> Cart
                 </button>
                 <button
                   className="bg-white/10 text-[var(--text)] border-none py-2 px-4 rounded-lg flex items-center justify-center gap-2 font-medium hover:bg-white/20 transition-all duration-300"
                   onClick={() => addToWishlist(product)}
+                  aria-label={`Add ${product.name} to wishlist`}
                 >
-                  <FontAwesomeIcon icon={faHeart} />
+                  <FontAwesomeIcon icon={faHeart} aria-hidden="true" />
                 </button>
               </div>
             </div>

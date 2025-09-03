@@ -78,16 +78,24 @@ const Login = () => {
       <div className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl flex flex-col p-8 shadow-[0_8px_40px_var(--shadow)] w-full max-w-[400px] mx-4 text-center text-[var(--auth-text)]">
         <h2 className="text-3xl font-bold mb-6 text-[var(--accent)]">Welcome to BazzarNet</h2>
         
-        <div className="flex justify-center bg-black/10 rounded-lg p-1 mb-6">
+        <div className="flex justify-center bg-black/10 rounded-lg p-1 mb-6" role="tablist">
           <button
             onClick={() => setActiveTab('user')}
             className={`w-1/2 py-2 rounded-md font-semibold transition-colors duration-300 ${activeTab === 'user' ? 'bg-[var(--accent)] text-white' : 'text-[var(--text)]'}`}
+            role="tab"
+            aria-selected={activeTab === 'user'}
+            aria-controls="user-login-panel"
+            id="user-login-tab"
           >
             User
           </button>
           <button
             onClick={() => setActiveTab('vendor')}
             className={`w-1/2 py-2 rounded-md font-semibold transition-colors duration-300 ${activeTab === 'vendor' ? 'bg-[var(--accent)] text-white' : 'text-[var(--text)]'}`}
+            role="tab"
+            aria-selected={activeTab === 'vendor'}
+            aria-controls="vendor-login-panel"
+            id="vendor-login-tab"
           >
             Vendor
           </button>
@@ -103,30 +111,40 @@ const Login = () => {
               exit="exit"
               onSubmit={handleUserLogin}
               className="flex flex-col"
+              role="tabpanel"
+              id="user-login-panel"
+              aria-labelledby="user-login-tab"
             >
+              <label htmlFor="userName" className="sr-only">User Name</label>
               <input
                 type="text"
+                id="userName"
                 value={userName}
                 onChange={(e) => setUserName(e.target.value)}
                 placeholder="Name"
                 className={inputClasses}
-                aria-label="User Name"
+                aria-invalid={!!userErrors.name}
+                aria-describedby={userErrors.name ? "userName-error" : undefined}
               />
-              {userErrors.name && <p className="text-red-400 text-xs text-left -mt-1 mb-2">{userErrors.name}</p>}
+              {userErrors.name && <p id="userName-error" className="text-red-400 text-xs text-left -mt-1 mb-2">{userErrors.name}</p>}
+              
+              <label htmlFor="userUsername" className="sr-only">Username</label>
               <input
                 type="text"
+                id="userUsername"
                 value={userUsername}
                 onChange={(e) => setUserUsername(e.target.value)}
                 placeholder="Username"
                 className={inputClasses}
-                aria-label="User Username"
+                aria-invalid={!!userErrors.username}
+                aria-describedby={userErrors.username ? "userUsername-error" : undefined}
               />
-              {userErrors.username && <p className="text-red-400 text-xs text-left -mt-1 mb-2">{userErrors.username}</p>}
+              {userErrors.username && <p id="userUsername-error" className="text-red-400 text-xs text-left -mt-1 mb-2">{userErrors.username}</p>}
               <button
                 type="submit"
                 className="bg-[var(--accent)] text-white border-none py-3 px-6 rounded-lg flex items-center justify-center w-full gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300 mt-4"
               >
-                <FontAwesomeIcon icon={faSignInAlt} /> Sign in as User
+                <FontAwesomeIcon icon={faSignInAlt} aria-hidden="true" /> Sign in as User
               </button>
             </motion.form>
           ) : (
@@ -138,30 +156,40 @@ const Login = () => {
               exit="exit"
               onSubmit={handleVendorLogin}
               className="flex flex-col"
+              role="tabpanel"
+              id="vendor-login-panel"
+              aria-labelledby="vendor-login-tab"
             >
+              <label htmlFor="vendorName" className="sr-only">Vendor Name</label>
               <input
                 type="text"
+                id="vendorName"
                 value={vendorName}
                 onChange={(e) => setVendorName(e.target.value)}
                 placeholder="Vendor Name"
                 className={inputClasses}
-                aria-label="Vendor Name"
+                aria-invalid={!!vendorErrors.name}
+                aria-describedby={vendorErrors.name ? "vendorName-error" : undefined}
               />
-              {vendorErrors.name && <p className="text-red-400 text-xs text-left -mt-1 mb-2">{vendorErrors.name}</p>}
+              {vendorErrors.name && <p id="vendorName-error" className="text-red-400 text-xs text-left -mt-1 mb-2">{vendorErrors.name}</p>}
+              
+              <label htmlFor="vendorStore" className="sr-only">Store Name</label>
               <input
                 type="text"
+                id="vendorStore"
                 value={vendorStore}
                 onChange={(e) => setVendorStore(e.target.value)}
                 placeholder="Store Name"
                 className={inputClasses}
-                aria-label="Store Name"
+                aria-invalid={!!vendorErrors.store}
+                aria-describedby={vendorErrors.store ? "vendorStore-error" : undefined}
               />
-              {vendorErrors.store && <p className="text-red-400 text-xs text-left -mt-1 mb-2">{vendorErrors.store}</p>}
+              {vendorErrors.store && <p id="vendorStore-error" className="text-red-400 text-xs text-left -mt-1 mb-2">{vendorErrors.store}</p>}
               <button
                 type="submit"
                 className="bg-[var(--accent)] text-white border-none py-3 px-6 rounded-lg flex items-center justify-center w-full gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300 mt-4"
               >
-                <FontAwesomeIcon icon={faSignInAlt} /> Sign in as Vendor
+                <FontAwesomeIcon icon={faSignInAlt} aria-hidden="true" /> Sign in as Vendor
               </button>
             </motion.form>
           )}

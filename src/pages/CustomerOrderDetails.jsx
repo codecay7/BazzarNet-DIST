@@ -33,17 +33,17 @@ const CustomerOrderDetails = () => {
         {/* Order Tracker */}
         <div className="bg-black/10 p-6 rounded-xl mb-8">
           <h3 className="text-xl font-semibold mb-6">Order Status: <span className="text-[var(--accent)]">{order.status}</span></h3>
-          <div className="flex items-center">
+          <div className="flex items-center" role="progressbar" aria-valuenow={steps.filter(s => s.completed).length} aria-valuemin="0" aria-valuemax={steps.length} aria-label={`Order ${order.id} progress`}>
             {steps.map((step, index) => (
               <React.Fragment key={step.name}>
                 <div className="flex flex-col items-center">
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center border-2 ${step.completed ? 'bg-[var(--accent)] border-[var(--accent)] text-white' : 'bg-transparent border-gray-500 text-gray-500'}`}>
+                  <div className={`w-12 h-12 rounded-full flex items-center justify-center border-2 ${step.completed ? 'bg-[var(--accent)] border-[var(--accent)] text-white' : 'bg-transparent border-gray-500 text-gray-500'}`} aria-hidden="true">
                     <FontAwesomeIcon icon={step.icon} size="lg" />
                   </div>
                   <p className={`text-sm mt-2 text-center ${step.completed ? 'font-semibold' : 'opacity-70'}`}>{step.name}</p>
                 </div>
                 {index < steps.length - 1 && (
-                  <div className={`flex-1 h-1 mx-2 ${step.completed ? 'bg-[var(--accent)]' : 'bg-gray-500'}`}></div>
+                  <div className={`flex-1 h-1 mx-2 ${step.completed ? 'bg-[var(--accent)]' : 'bg-gray-500'}`} aria-hidden="true"></div>
                 )}
               </React.Fragment>
             ))}
@@ -53,9 +53,9 @@ const CustomerOrderDetails = () => {
         {/* Items List */}
         <div className="bg-black/10 p-6 rounded-xl">
           <h3 className="text-xl font-semibold mb-4">Items in Your Order</h3>
-          <div className="space-y-4">
+          <div className="space-y-4" role="list">
             {order.items.map(item => (
-              <div key={item.id} className="flex items-center gap-4 bg-black/10 p-3 rounded-lg">
+              <div key={item.id} className="flex items-center gap-4 bg-black/10 p-3 rounded-lg" role="listitem" aria-label={`Item: ${item.name}, Quantity: ${item.quantity}, Price: ₹${(item.price * item.quantity).toFixed(2)}`}>
                 <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-md" />
                 <div className="flex-grow">
                   <p className="font-semibold">{item.name}</p>

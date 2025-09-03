@@ -96,8 +96,8 @@ const CustomerDashboard = () => {
             {/* Stats Cards */}
             <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
               {stats.map(stat => (
-                <div key={stat.label} onClick={() => navigate(stat.path)} className="bg-black/10 p-6 rounded-xl flex items-center gap-4 cursor-pointer hover:bg-white/20 transition-colors duration-300">
-                  <FontAwesomeIcon icon={stat.icon} className="text-3xl text-[var(--accent)]" />
+                <div key={stat.label} onClick={() => navigate(stat.path)} className="bg-black/10 p-6 rounded-xl flex items-center gap-4 cursor-pointer hover:bg-white/20 transition-colors duration-300" role="button" tabIndex="0" aria-label={`${stat.label}: ${stat.value}. Click to view.`}>
+                  <FontAwesomeIcon icon={stat.icon} className="text-3xl text-[var(--accent)]" aria-hidden="true" />
                   <div>
                     <p className="text-sm opacity-70">{stat.label}</p>
                     <p className="text-2xl font-bold">{stat.value}</p>
@@ -115,22 +115,22 @@ const CustomerDashboard = () => {
                     <p className="font-semibold text-lg">Order {recentOrder.id}</p>
                     <p className="text-sm opacity-80">{recentOrder.items}</p>
                   </div>
-                  <button className="bg-[var(--accent)] text-white py-2 px-4 rounded-lg font-medium flex items-center gap-2 hover:bg-[var(--accent-dark)] transition-colors">
-                    <FontAwesomeIcon icon={faMapMarkerAlt} /> Track
+                  <button className="bg-[var(--accent)] text-white py-2 px-4 rounded-lg font-medium flex items-center gap-2 hover:bg-[var(--accent-dark)] transition-colors" aria-label={`Track Order ${recentOrder.id}`}>
+                    <FontAwesomeIcon icon={faMapMarkerAlt} aria-hidden="true" /> Track
                   </button>
                 </div>
                 {/* Progress Bar */}
-                <div className="flex items-center">
+                <div className="flex items-center" role="progressbar" aria-valuenow={recentOrder.steps.filter(s => s.completed).length} aria-valuemin="0" aria-valuemax={recentOrder.steps.length} aria-label={`Order ${recentOrder.id} progress`}>
                   {recentOrder.steps.map((step, index) => (
                     <React.Fragment key={step.name}>
                       <div className="flex flex-col items-center">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${step.completed ? 'bg-[var(--accent)] border-[var(--accent)] text-white' : 'bg-transparent border-gray-500 text-gray-500'}`}>
+                        <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${step.completed ? 'bg-[var(--accent)] border-[var(--accent)] text-white' : 'bg-transparent border-gray-500 text-gray-500'}`} aria-hidden="true">
                           <FontAwesomeIcon icon={faCheckCircle} />
                         </div>
                         <p className={`text-xs mt-2 ${step.completed ? 'font-semibold' : 'opacity-70'}`}>{step.name}</p>
                       </div>
                       {index < recentOrder.steps.length - 1 && (
-                        <div className={`flex-1 h-1 mx-2 ${step.completed ? 'bg-[var(--accent)]' : 'bg-gray-500'}`}></div>
+                        <div className={`flex-1 h-1 mx-2 ${step.completed ? 'bg-[var(--accent)]' : 'bg-gray-500'}`} aria-hidden="true"></div>
                       )}
                     </React.Fragment>
                   ))}
@@ -141,7 +141,7 @@ const CustomerDashboard = () => {
                 <h2 className="text-2xl font-bold mb-4">Recommended</h2>
                 <div className="space-y-4">
                   {featuredProducts.map(product => (
-                    <div key={product.id} onClick={() => navigate(`/products/${product.id}`)} className="flex items-center gap-4 cursor-pointer hover:bg-white/10 p-2 rounded-lg transition-colors">
+                    <div key={product.id} onClick={() => navigate(`/products/${product.id}`)} className="flex items-center gap-4 cursor-pointer hover:bg-white/10 p-2 rounded-lg transition-colors" role="link" tabIndex="0" aria-label={`View details for ${product.name}`}>
                       <img src={product.image} alt={product.name} className="w-12 h-12 object-cover rounded-lg" />
                       <div>
                         <p className="font-semibold">{product.name}</p>

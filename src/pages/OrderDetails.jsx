@@ -38,7 +38,7 @@ const OrderDetails = () => {
           <div className="lg:col-span-2 space-y-6">
             <div className="bg-black/10 p-6 rounded-xl">
               <h3 className="text-xl font-semibold mb-4">Order Information</h3>
-              <div className="grid grid-cols-2 gap-4">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <p><strong>Order ID:</strong> {order.id}</p>
                 <p><strong>Customer:</strong> {order.customer.name}</p>
                 <p><strong>Date:</strong> {order.date}</p>
@@ -48,9 +48,9 @@ const OrderDetails = () => {
             </div>
             <div className="bg-black/10 p-6 rounded-xl">
               <h3 className="text-xl font-semibold mb-4">Items</h3>
-              <ul className="space-y-2">
+              <ul className="space-y-2" role="list">
                 {order.items.map(item => (
-                  <li key={item.id} className="flex justify-between">
+                  <li key={item.id} className="flex justify-between" role="listitem">
                     <span>{item.name} (Qty: {item.quantity})</span>
                     <span>₹{(item.price * item.quantity).toFixed(2)}</span>
                   </li>
@@ -69,24 +69,31 @@ const OrderDetails = () => {
             <div className="bg-black/10 p-6 rounded-xl">
               <h3 className="text-xl font-semibold mb-4">Update Status</h3>
               <div className="relative mb-4">
-                <select value={status} onChange={(e) => setStatus(e.target.value)} className="w-full appearance-none p-3 rounded-lg bg-white/10 border border-black/30 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] pr-8">
+                <label htmlFor="orderStatus" className="sr-only">Order Status</label>
+                <select 
+                  id="orderStatus"
+                  value={status} 
+                  onChange={(e) => setStatus(e.target.value)} 
+                  className="w-full appearance-none p-3 rounded-lg bg-white/10 border border-black/30 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] pr-8"
+                  aria-label="Update order status"
+                >
                   <option>Pending</option>
                   <option>Shipped</option>
                   <option>Delivered</option>
                   <option>Cancelled</option>
                 </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-[var(--text)]"><ChevronDown size={20} /></div>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-[var(--text)]" aria-hidden="true"><ChevronDown size={20} /></div>
               </div>
               <button onClick={handleStatusUpdate} className="w-full bg-[var(--accent)] text-white py-2 px-4 rounded-lg font-medium">Save Changes</button>
             </div>
             <div className="bg-black/10 p-6 rounded-xl">
               <h3 className="text-xl font-semibold mb-4">Customer Contact</h3>
               <p className="mb-4"><strong>Email:</strong> {order.customer.email}</p>
-              <button onClick={() => toast.info('Contacting customer...')} className="w-full bg-white/10 text-[var(--text)] py-2 px-4 rounded-lg font-medium">Contact Customer</button>
+              <button onClick={() => toast.info('Contacting customer...')} className="w-full bg-white/10 text-[var(--text)] py-2 px-4 rounded-lg font-medium" aria-label={`Contact customer ${order.customer.name}`}>Contact Customer</button>
             </div>
             <div className="bg-black/10 p-6 rounded-xl space-y-3">
-              <button onClick={() => toast.error('Refund issued!')} className="w-full bg-red-500/20 text-red-400 py-2 px-4 rounded-lg font-medium">Issue Refund</button>
-              <button onClick={() => toast.success('Invoice downloaded!')} className="w-full bg-white/10 text-[var(--text)] py-2 px-4 rounded-lg font-medium">Download Invoice</button>
+              <button onClick={() => toast.error('Refund issued!')} className="w-full bg-red-500/20 text-red-400 py-2 px-4 rounded-lg font-medium" aria-label={`Issue refund for order ${order.id}`}>Issue Refund</button>
+              <button onClick={() => toast.success('Invoice downloaded!')} className="w-full bg-white/10 text-[var(--text)] py-2 px-4 rounded-lg font-medium" aria-label={`Download invoice for order ${order.id}`}>Download Invoice</button>
             </div>
           </div>
         </div>

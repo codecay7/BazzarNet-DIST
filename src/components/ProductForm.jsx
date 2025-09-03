@@ -102,49 +102,112 @@ const ProductForm = ({ onSubmit, initialData = null }) => {
   const inputClasses = "w-full p-2 rounded-lg bg-white/10 border border-black/30 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]";
 
   return (
-    <form onSubmit={handleSubmit} className="space-y-4">
+    <form onSubmit={handleSubmit} className="space-y-4" aria-label={initialData ? 'Edit Product Form' : 'Add New Product Form'}>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         <div>
-          <label className="block text-sm font-medium mb-1">Product Name</label>
-          <input type="text" name="name" value={product.name} onChange={handleChange} className={inputClasses} />
-          {errors.name && <p className="text-red-400 text-xs mt-1">{errors.name}</p>}
+          <label htmlFor="productName" className="block text-sm font-medium mb-1">Product Name</label>
+          <input 
+            type="text" 
+            id="productName"
+            name="name" 
+            value={product.name} 
+            onChange={handleChange} 
+            className={inputClasses} 
+            aria-invalid={!!errors.name}
+            aria-describedby={errors.name ? "productName-error" : undefined}
+          />
+          {errors.name && <p id="productName-error" className="text-red-400 text-xs mt-1">{errors.name}</p>}
         </div>
         <div className="relative">
-          <label className="block text-sm font-medium mb-1">Category</label>
-          <select name="category" value={product.category} onChange={handleChange} className={`${inputClasses} appearance-none pr-8`}>
+          <label htmlFor="productCategory" className="block text-sm font-medium mb-1">Category</label>
+          <select 
+            name="category" 
+            id="productCategory"
+            value={product.category} 
+            onChange={handleChange} 
+            className={`${inputClasses} appearance-none pr-8`}
+            aria-invalid={!!errors.category}
+            aria-describedby={errors.category ? "productCategory-error" : undefined}
+          >
             <option value="" disabled>Select a category</option>
             {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
           </select>
-          <div className="pointer-events-none absolute inset-y-0 right-0 top-6 flex items-center px-2 text-[var(--text)]"><ChevronDown size={20} /></div>
-          {errors.category && <p className="text-red-400 text-xs mt-1">{errors.category}</p>}
+          <div className="pointer-events-none absolute inset-y-0 right-0 top-6 flex items-center px-2 text-[var(--text)]" aria-hidden="true"><ChevronDown size={20} /></div>
+          {errors.category && <p id="productCategory-error" className="text-red-400 text-xs mt-1">{errors.category}</p>}
         </div>
       </div>
       <div>
-        <label className="block text-sm font-medium mb-1">Image URL</label>
-        <input type="url" name="image" value={product.image} onChange={handleChange} placeholder="https://example.com/image.png" className={inputClasses} />
-        {errors.image && <p className="text-red-400 text-xs mt-1">{errors.image}</p>}
+        <label htmlFor="productImage" className="block text-sm font-medium mb-1">Image URL</label>
+        <input 
+          type="url" 
+          id="productImage"
+          name="image" 
+          value={product.image} 
+          onChange={handleChange} 
+          placeholder="https://example.com/image.png" 
+          className={inputClasses} 
+          aria-invalid={!!errors.image}
+          aria-describedby={errors.image ? "productImage-error" : undefined}
+        />
+        {errors.image && <p id="productImage-error" className="text-red-400 text-xs mt-1">{errors.image}</p>}
       </div>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         <div>
-          <label className="block text-sm font-medium mb-1">Price (₹)</label>
-          <input type="number" name="price" value={product.price} onChange={handleChange} className={inputClasses} />
-          {errors.price && <p className="text-red-400 text-xs mt-1">{errors.price}</p>}
+          <label htmlFor="productPrice" className="block text-sm font-medium mb-1">Price (₹)</label>
+          <input 
+            type="number" 
+            id="productPrice"
+            name="price" 
+            value={product.price} 
+            onChange={handleChange} 
+            className={inputClasses} 
+            aria-invalid={!!errors.price}
+            aria-describedby={errors.price ? "productPrice-error" : undefined}
+          />
+          {errors.price && <p id="productPrice-error" className="text-red-400 text-xs mt-1">{errors.price}</p>}
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1">Original Price (Optional)</label>
-          <input type="number" name="originalPrice" value={product.originalPrice} onChange={handleChange} className={inputClasses} />
-          {errors.originalPrice && <p className="text-red-400 text-xs mt-1">{errors.originalPrice}</p>}
+          <label htmlFor="originalPrice" className="block text-sm font-medium mb-1">Original Price (Optional)</label>
+          <input 
+            type="number" 
+            id="originalPrice"
+            name="originalPrice" 
+            value={product.originalPrice} 
+            onChange={handleChange} 
+            className={inputClasses} 
+            aria-invalid={!!errors.originalPrice}
+            aria-describedby={errors.originalPrice ? "originalPrice-error" : undefined}
+          />
+          {errors.originalPrice && <p id="originalPrice-error" className="text-red-400 text-xs mt-1">{errors.originalPrice}</p>}
         </div>
         <div>
-          <label className="block text-sm font-medium mb-1">Stock</label>
-          <input type="number" name="stock" value={product.stock} onChange={handleChange} className={inputClasses} />
-          {errors.stock && <p className="text-red-400 text-xs mt-1">{errors.stock}</p>}
+          <label htmlFor="productStock" className="block text-sm font-medium mb-1">Stock</label>
+          <input 
+            type="number" 
+            id="productStock"
+            name="stock" 
+            value={product.stock} 
+            onChange={handleChange} 
+            className={inputClasses} 
+            aria-invalid={!!errors.stock}
+            aria-describedby={errors.stock ? "productStock-error" : undefined}
+          />
+          {errors.stock && <p id="productStock-error" className="text-red-400 text-xs mt-1">{errors.stock}</p>}
         </div>
       </div>
       <div>
-        <label className="block text-sm font-medium mb-1">Description</label>
-        <textarea name="description" rows="3" value={product.description} onChange={handleChange} className={inputClasses}></textarea>
-        {errors.description && <p className="text-red-400 text-xs mt-1">{errors.description}</p>}
+        <label htmlFor="productDescription" className="block text-sm font-medium mb-1">Description</label>
+        <textarea 
+          name="description" 
+          id="productDescription"
+          rows="3" 
+          value={product.description} 
+          onChange={handleChange} 
+          className={inputClasses}
+          aria-invalid={!!errors.description}
+          aria-describedby={errors.description ? "productDescription-error" : undefined}
+        ></textarea>
+        {errors.description && <p id="productDescription-error" className="text-red-400 text-xs mt-1">{errors.description}</p>}
       </div>
       <div className="flex justify-end">
         <button type="submit" className="bg-[var(--accent)] text-white py-2 px-6 rounded-lg font-medium hover:bg-[var(--accent-dark)] transition-colors">
