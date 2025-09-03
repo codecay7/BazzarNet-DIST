@@ -21,6 +21,15 @@ const Orders = () => {
     }
   };
 
+  const handleViewDetails = (orderId) => {
+    const cleanId = orderId.replace('#', '');
+    if (isVendor) {
+      navigate(`/orders/${cleanId}`);
+    } else {
+      navigate(`/my-orders/${cleanId}`);
+    }
+  };
+
   const filteredOrders = allMockOrders.filter(order =>
     order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
     order.items.some(item => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
@@ -59,7 +68,7 @@ const Orders = () => {
                       </div>
                       <button
                         className="bg-[var(--accent)] w-full md:w-fit text-white border-none py-2 px-6 rounded-lg flex items-center justify-center gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300"
-                        onClick={() => navigate(`/orders/${order.id.replace('#', '')}`)}
+                        onClick={() => handleViewDetails(order.id)}
                       >
                         View Details <FontAwesomeIcon icon={faChevronRight} />
                       </button>

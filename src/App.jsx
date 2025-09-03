@@ -18,6 +18,7 @@ import Wishlist from './pages/Wishlist';
 import ManageProducts from './pages/ManageProducts';
 import Orders from './pages/Orders';
 import OrderDetails from './pages/OrderDetails';
+import CustomerOrderDetails from './pages/CustomerOrderDetails';
 import StoreSettings from './pages/StoreSettings';
 import FAQ from './pages/FAQ';
 import About from './pages/About';
@@ -52,6 +53,7 @@ const App = () => {
                 <Route path="/wishlist" element={<Navigate to="/dashboard" />} />
                 <Route path="/faq" element={<Navigate to="/dashboard" />} />
                 <Route path="/about" element={<Navigate to="/dashboard" />} />
+                <Route path="/my-orders/:orderId" element={<Navigate to="/dashboard" />} />
               </>
             ) : (
               <>
@@ -65,6 +67,7 @@ const App = () => {
                 <Route path="/wishlist" element={<Wishlist />} />
                 <Route path="/faq" element={<FAQ />} />
                 <Route path="/about" element={<About />} />
+                <Route path="/my-orders/:orderId" element={<CustomerOrderDetails />} />
                 {/* Redirect vendor routes for customers */}
                 <Route path="/manage-products" element={<Navigate to="/dashboard" />} />
                 <Route path="/orders/:orderId" element={<Navigate to="/dashboard" />} />
