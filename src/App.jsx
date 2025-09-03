@@ -72,7 +72,7 @@ const App = () => {
             <Route element={<PublicLayout />}>
               <Route path="/" element={<Dashboard />} />
               <Route path="/faq" element={<FAQ />} />
-              <Route path="/about"={<About />} />
+              <Route path="/about" element={<About />} />
             </Route>
             <Route path="*" element={<Navigate to="/" />} />
           </>
