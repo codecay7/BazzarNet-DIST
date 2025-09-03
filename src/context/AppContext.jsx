@@ -29,7 +29,7 @@ export const AppProvider = ({ children }) => {
   const loginAsUser = (name, username) => {
     if (!name || !username) {
       toast.error('Please enter both your name and username.');
-      return;
+      return false;
     }
     const userData = { name, username, role: 'user' };
     setUser(userData);
@@ -37,12 +37,13 @@ export const AppProvider = ({ children }) => {
     setIsVendor(false);
     localStorage.setItem('user', JSON.stringify(userData));
     toast.success(`Welcome to BazzarNet, ${name}!`);
+    return true;
   };
 
   const loginAsVendor = (name, store) => {
     if (!name || !store) {
       toast.error('Please enter both your name and store name.');
-      return;
+      return false;
     }
     const userData = { name, store, role: 'vendor' };
     setUser(userData);
@@ -50,6 +51,7 @@ export const AppProvider = ({ children }) => {
     setIsVendor(true);
     localStorage.setItem('user', JSON.stringify(userData));
     toast.success(`Welcome, ${name}! Manage your store now.`);
+    return true;
   };
 
   const logout = () => {

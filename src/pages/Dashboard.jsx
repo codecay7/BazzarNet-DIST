@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShoppingBag, faStore, faCartPlus, faTruck, faUser } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 
-const Home = () => {
+const Dashboard = () => {
   const [deliveryTime, setDeliveryTime] = useState(30);
   const navigate = useNavigate();
 
@@ -149,4 +149,4 @@ const Home = () => {
   );
 };
 
-export default Home;
+export default Dashboard;

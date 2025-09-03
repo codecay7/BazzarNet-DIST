@@ -2,16 +2,30 @@ import React, { useState, useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSignInAlt } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
+import { useNavigate } from 'react-router-dom';
 
 const Login = () => {
   const { loginAsUser, loginAsVendor } = useContext(AppContext);
+  const navigate = useNavigate();
   const [userName, setUserName] = useState('');
   const [userUsername, setUserUsername] = useState('');
   const [vendorName, setVendorName] = useState('');
   const [vendorStore, setVendorStore] = useState('');
 
+  const handleUserLogin = () => {
+    if (loginAsUser(userName, userUsername)) {
+      navigate('/dashboard');
+    }
+  };
+
+  const handleVendorLogin = () => {
+    if (loginAsVendor(vendorName, vendorStore)) {
+      navigate('/dashboard');
+    }
+  };
+
   return (
-    <div className="fixed inset-0 flex flex-col justify-center items-center z-[1003] bg-[var(--accent)] bg-opacity-30 transition-opacity duration-300">
+    <div className="min-h-screen flex flex-col justify-center items-center bg-[var(--bg-body)] p-4">
       <div className="bg-[black] backdrop-blur-[5px] border border-white/30 rounded-2xl flex flex-col p-8 shadow-[0_8px_40px_var(--shadow)] w-full max-w-[400px] mx-4 text-center text-[var(--auth-text)]">
         <h2 className="text-3xl font-bold mb-5 text-[var(--accent)]">Welcome to BazzarNet</h2>
         <h3 className="text-xl font-semibold mb-3">Login as User</h3>
@@ -33,7 +47,7 @@ const Login = () => {
         />
         <button
           className="bg-[var(--accent)] text-white border-none py-2 px-6 rounded-lg flex items-center w-fit gap-2 font-medium hover:bg-[var(--accent-dark)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.15)] hover:-translate-y-0.5 active:translate-y-0 active:shadow-[0_2px_10px_rgba(0,0,0,0.1)] transition-all duration-300 mx-auto mb-4"
-          onClick={() => loginAsUser(userName, userUsername)}
+          onClick={handleUserLogin}
         >
           <FontAwesomeIcon icon={faSignInAlt} /> Sign in as User
         </button>
@@ -56,7 +70,7 @@ const Login = () => {
         />
         <button
           className="bg-[var(--accent)] text-white border-none py-2 px-6 rounded-lg flex items-center w-fit gap-2 font-medium hover:bg-[var(--accent-dark)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.15)] hover:-translate-y-0.5 active:translate-y-0 active:shadow-[0_2px_10px_rgba(0,0,0,0.1)] transition-all duration-300 mx-auto"
-          onClick={() => loginAsVendor(vendorName, vendorStore)}
+          onClick={handleVendorLogin}
         >
           <FontAwesomeIcon icon={faSignInAlt} /> Sign in as Vendor
         </button>

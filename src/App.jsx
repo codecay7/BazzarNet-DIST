@@ -4,7 +4,8 @@ import { AppContext } from './context/AppContext';
 
 import Layout from './components/Layout';
 import Login from './pages/Login';
-import Home from './pages/Home';
+import LandingPage from './pages/LandingPage';
+import Dashboard from './pages/Dashboard';
 import Stores from './pages/Stores';
 import Products from './pages/Products';
 import Cart from './pages/Cart';
@@ -21,26 +22,25 @@ const App = () => {
 
   return (
     <div className={`font-poppins min-h-screen flex flex-col transition-all duration-300 ${theme === 'dark' ? 'bg-[#07080a] text-[#E0E0E0]' : 'bg-[#E0E0E0] text-[#333]'}`}>
-      {!isLoggedIn ? (
-        <Login />
-      ) : (
-        <Routes>
+      <Routes>
+        {isLoggedIn ? (
+          // --- Logged In Routes ---
           <Route element={<Layout />}>
-            <Route path="/" element={<Home />} />
+            <Route path="/dashboard" element={<Dashboard />} />
             <Route path="/orders" element={<Orders />} />
             <Route path="/profile" element={<Profile />} />
 
             {isVendor ? (
               <>
                 <Route path="/vendor" element={<VendorDashboard />} />
-                {/* Redirect non-vendor pages to home */}
-                <Route path="/stores" element={<Navigate to="/" />} />
-                <Route path="/products" element={<Navigate to="/" />} />
-                <Route path="/cart" element={<Navigate to="/" />} />
-                <Route path="/checkout" element={<Navigate to="/" />} />
-                <Route path="/wishlist" element={<Navigate to="/" />} />
-                <Route path="/faq" element={<Navigate to="/" />} />
-                <Route path="/about" element={<Navigate to="/" />} />
+                {/* Redirect non-vendor pages to dashboard */}
+                <Route path="/stores" element={<Navigate to="/dashboard" />} />
+                <Route path="/products" element={<Navigate to="/dashboard" />} />
+                <Route path="/cart" element={<Navigate to="/dashboard" />} />
+                <Route path="/checkout" element={<Navigate to="/dashboard" />} />
+                <Route path="/wishlist" element={<Navigate to="/dashboard" />} />
+                <Route path="/faq" element={<Navigate to="/dashboard" />} />
+                <Route path="/about" element={<Navigate to="/dashboard" />} />
               </>
             ) : (
               <>
@@ -51,15 +51,23 @@ const App = () => {
                 <Route path="/wishlist" element={<Wishlist />} />
                 <Route path="/faq" element={<FAQ />} />
                 <Route path="/about" element={<About />} />
-                 {/* Redirect vendor pages to home */}
-                <Route path="/vendor" element={<Navigate to="/" />} />
+                <Route path="/vendor" element={<Navigate to="/dashboard" />} />
               </>
             )}
             
-            <Route path="*" element={<Navigate to="/" />} />
+            {/* Redirect root and any other path to dashboard */}
+            <Route path="*" element={<Navigate to="/dashboard" />} />
           </Route>
-        </Routes>
-      )}
+        ) : (
+          // --- Logged Out Routes ---
+          <>
+            <Route path="/" element={<LandingPage />} />
+            <Route path="/login" element={<Login />} />
+            {/* Redirect any other path to the landing page */}
+            <Route path="*" element={<Navigate to="/" />} />
+          </>
+        )}
+      </Routes>
       <CustomStyles />
     </div>
   );
