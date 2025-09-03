@@ -161,16 +161,14 @@ const Checkout = () => {
   const handlePlaceOrder = () => {
     if (validatePaymentForm()) {
       const orderDetails = {
-          orderId: Math.floor(Math.random() * 100000),
           total,
           cart,
           shippingAddress: paymentMethod === 'card' ? cardFormData.shippingAddress : upiFormData.shippingAddress,
           paymentMethod: paymentMethod === 'card' ? 'Credit Card' : 'UPI',
       };
       
-      checkout(); // Clears the cart
-      toast.success('Order placed successfully!');
-      navigate('/confirmation', { state: { orderDetails } });
+      const newOrder = checkout(orderDetails); // Call checkout from context, which now returns the new order
+      navigate('/confirmation', { state: { orderDetails: newOrder } }); // Pass the full new order with OTP
     } else {
       toast.error('Please correct the errors in the payment form.');
     }

@@ -48,6 +48,11 @@ export const AppProvider = ({ children }) => {
     return new Promise(resolve => setTimeout(resolve, delay));
   };
 
+  // Generate a 6-digit OTP
+  const generateOtp = () => {
+    return Math.floor(100000 + Math.random() * 900000).toString();
+  };
+
   // Login Functions
   const loginAsUser = (name, email, password) => {
     if (!name || !email || !password) {
@@ -152,9 +157,24 @@ export const AppProvider = ({ children }) => {
     );
   };
 
-  const checkout = () => {
-    toast.success('Proceeding to checkout! (Implementation pending)');
-    setCart([]);
+  const checkout = (orderDetails) => {
+    // Generate OTP and add to order details
+    const otp = generateOtp();
+    const newOrder = {
+      ...orderDetails,
+      id: `#BN${Math.floor(10000 + Math.random() * 90000)}`, // Generate a new order ID
+      customer: { name: user.name, email: user.email },
+      customerEmail: user.email,
+      date: new Date().toISOString().slice(0, 10),
+      status: 'Pending', // Initial status
+      otp: otp, // Store the OTP with the order
+      shipping: { trackingNumber: 'N/A', carrier: 'BazzarNet Delivery' }, // Default shipping
+    };
+
+    setOrders(prevOrders => [...prevOrders, newOrder]);
+    setCart([]); // Clear the cart after checkout
+    toast.success('Order placed successfully!');
+    return newOrder; // Return the new order including OTP
   };
 
   // Wishlist Functions
@@ -217,6 +237,28 @@ export const AppProvider = ({ children }) => {
     toast.success(`Order ${orderId} status updated to ${newStatus}.`);
   };
 
+  const confirmDeliveryWithOtp = (orderId, enteredOtp) => {
+    const orderIndex = orders.findIndex(o => o.id === orderId);
+    if (orderIndex === -1) {
+      toast.error('Order not found.');
+      return false;
+    }
+
+    const order = orders[orderIndex];
+    if (order.otp === enteredOtp) {
+      setOrders(prevOrders =>
+        prevOrders.map((o, idx) =>
+          idx === orderIndex ? { ...o, status: 'Delivered' } : o
+        )
+      );
+      toast.success(`Delivery for Order ${orderId} confirmed!`);
+      return true;
+    } else {
+      toast.error('Invalid OTP. Please try again.');
+      return false;
+    }
+  };
+
   // Auto-login from localStorage
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
@@ -256,6 +298,7 @@ export const AppProvider = ({ children }) => {
     deleteVendorProduct,
     orders,
     updateOrderStatus,
+    confirmDeliveryWithOtp, // Expose new function
     simulateLoading,
     appStores, // Expose the central stores list
   };

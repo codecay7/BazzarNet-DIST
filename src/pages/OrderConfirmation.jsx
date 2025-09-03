@@ -3,6 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
+import QRCode from 'qrcode.react'; // Import QRCode component
 
 const OrderConfirmation = () => {
   const { user } = useContext(AppContext);
@@ -20,7 +21,10 @@ const OrderConfirmation = () => {
     );
   }
 
-  const { orderId, total, cart } = orderDetails;
+  const { id: orderId, total, cart, otp } = orderDetails; // Destructure OTP
+
+  // Data to encode in QR code (e.g., order ID and OTP)
+  const qrCodeValue = JSON.stringify({ orderId, otp });
 
   return (
     <section className="w-full max-w-[1200px] my-10">
@@ -31,7 +35,7 @@ const OrderConfirmation = () => {
         
         <div className="text-left max-w-md mx-auto bg-black/10 p-6 rounded-lg" aria-labelledby="order-summary-heading">
             <h3 id="order-summary-heading" className="text-xl font-semibold mb-4 border-b border-white/20 pb-2">Order Summary</h3>
-            <p className="mb-2"><strong>Order ID:</strong> #{orderId}</p>
+            <p className="mb-2"><strong>Order ID:</strong> {orderId}</p>
             <p className="mb-4"><strong>Total:</strong> ₹{total.toFixed(2)}</p>
             <div className="mb-4">
                 <h4 className="font-semibold">Items:</h4>
@@ -45,6 +49,17 @@ const OrderConfirmation = () => {
                 </ul>
             </div>
             <p className="text-sm opacity-80">You will receive an email confirmation shortly.</p>
+        </div>
+
+        {/* OTP and QR Code Section */}
+        <div className="bg-black/10 p-6 rounded-lg max-w-md mx-auto mt-8">
+            <h3 className="text-xl font-semibold mb-4">Delivery Confirmation</h3>
+            <p className="mb-4">Please show this QR code to the delivery person to confirm your order.</p>
+            <div className="flex justify-center mb-4">
+                <QRCode value={qrCodeValue} size={180} level="H" renderAs="svg" className="rounded-lg" aria-label={`QR code for order ${orderId} with OTP ${otp}`} />
+            </div>
+            <p className="text-lg font-bold">OTP: <span className="text-[var(--accent)]">{otp}</span></p>
+            <p className="text-sm opacity-80 mt-2">The delivery person will scan this QR or ask for the OTP.</p>
         </div>
 
         <Link to="/dashboard" className="inline-block mt-8 bg-[var(--accent)] text-white py-2 px-6 rounded-lg font-medium hover:bg-[var(--accent-dark)] transition-all duration-300">

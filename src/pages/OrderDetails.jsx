@@ -6,9 +6,10 @@ import { ChevronDown } from 'lucide-react';
 
 const OrderDetails = () => {
   const { orderId } = useParams();
-  const { orders, updateOrderStatus } = useContext(AppContext);
+  const { orders, updateOrderStatus, confirmDeliveryWithOtp } = useContext(AppContext);
   const order = orders.find(o => o.id === `#${orderId}`);
   const [status, setStatus] = useState(order?.status || '');
+  const [otpInput, setOtpInput] = useState('');
 
   useEffect(() => {
     if (order) {
@@ -29,6 +30,14 @@ const OrderDetails = () => {
     updateOrderStatus(order.id, status);
   };
 
+  const handleConfirmDelivery = () => {
+    if (confirmDeliveryWithOtp(order.id, otpInput)) {
+      // Status will be updated by confirmDeliveryWithOtp, so just clear input
+      setOtpInput('');
+      setStatus('Delivered'); // Update local state to reflect change
+    }
+  };
+
   return (
     <section className="w-full max-w-[1200px] my-10">
       <div className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-8 mx-4">
@@ -43,7 +52,8 @@ const OrderDetails = () => {
                 <p><strong>Customer:</strong> {order.customer.name}</p>
                 <p><strong>Date:</strong> {order.date}</p>
                 <p><strong>Total:</strong> ₹{order.total.toFixed(2)}</p>
-                <p><strong>Status:</strong> <span className="font-semibold text-[var(--accent)]">{order.status}</span></p>
+                <p><strong>Status:</strong> <span className="font-semibold text-[var(--accent)]">{status}</span></p>
+                <p><strong>Delivery OTP:</strong> <span className="font-semibold text-[var(--accent)]">{order.otp}</span></p> {/* Display OTP for vendor */}
               </div>
             </div>
             <div className="bg-black/10 p-6 rounded-xl">
@@ -67,7 +77,20 @@ const OrderDetails = () => {
           {/* Actions & Contact */}
           <div className="space-y-6">
             <div className="bg-black/10 p-6 rounded-xl">
-              <h3 className="text-xl font-semibold mb-4">Update Status</h3>
+              <h3 className="text-xl font-semibold mb-4">Confirm Delivery with OTP</h3>
+              <input
+                type="text"
+                value={otpInput}
+                onChange={(e) => setOtpInput(e.target.value)}
+                placeholder="Enter OTP from customer"
+                className="w-full p-3 rounded-lg bg-white/10 border border-black/30 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] text-[var(--text)] mb-4"
+                maxLength="6"
+                aria-label="Enter OTP for delivery confirmation"
+              />
+              <button onClick={handleConfirmDelivery} className="w-full bg-[var(--accent)] text-white py-2 px-4 rounded-lg font-medium">Confirm Delivery</button>
+            </div>
+            <div className="bg-black/10 p-6 rounded-xl">
+              <h3 className="text-xl font-semibold mb-4">Update Status (Manual)</h3>
               <div className="relative mb-4">
                 <label htmlFor="orderStatus" className="sr-only">Order Status</label>
                 <select 
@@ -76,6 +99,7 @@ const OrderDetails = () => {
                   onChange={(e) => setStatus(e.target.value)} 
                   className="w-full appearance-none p-3 rounded-lg bg-white/10 border border-black/30 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] pr-8"
                   aria-label="Update order status"
+                  disabled={status === 'Delivered'} // Disable if already delivered by OTP
                 >
                   <option>Pending</option>
                   <option>Shipped</option>
@@ -84,12 +108,7 @@ const OrderDetails = () => {
                 </select>
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-[var(--text)]" aria-hidden="true"><ChevronDown size={20} /></div>
               </div>
-              <button onClick={handleStatusUpdate} className="w-full bg-[var(--accent)] text-white py-2 px-4 rounded-lg font-medium">Save Changes</button>
-            </div>
-            <div className="bg-black/10 p-6 rounded-xl">
-              <h3 className="text-xl font-semibold mb-4">Customer Contact</h3>
-              <p className="mb-4"><strong>Email:</strong> {order.customer.email}</p>
-              <button onClick={() => toast.info('Contacting customer...')} className="w-full bg-white/10 text-[var(--text)] py-2 px-4 rounded-lg font-medium" aria-label={`Contact customer ${order.customer.name}`}>Contact Customer</button>
+              <button onClick={handleStatusUpdate} className="w-full bg-[var(--accent)] text-white py-2 px-4 rounded-lg font-medium" disabled={status === 'Delivered'}>Save Changes</button>
             </div>
             <div className="bg-black/10 p-6 rounded-xl space-y-3">
               <button onClick={() => toast.error('Refund issued!')} className="w-full bg-red-500/20 text-red-400 py-2 px-4 rounded-lg font-medium" aria-label={`Issue refund for order ${order.id}`}>Issue Refund</button>
