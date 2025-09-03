@@ -19,7 +19,7 @@ const About = () => (
           className="bg-[var(--accent)] w-fit text-white border-none py-2 px-6 rounded-lg flex items-center gap-2 font-medium hover:bg-[var(--accent-dark)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.15)] hover:-translate-y-0.5 active:translate-y-0 active:shadow-[0_2px_10px_rgba(0,0,0,0.1)] transition-all duration-300 no-underline"
           onClick={(e) => {
             e.preventDefault();
-            toast.info('Careers page coming soon!');
+            toast('Careers page coming soon!');
           }}
         >
           <FontAwesomeIcon icon={faBriefcase} /> View Openings

@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 const Footer = () => {
   const handleExternalClick = (e) => {
     e.preventDefault();
-    toast.info('This is a demo link.');
+    toast('This is a demo link.');
   };
 
   return (
