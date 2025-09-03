@@ -1,14 +1,24 @@
-import React, { useState } from 'react';
+import React, { useState, useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShoppingBag, faStore, faCartPlus, faTruck, faUser } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
+import { AppContext } from '../context/AppContext';
 
 const Dashboard = () => {
   const [deliveryTime, setDeliveryTime] = useState(30);
   const navigate = useNavigate();
+  const { isLoggedIn } = useContext(AppContext);
 
   const updateDeliveryTime = (e) => {
     setDeliveryTime(parseInt(e.target.value));
+  };
+
+  const handleNavigate = (path) => {
+    if (isLoggedIn) {
+      navigate(path);
+    } else {
+      navigate('/login');
+    }
   };
 
   return (
@@ -25,13 +35,13 @@ const Dashboard = () => {
         <div className="flex flex-wrap justify-center gap-5">
           <button
             className="bg-[var(--accent)] text-white py-2 px-6 rounded-lg flex items-center gap-2 font-medium hover:bg-[var(--accent-dark)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.15)] hover:-translate-y-0.5 active:translate-y-0 active:shadow-[0_2px_10px_rgba(0,0,0,0.1)] transition-all duration-300 m-1.5"
-            onClick={() => navigate('/stores')}
+            onClick={() => handleNavigate('/stores')}
           >
             <FontAwesomeIcon icon={faShoppingBag} /> Start Shopping
           </button>
           <button
             className="bg-[var(--accent)] text-white py-2 px-6 rounded-lg flex items-center gap-2 font-medium hover:bg-[var(--accent-dark)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.15)] hover:-translate-y-0.5 active:translate-y-0 active:shadow-[0_2px_10px_rgba(0,0,0,0.1)] transition-all duration-300 m-1.5"
-            onClick={() => navigate('/vendor')}
+            onClick={() => handleNavigate('/vendor')}
           >
             <FontAwesomeIcon icon={faStore} /> Become a Vendor
           </button>

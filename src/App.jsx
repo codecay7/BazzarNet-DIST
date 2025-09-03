@@ -3,8 +3,8 @@ import { Routes, Route, Navigate } from 'react-router-dom';
 import { AppContext } from './context/AppContext';
 
 import Layout from './components/Layout';
+import PublicLayout from './components/PublicLayout';
 import Login from './pages/Login';
-import LandingPage from './pages/LandingPage';
 import Dashboard from './pages/Dashboard';
 import Stores from './pages/Stores';
 import Products from './pages/Products';
@@ -35,7 +35,6 @@ const App = () => {
             {isVendor ? (
               <>
                 <Route path="/vendor" element={<VendorDashboard />} />
-                {/* Redirect non-vendor pages to dashboard */}
                 <Route path="/stores" element={<Navigate to="/dashboard" />} />
                 <Route path="/products" element={<Navigate to="/dashboard" />} />
                 <Route path="/products/:id" element={<Navigate to="/dashboard" />} />
@@ -61,15 +60,17 @@ const App = () => {
               </>
             )}
             
-            {/* Redirect root and any other path to dashboard */}
             <Route path="*" element={<Navigate to="/dashboard" />} />
           </Route>
         ) : (
           // --- Logged Out Routes ---
           <>
-            <Route path="/" element={<LandingPage />} />
             <Route path="/login" element={<Login />} />
-            {/* Redirect any other path to the landing page */}
+            <Route element={<PublicLayout />}>
+              <Route path="/" element={<Dashboard />} />
+              <Route path="/faq" element={<FAQ />} />
+              <Route path="/about" element={<About />} />
+            </Route>
             <Route path="*" element={<Navigate to="/" />} />
           </>
         )}
