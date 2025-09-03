@@ -3,13 +3,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faStore, faPen, faSave } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
 import toast from 'react-hot-toast';
-import { Building2, Mail, Phone, FileText } from 'lucide-react';
+import { Building2, Mail, Phone, FileText, Landmark, CreditCard, Wallet, Shield } from 'lucide-react';
 
 const Profile = () => {
   const { user, isVendor } = useContext(AppContext);
   const [isEditing, setIsEditing] = useState(false);
   
-  // Mock data for vendor details, as it's not stored yet
   const [profileData, setProfileData] = useState({
     name: user?.name || 'Guest',
     store: user?.store || '',
@@ -19,7 +18,11 @@ const Profile = () => {
     pan: 'ABCDE1234F',
     gst: '27ABCDE1234F1Z5',
     category: 'Groceries',
-    description: 'Your friendly neighborhood grocery store, bringing fresh produce and daily essentials right to your doorstep with BazzarNet.'
+    description: 'Your friendly neighborhood grocery store, bringing fresh produce and daily essentials right to your doorstep with BazzarNet.',
+    bankAccount: '123456789012',
+    bankName: 'BazzarNet Bank',
+    ifsc: 'BAZZ0001234',
+    upiId: 'vendor@bazzarnetupi'
   });
 
   const handleInputChange = (e) => {
@@ -31,6 +34,9 @@ const Profile = () => {
     toast.success('Profile updated successfully!');
     setIsEditing(false);
   };
+
+  const inputClasses = "w-full p-2 rounded-lg bg-white/10 border border-black/30 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] text-[var(--text)]";
+  const textareaClasses = `${inputClasses} min-h-[80px]`;
 
   if (isVendor) {
     return (
@@ -48,9 +54,9 @@ const Profile = () => {
             </div>
             <button
               className="bg-[var(--accent)] w-full md:w-fit mt-4 md:mt-0 text-white border-none py-2 px-6 rounded-lg flex items-center justify-center gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300"
-              onClick={() => toast.info('Edit functionality coming soon!')}
+              onClick={() => isEditing ? handleSaveChanges() : setIsEditing(true)}
             >
-              <FontAwesomeIcon icon={faPen} /> Edit Profile
+              <FontAwesomeIcon icon={isEditing ? faSave : faPen} /> {isEditing ? 'Save Changes' : 'Edit Profile'}
             </button>
           </div>
 
@@ -58,14 +64,45 @@ const Profile = () => {
             <div className="lg:col-span-2 space-y-6">
               <div className="bg-black/10 p-6 rounded-xl">
                 <h3 className="text-xl font-semibold mb-4 flex items-center gap-2"><Building2 size={20} /> Business Details</h3>
-                <p className="opacity-80">{profileData.description}</p>
+                {isEditing ? (
+                  <textarea name="description" value={profileData.description} onChange={handleInputChange} className={textareaClasses} />
+                ) : (
+                  <p className="opacity-80">{profileData.description}</p>
+                )}
                 <p className="mt-3"><strong className="opacity-80">Category:</strong> {profileData.category}</p>
               </div>
               <div className="bg-black/10 p-6 rounded-xl">
                 <h3 className="text-xl font-semibold mb-4 flex items-center gap-2"><FileText size={20} /> Legal Information</h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <p><strong className="opacity-80">PAN:</strong> {profileData.pan}</p>
-                  <p><strong className="opacity-80">GSTIN:</strong> {profileData.gst}</p>
+                  <div>
+                    <p className="text-sm opacity-70 mb-1">PAN</p>
+                    {isEditing ? <input type="text" name="pan" value={profileData.pan} onChange={handleInputChange} className={inputClasses} /> : <p className="font-medium">{profileData.pan}</p>}
+                  </div>
+                  <div>
+                    <p className="text-sm opacity-70 mb-1">GSTIN</p>
+                    {isEditing ? <input type="text" name="gst" value={profileData.gst} onChange={handleInputChange} className={inputClasses} /> : <p className="font-medium">{profileData.gst}</p>}
+                  </div>
+                </div>
+              </div>
+              <div className="bg-black/10 p-6 rounded-xl">
+                <h3 className="text-xl font-semibold mb-4 flex items-center gap-2"><Landmark size={20} /> Payment Information</h3>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                  <div>
+                    <p className="text-sm opacity-70 mb-1">Bank Name</p>
+                    {isEditing ? <input type="text" name="bankName" value={profileData.bankName} onChange={handleInputChange} className={inputClasses} /> : <p className="font-medium">{profileData.bankName}</p>}
+                  </div>
+                  <div>
+                    <p className="text-sm opacity-70 mb-1">Account Number</p>
+                    {isEditing ? <input type="text" name="bankAccount" value={profileData.bankAccount} onChange={handleInputChange} className={inputClasses} /> : <p className="font-medium">{profileData.bankAccount}</p>}
+                  </div>
+                  <div>
+                    <p className="text-sm opacity-70 mb-1">IFSC Code</p>
+                    {isEditing ? <input type="text" name="ifsc" value={profileData.ifsc} onChange={handleInputChange} className={inputClasses} /> : <p className="font-medium">{profileData.ifsc}</p>}
+                  </div>
+                  <div>
+                    <p className="text-sm opacity-70 mb-1">UPI ID</p>
+                    {isEditing ? <input type="text" name="upiId" value={profileData.upiId} onChange={handleInputChange} className={inputClasses} /> : <p className="font-medium">{profileData.upiId}</p>}
+                  </div>
                 </div>
               </div>
             </div>
@@ -76,21 +113,21 @@ const Profile = () => {
                   <Mail size={20} className="mt-1 text-[var(--accent)]" />
                   <div>
                     <p className="text-sm opacity-70">Email</p>
-                    <p className="font-medium break-all">{profileData.email}</p>
+                    {isEditing ? <input type="email" name="email" value={profileData.email} onChange={handleInputChange} className={inputClasses} /> : <p className="font-medium break-all">{profileData.email}</p>}
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <Phone size={20} className="mt-1 text-[var(--accent)]" />
                   <div>
                     <p className="text-sm opacity-70">Phone</p>
-                    <p className="font-medium">{profileData.phone}</p>
+                    {isEditing ? <input type="tel" name="phone" value={profileData.phone} onChange={handleInputChange} className={inputClasses} /> : <p className="font-medium">{profileData.phone}</p>}
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
                   <Building2 size={20} className="mt-1 text-[var(--accent)]" />
                   <div>
                     <p className="text-sm opacity-70">Address</p>
-                    <p className="font-medium">{profileData.address}</p>
+                    {isEditing ? <textarea name="address" value={profileData.address} onChange={handleInputChange} className={textareaClasses} /> : <p className="font-medium">{profileData.address}</p>}
                   </div>
                 </div>
               </div>
