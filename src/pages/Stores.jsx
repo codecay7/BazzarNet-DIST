@@ -37,9 +37,9 @@ const Stores = () => {
                 <p className="text-base md:text-lg">{store.description}</p>
                 <button
                   className="bg-[var(--accent)] text-white border-none py-2 px-6 rounded-lg flex items-center gap-2 font-medium hover:bg-[var(--accent-dark)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.15)] hover:-translate-y-0.5 active:translate-y-0 active:shadow-[0_2px_10px_rgba(0,0,0,0.1)] transition-all duration-300 mt-4"
-                  onClick={() => navigate(`/stores/${encodeURIComponent(store.name)}/products`)}
+                  onClick={() => navigate(`/stores/${encodeURIComponent(store.name)}`)}
                 >
-                  View Products
+                  Visit Store
                 </button>
               </div>
             ))}

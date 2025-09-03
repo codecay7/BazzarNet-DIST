@@ -1,17 +1,14 @@
 import React, { useContext, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMapMarkerAlt, faBoxOpen, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
+import { faMapMarkerAlt, faBoxOpen, faCheckCircle, faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
-import toast from 'react-hot-toast';
-
-const mockOrders = [
-  { id: '#1234', items: 'Apples, Bread', total: 7.49, status: 'Out for Delivery' },
-  { id: '#1235', items: 'Milk', total: 3.99, status: 'Delivered' },
-];
+import { mockOrders as allMockOrders } from '../data/mockData';
+import { motion, AnimatePresence } from 'framer-motion';
 
 const Orders = () => {
   const { isVendor } = useContext(AppContext);
   const [searchTerm, setSearchTerm] = useState('');
+  const [expandedOrder, setExpandedOrder] = useState(null);
 
   const getStatusInfo = (status) => {
     switch (status) {
@@ -24,10 +21,14 @@ const Orders = () => {
     }
   };
 
-  const filteredOrders = mockOrders.filter(order =>
+  const filteredOrders = allMockOrders.filter(order =>
     order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    order.items.toLowerCase().includes(searchTerm.toLowerCase())
+    order.items.some(item => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
   );
+
+  const toggleOrderDetails = (orderId) => {
+    setExpandedOrder(expandedOrder === orderId ? null : orderId);
+  };
 
   return (
     <section className="w-full max-w-[1200px] my-10">
@@ -48,25 +49,54 @@ const Orders = () => {
           <div className="space-y-6">
             {filteredOrders.map(order => {
               const statusInfo = getStatusInfo(order.status);
+              const isExpanded = expandedOrder === order.id;
               return (
-                <div key={order.id} className="bg-black/10 rounded-2xl p-6 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                  <div className="flex-1">
-                    <h3 className="text-xl font-semibold md:text-2xl mb-2">Order {order.id}</h3>
-                    <p className="text-base md:text-lg mb-1"><strong>Items:</strong> {order.items}</p>
-                    <p className="text-base md:text-lg"><strong>Total:</strong> ${order.total.toFixed(2)}</p>
-                  </div>
-                  <div className="w-full md:w-auto text-left md:text-right">
-                    <div className={`flex items-center gap-2 font-semibold mb-3 ${statusInfo.color}`}>
-                      <FontAwesomeIcon icon={statusInfo.icon} />
-                      <span>{order.status}</span>
+                <div key={order.id} className="bg-black/10 rounded-2xl p-6 transition-all duration-300">
+                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
+                    <div className="flex-1">
+                      <h3 className="text-xl font-semibold md:text-2xl mb-2">Order {order.id}</h3>
+                      <p className="text-base md:text-lg"><strong>Total:</strong> ${order.total.toFixed(2)}</p>
                     </div>
-                    <button
-                      className="bg-[var(--accent)] w-full md:w-fit text-white border-none py-2 px-6 rounded-lg flex items-center justify-center gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300"
-                      onClick={() => toast.info('Feature coming soon!')}
-                    >
-                      {isVendor ? 'Update Status' : 'View Details'}
-                    </button>
+                    <div className="w-full md:w-auto flex flex-col items-start md:items-end gap-3">
+                      <div className={`flex items-center gap-2 font-semibold ${statusInfo.color}`}>
+                        <FontAwesomeIcon icon={statusInfo.icon} />
+                        <span>{order.status}</span>
+                      </div>
+                      <button
+                        className="bg-[var(--accent)] w-full md:w-fit text-white border-none py-2 px-6 rounded-lg flex items-center justify-center gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300"
+                        onClick={() => toggleOrderDetails(order.id)}
+                      >
+                        View Details <FontAwesomeIcon icon={isExpanded ? faChevronUp : faChevronDown} />
+                      </button>
+                    </div>
                   </div>
+                  <AnimatePresence>
+                    {isExpanded && (
+                      <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={{ opacity: 1, height: 'auto' }}
+                        exit={{ opacity: 0, height: 0 }}
+                        transition={{ duration: 0.3, ease: 'easeInOut' }}
+                        className="overflow-hidden"
+                      >
+                        <div className="mt-6 pt-4 border-t border-white/20">
+                          <h4 className="font-semibold text-lg mb-3">Items in this order:</h4>
+                          <div className="space-y-4">
+                            {order.items.map(item => (
+                              <div key={item.id} className="flex items-center gap-4 bg-black/10 p-3 rounded-lg">
+                                <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-md" />
+                                <div className="flex-grow">
+                                  <p className="font-semibold">{item.name}</p>
+                                  <p className="text-sm opacity-80">Quantity: {item.quantity}</p>
+                                </div>
+                                <p className="font-semibold">${(item.price * item.quantity).toFixed(2)}</p>
+                              </div>
+                            ))}
+                          </div>
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
                 </div>
               );
             })}

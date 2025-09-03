@@ -37,3 +37,23 @@ export const stores = [
 ];
 
 export const allProducts = stores.flatMap(store => store.products);
+
+export const mockOrders = [
+    { 
+      id: '#1234', 
+      items: [
+        { ...allProducts.find(p => p.id === 101), quantity: 2 }, // 2 Apples
+        { ...allProducts.find(p => p.id === 201), quantity: 1 }, // 1 Sourdough
+      ],
+      total: (2.99 * 2) + 4.50, 
+      status: 'Out for Delivery' 
+    },
+    { 
+      id: '#1235', 
+      items: [
+        { ...allProducts.find(p => p.id === 102), quantity: 1 }, // 1 Milk
+      ],
+      total: 3.99, 
+      status: 'Delivered' 
+    },
+];

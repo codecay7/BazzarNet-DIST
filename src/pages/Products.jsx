@@ -53,7 +53,10 @@ const Products = () => {
   return (
     <section className="w-full max-w-[1200px] my-10">
       <div className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-8 mx-4">
-        <h2 className="text-3xl font-bold mb-5 md:text-4xl">Products from {store.name}</h2>
+        <div className="mb-8 pb-8 border-b border-white/20">
+            <h2 className="text-3xl font-bold md:text-4xl">{store.name}</h2>
+            <p className="text-base md:text-lg mt-2 opacity-80">{store.description}</p>
+        </div>
         
         <div className="flex flex-col md:flex-row gap-4 mb-8">
           <input
