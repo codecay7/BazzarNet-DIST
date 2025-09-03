@@ -1,8 +1,8 @@
-import React, { useContext } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { AppContext } from '../context/AppContext';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, LineChart, Line, Legend } from 'recharts';
 import { Wallet, Package, Users, Tag, Search, Calendar as CalendarIcon } from 'lucide-react';
-import { salesData, topProductsData } from '../data/mockData';
+import { salesData, allProducts } from '../data/mockData';
 import StatCard from './StatCard';
 import { useNavigate } from 'react-router-dom';
 
@@ -15,6 +15,23 @@ const VendorDashboard = () => {
   const totalOrders = orders.length;
   const uniqueCustomers = new Set(orders.map(o => o.customer.name)).size;
   const totalProducts = vendorProducts.length;
+
+  const fastSellingItems = useMemo(() => {
+    const salesCount = {};
+    orders.forEach(order => {
+      order.items.forEach(item => {
+        salesCount[item.id] = (salesCount[item.id] || 0) + item.quantity;
+      });
+    });
+
+    return Object.entries(salesCount)
+      .sort(([, a], [, b]) => b - a)
+      .slice(0, 5)
+      .map(([id, sales]) => {
+        const product = allProducts.find(p => p.id === parseInt(id));
+        return { ...product, sales };
+      });
+  }, [orders]);
 
   return (
     <div className="w-full max-w-[1400px] mx-auto my-10 px-4 md:px-8">
@@ -79,16 +96,23 @@ const VendorDashboard = () => {
             </ResponsiveContainer>
           </div>
           <div className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-6">
-            <h3 className="text-xl font-semibold mb-4">Top Products</h3>
-            <ResponsiveContainer width="100%" height={300}>
-              <BarChart data={topProductsData} layout="vertical" margin={{ top: 5, right: 20, left: 20, bottom: 5 }}>
-                <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.1)" />
-                <XAxis type="number" hide />
-                <YAxis dataKey="name" type="category" width={100} tickLine={false} axisLine={false} stroke="var(--text)" />
-                <Tooltip contentStyle={{ backgroundColor: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.1)' }} />
-                <Bar dataKey="sales" fill="var(--accent)" radius={[0, 4, 4, 0]} />
-              </BarChart>
-            </ResponsiveContainer>
+            <h3 className="text-xl font-semibold mb-4">Fast Selling Items</h3>
+            <div className="space-y-4">
+              {fastSellingItems.map(product => (
+                <div 
+                  key={product.id} 
+                  onClick={() => navigate('/manage-products')} 
+                  className="flex items-center gap-4 cursor-pointer hover:bg-white/10 p-2 rounded-lg transition-colors"
+                >
+                  <img src={product.image} alt={product.name} className="w-12 h-12 object-cover rounded-lg" />
+                  <div className="flex-1">
+                    <p className="font-semibold">{product.name}</p>
+                    <p className="text-sm opacity-70">{product.sales} units sold</p>
+                  </div>
+                  <p className="font-bold text-[var(--accent)]">₹{product.price.toFixed(2)}</p>
+                </div>
+              ))}
+            </div>
           </div>
         </div>
       </div>
