@@ -49,10 +49,10 @@ const VendorDashboard = () => {
 
       {/* Dashboard Overview */}
       <div className="mb-8">
-        <div className="flex flex-col md:flex-row justify-between items-start md:items-center mb-4 gap-4">
+        <div className="flex flex-col md:flex-row justify-between items-center mb-4">
           <h2 className="text-2xl font-bold">Dashboard Overview</h2>
-          <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-            <div className="relative w-full sm:w-auto">
+          <div className="flex items-center gap-4 mt-4 md:mt-0">
+            <div className="relative">
               <select className="w-full appearance-none bg-black/10 border border-white/10 rounded-lg pl-3 pr-8 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]">
                 <option>This Month</option>
                 <option>Last Month</option>
@@ -60,9 +60,9 @@ const VendorDashboard = () => {
               </select>
               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-[var(--text)] opacity-50"><Tag size={16} /></div>
             </div>
-            <div className="relative w-full sm:w-auto">
+            <div className="relative">
               <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text)] opacity-50" size={20} />
-              <input type="text" placeholder="dd/mm/yyyy" className="w-full sm:w-36 bg-black/10 border border-white/10 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]" />
+              <input type="text" placeholder="dd/mm/yyyy" className="w-36 bg-black/10 border border-white/10 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]" />
             </div>
           </div>
         </div>
