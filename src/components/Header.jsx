@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faBars, faTimes, faSignOutAlt, faShoppingCart, faHeart, faUser, faBox, faIdCard
+  faBars, faTimes, faSignOutAlt, faShoppingCart, faHeart, faUser, faBox, faIdCard, faSun, faMoon
 } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
 import MobileNav from './MobileNav';
@@ -56,34 +56,27 @@ const Header = () => {
   return (
     <header className="relative flex items-center py-4 bg-[var(--card-bg)] backdrop-blur-[5px] sticky top-0 z-[1000] rounded-b-2xl shadow-[0_4px_20px_var(--shadow)]">
       <div className="container mx-auto px-5 flex items-center justify-between">
-        <div className="flex-shrink-0">
-          <span className="text-2xl font-bold text-[var(--accent)] md:text-3xl">BazzarNet</span>
+        <div className="flex items-center gap-6">
+          <div className="flex-shrink-0">
+            <span className="text-2xl font-bold text-[var(--accent)] md:text-3xl">BazzarNet</span>
+          </div>
+          <nav className="hidden md:flex items-center gap-2">
+            {links.map((link) => (
+              <NavLink key={link.name} to={link.path} className={({ isActive }) => `${navLinkClasses} ${isActive ? activeLinkClasses : ''}`}>
+                {({ isActive }) => (
+                  <>
+                    {link.name}
+                    {isActive && <motion.div className="absolute -bottom-1 left-2 right-2 h-0.5 bg-[var(--accent)]" layoutId="underline" />}
+                  </>
+                )}
+              </NavLink>
+            ))}
+          </nav>
         </div>
 
-        <nav className="hidden md:flex items-center gap-2">
-          {links.map((link) => (
-            <NavLink key={link.name} to={link.path} className={({ isActive }) => `${navLinkClasses} ${isActive ? activeLinkClasses : ''}`}>
-              {({ isActive }) => (
-                <>
-                  {link.name}
-                  {isActive && <motion.div className="absolute -bottom-1 left-2 right-2 h-0.5 bg-[var(--accent)]" layoutId="underline" />}
-                </>
-              )}
-            </NavLink>
-          ))}
-        </nav>
-
         <div className="flex items-center gap-4">
-          <button
-            className="bg-[var(--card-bg)] rounded-full w-10 h-10 flex items-center justify-center hover:scale-110 hover:border-2 hover:border-[var(--accent)] transition-all duration-200"
-            onClick={toggleTheme}
-            aria-label="Toggle theme"
-          >
-            <span className="text-xl">{theme === 'light' ? '☀️' : '🌙'}</span>
-          </button>
-
           {!isVendor && (
-            <div className="hidden md:flex items-center gap-4">
+            <div className="hidden md:flex items-center gap-4 border border-white/20 rounded-full px-4 py-2">
               <NavLink to="/cart" className="relative text-[var(--text)] hover:text-[var(--accent)] transition-colors duration-200">
                 <FontAwesomeIcon icon={faShoppingCart} className="text-xl" />
                 {cartItemCount > 0 && (
@@ -92,6 +85,7 @@ const Header = () => {
                   </span>
                 )}
               </NavLink>
+              <div className="w-px h-5 bg-white/20"></div>
               <NavLink to="/wishlist" className="text-[var(--text)] hover:text-[var(--accent)] transition-colors duration-200">
                 <FontAwesomeIcon icon={faHeart} className="text-xl" />
               </NavLink>
@@ -101,7 +95,7 @@ const Header = () => {
           <div className="relative hidden md:block" ref={profileRef}>
             <button
               onClick={() => setProfileOpen(!profileOpen)}
-              className="bg-[var(--card-bg)] rounded-full w-10 h-10 flex items-center justify-center hover:scale-110 transition-transform duration-200"
+              className="bg-[var(--card-bg)] rounded-full w-10 h-10 flex items-center justify-center hover:scale-110 transition-transform duration-200 border border-white/20"
             >
               <FontAwesomeIcon icon={faUser} className="text-xl" />
             </button>
@@ -112,7 +106,7 @@ const Header = () => {
                   initial="hidden"
                   animate="visible"
                   exit="exit"
-                  className="absolute top-14 right-0 w-48 bg-[var(--card-bg)] border border-white/10 rounded-lg shadow-lg flex flex-col"
+                  className="absolute top-14 right-0 w-48 bg-[var(--card-bg)] border border-white/10 rounded-lg shadow-lg flex flex-col py-1"
                 >
                   <NavLink to="/profile" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm hover:bg-white/10">
                     <FontAwesomeIcon icon={faIdCard} /> Profile
@@ -120,6 +114,14 @@ const Header = () => {
                   <NavLink to="/orders" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm hover:bg-white/10">
                     <FontAwesomeIcon icon={faBox} /> Orders
                   </NavLink>
+                  <button onClick={toggleTheme} className="flex items-center justify-between gap-3 px-4 py-2 text-sm hover:bg-white/10 w-full">
+                    <div className="flex items-center gap-3">
+                      <FontAwesomeIcon icon={theme === 'light' ? faMoon : faSun} />
+                      <span>Toggle Theme</span>
+                    </div>
+                    <span className="text-xs opacity-70">{theme === 'light' ? 'Dark' : 'Light'}</span>
+                  </button>
+                  <div className="h-px bg-white/10 my-1"></div>
                   <button onClick={handleLogout} className="flex items-center gap-3 px-4 py-2 text-sm text-red-400 hover:bg-white/10">
                     <FontAwesomeIcon icon={faSignOutAlt} /> Logout
                   </button>
