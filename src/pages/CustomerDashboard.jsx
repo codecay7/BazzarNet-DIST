@@ -1,13 +1,13 @@
 import React, { useContext, useState, useEffect, useMemo } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faShoppingBag, faBoxOpen, faHeart, faMapMarkerAlt, faCheckCircle, faReceipt } from '@fortawesome/free-solid-svg-icons';
+import { faShoppingBag, faBoxOpen, faHeart, faMapMarkerAlt, faCheckCircle, faReceipt, faCartPlus } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
 import { useNavigate } from 'react-router-dom';
 import SkeletonText from '../components/SkeletonText';
 import SkeletonCard from '../components/SkeletonCard';
 
 const CustomerDashboard = () => {
-  const { user, cart, wishlist, simulateLoading, allAppProducts, orders } = useContext(AppContext); // Added orders
+  const { user, cart, wishlist, simulateLoading, allAppProducts, orders, addToCart } = useContext(AppContext); // Added addToCart
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
@@ -20,7 +20,7 @@ const CustomerDashboard = () => {
     loadData();
   }, [simulateLoading]);
 
-  // Dynamically find the latest order for the logged-in user
+  // Dynamically find the latest order for the logged-in user (still needed for stats)
   const latestOrder = useMemo(() => {
     if (!user || !user.email || orders.length === 0) return null;
     
@@ -31,17 +31,7 @@ const CustomerDashboard = () => {
     return userOrders.sort((a, b) => new Date(b.date) - new Date(a.date))[0];
   }, [user, orders]);
 
-  // Define steps for the progress bar based on actual order status
-  const getOrderSteps = (status) => {
-    return [
-      { name: 'Ordered', completed: true },
-      { name: 'Processing', completed: ['Processing', 'Shipped', 'Delivered'].includes(status) },
-      { name: 'Out for Delivery', completed: ['Shipped', 'Delivered'].includes(status) },
-      { name: 'Delivered', completed: status === 'Delivered' },
-    ];
-  };
-
-  const featuredProducts = allAppProducts.slice(0, 3);
+  const recommendedProducts = allAppProducts.slice(0, 6); // Increased to 6 recommended products
 
   const stats = [
     { icon: faShoppingBag, label: 'Items in Cart', value: cart.length, path: '/cart' },
@@ -67,31 +57,13 @@ const CustomerDashboard = () => {
                 </div>
               ))}
             </div>
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <div className="lg:col-span-2 bg-black/10 p-6 rounded-xl animate-pulse">
-                <SkeletonText width="60%" height="1.5rem" className="mb-4" />
-                <SkeletonText width="90%" height="1rem" className="mb-2" />
-                <SkeletonText width="70%" height="1rem" className="mb-6" />
-                <div className="flex justify-between">
-                  <SkeletonText width="20%" height="2rem" />
-                  <SkeletonText width="20%" height="2rem" />
-                  <SkeletonText width="20%" height="2rem" />
-                  <SkeletonText width="20%" height="2rem" />
-                </div>
-              </div>
-              <div className="bg-black/10 p-6 rounded-xl animate-pulse">
-                <SkeletonText width="60%" height="1.5rem" className="mb-4" />
-                <div className="space-y-4">
-                  {[...Array(3)].map((_, index) => (
-                    <div key={index} className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-gray-700 rounded-lg"></div>
-                      <div>
-                        <SkeletonText width="100px" height="1rem" className="mb-1" />
-                        <SkeletonText width="80px" height="0.8rem" />
-                      </div>
-                    </div>
-                  ))}
-                </div>
+            {/* Recommended Products Skeleton */}
+            <div className="bg-black/10 p-6 rounded-xl animate-pulse">
+              <SkeletonText width="60%" height="1.5rem" className="mb-4" />
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {[...Array(6)].map((_, index) => (
+                  <SkeletonCard key={index} />
+                ))}
               </div>
             </div>
           </>
@@ -113,53 +85,24 @@ const CustomerDashboard = () => {
               ))}
             </div>
 
-            {/* Order Tracker & Featured Products */}
-            <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              <div className="lg:col-span-2 bg-black/10 p-6 rounded-xl">
-                <h2 className="text-2xl font-bold mb-4">Latest Order Tracking</h2>
-                {latestOrder ? (
-                  <>
-                    <div className="flex items-center justify-between mb-6">
-                      <div>
-                        <p className="font-semibold text-lg">Order {latestOrder.id}</p>
-                        <p className="text-sm opacity-80">{latestOrder.items.map(item => item.name).join(', ')}</p>
-                      </div>
-                      {/* Removed the "Track" button */}
-                    </div>
-                    {/* Progress Bar */}
-                    <div className="flex items-center" role="progressbar" aria-valuenow={getOrderSteps(latestOrder.status).filter(s => s.completed).length} aria-valuemin="0" aria-valuemax={getOrderSteps(latestOrder.status).length} aria-label={`Order ${latestOrder.id} progress`}>
-                      {getOrderSteps(latestOrder.status).map((step, index) => (
-                        <React.Fragment key={step.name}>
-                          <div className="flex flex-col items-center">
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${step.completed ? 'bg-[var(--accent)] border-[var(--accent)] text-white' : 'bg-transparent border-white/30 text-white/50'}`} aria-hidden="true">
-                              <FontAwesomeIcon icon={faCheckCircle} />
-                            </div>
-                            <p className={`text-xs mt-2 ${step.completed ? 'font-semibold' : 'opacity-70'}`}>{step.name}</p>
-                          </div>
-                          {index < getOrderSteps(latestOrder.status).length - 1 && (
-                            <div className={`flex-1 h-1 mx-2 ${step.completed ? 'bg-[var(--accent)]' : 'bg-white/10'}`} aria-hidden="true"></div>
-                          )}
-                        </React.Fragment>
-                      ))}
-                    </div>
-                  </>
-                ) : (
-                  <p className="text-center text-lg opacity-80 py-10">No recent orders found.</p>
-                )}
-              </div>
-
-              <div className="bg-black/10 p-6 rounded-xl">
-                <h2 className="text-2xl font-bold mb-4">Recommended</h2>
-                <div className="space-y-4">
-                  {featuredProducts.map(product => (
-                    <div key={product.id} onClick={() => navigate(`/products/${product.id}`)} className="flex items-center gap-4 cursor-pointer hover:bg-white/10 p-2 rounded-lg transition-colors" role="link" tabIndex="0" aria-label={`View details for ${product.name}`}>
-                      <img src={product.image} alt={product.name} className="w-12 h-12 object-cover rounded-lg" />
-                      <div>
-                        <p className="font-semibold">{product.name}</p>
-                      </div>
-                    </div>
-                  ))}
-                </div>
+            {/* Recommended Products Section */}
+            <div className="bg-black/10 p-6 rounded-xl">
+              <h2 className="text-2xl font-bold mb-4">Recommended Products</h2>
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {recommendedProducts.map(product => (
+                  <div key={product.id} className="flex flex-col bg-black/10 p-3 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                    <img src={product.image} alt={product.name} className="w-full h-32 object-cover rounded-md mb-2" />
+                    <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
+                    <p className="text-sm opacity-70 mb-2">₹{product.price.toFixed(2)}</p>
+                    <button 
+                      onClick={() => addToCart(product)} 
+                      className="bg-[var(--accent)] text-white py-2 px-3 rounded-lg text-sm flex items-center justify-center gap-2 font-medium hover:bg-[var(--accent-dark)] transition-colors mt-auto"
+                      aria-label={`Add ${product.name} to cart`}
+                    >
+                      <FontAwesomeIcon icon={faCartPlus} aria-hidden="true" /> Add to Cart
+                    </button>
+                  </div>
+                ))}
               </div>
             </div>
           </>
