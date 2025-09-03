@@ -9,6 +9,8 @@ const VendorDashboard = () => {
   const [name, setName] = useState('');
   const [price, setPrice] = useState('');
   const [description, setDescription] = useState('');
+  const [editingIndex, setEditingIndex] = useState(null);
+  const [editedProduct, setEditedProduct] = useState({ name: '', price: '', description: '' });
 
   const handleAddProduct = () => {
     if (!name || isNaN(parseFloat(price))) {
@@ -19,6 +21,20 @@ const VendorDashboard = () => {
     setName('');
     setPrice('');
     setDescription('');
+  };
+
+  const handleEditClick = (product, index) => {
+    setEditingIndex(index);
+    setEditedProduct(product);
+  };
+
+  const handleSaveClick = (index) => {
+    if (!editedProduct.name || isNaN(parseFloat(editedProduct.price))) {
+      toast.error('Please enter a valid name and price.');
+      return;
+    }
+    editVendorProduct(index, { ...editedProduct, price: parseFloat(editedProduct.price) });
+    setEditingIndex(null);
   };
 
   return (
@@ -65,29 +81,36 @@ const VendorDashboard = () => {
           ) : (
             vendorProducts.map((product, index) => (
               <div key={index} className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-5 mb-4 flex flex-col gap-2">
-                <h4 className="text-xl font-semibold">{product.name}</h4>
-                <p className="text-base">$ {product.price.toFixed(2)} | Description: {product.description}</p>
-                <div className="flex gap-2">
-                  <button
-                    className="bg-[var(--accent)] text-white border-none py-2 px-4 rounded-lg flex items-center gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300"
-                    onClick={() => {
-                      const updatedName = prompt('Edit Name', product.name);
-                      const updatedPrice = parseFloat(prompt('Edit Price', product.price));
-                      const updatedDescription = prompt('Edit Description', product.description);
-                      if (updatedName && !isNaN(updatedPrice)) {
-                        editVendorProduct(index, { name: updatedName, price: updatedPrice, description: updatedDescription });
-                      }
-                    }}
-                  >
-                    Edit
-                  </button>
-                  <button
-                    className="bg-red-500 text-white border-none py-2 px-4 rounded-lg flex items-center gap-2 font-medium hover:bg-red-600 transition-all duration-300"
-                    onClick={() => deleteVendorProduct(index)}
-                  >
-                    Delete
-                  </button>
-                </div>
+                {editingIndex === index ? (
+                  <>
+                    <input type="text" value={editedProduct.name} onChange={(e) => setEditedProduct({...editedProduct, name: e.target.value})} className="w-full p-2 rounded-lg bg-white/10 border border-black/30" />
+                    <input type="number" value={editedProduct.price} onChange={(e) => setEditedProduct({...editedProduct, price: e.target.value})} className="w-full p-2 rounded-lg bg-white/10 border border-black/30" />
+                    <input type="text" value={editedProduct.description} onChange={(e) => setEditedProduct({...editedProduct, description: e.target.value})} className="w-full p-2 rounded-lg bg-white/10 border border-black/30" />
+                    <div className="flex gap-2">
+                      <button onClick={() => handleSaveClick(index)} className="bg-green-500 text-white py-2 px-4 rounded-lg">Save</button>
+                      <button onClick={() => setEditingIndex(null)} className="bg-gray-500 text-white py-2 px-4 rounded-lg">Cancel</button>
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <h4 className="text-xl font-semibold">{product.name}</h4>
+                    <p className="text-base">$ {product.price.toFixed(2)} | Description: {product.description}</p>
+                    <div className="flex gap-2">
+                      <button
+                        className="bg-[var(--accent)] text-white border-none py-2 px-4 rounded-lg flex items-center gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300"
+                        onClick={() => handleEditClick(product, index)}
+                      >
+                        Edit
+                      </button>
+                      <button
+                        className="bg-red-500 text-white border-none py-2 px-4 rounded-lg flex items-center gap-2 font-medium hover:bg-red-600 transition-all duration-300"
+                        onClick={() => deleteVendorProduct(index)}
+                      >
+                        Delete
+                      </button>
+                    </div>
+                  </>
+                )}
               </div>
             ))
           )}
