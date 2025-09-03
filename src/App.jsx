@@ -13,7 +13,7 @@ import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
 import OrderConfirmation from './pages/OrderConfirmation';
 import Wishlist from './pages/Wishlist';
-import VendorDashboard from './pages/VendorDashboard';
+import ManageProducts from './pages/ManageProducts';
 import Orders from './pages/Orders';
 import FAQ from './pages/FAQ';
 import About from './pages/About';
@@ -34,7 +34,7 @@ const App = () => {
 
             {isVendor ? (
               <>
-                <Route path="/vendor" element={<VendorDashboard />} />
+                <Route path="/manage-products" element={<ManageProducts />} />
                 <Route path="/stores" element={<Navigate to="/dashboard" />} />
                 <Route path="/products" element={<Navigate to="/dashboard" />} />
                 <Route path="/products/:id" element={<Navigate to="/dashboard" />} />
@@ -56,7 +56,7 @@ const App = () => {
                 <Route path="/wishlist" element={<Wishlist />} />
                 <Route path="/faq" element={<FAQ />} />
                 <Route path="/about" element={<About />} />
-                <Route path="/vendor" element={<Navigate to="/dashboard" />} />
+                <Route path="/manage-products" element={<Navigate to="/dashboard" />} />
               </>
             )}
             
