@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
-import { QRCode } from 'qrcode.react'; // Corrected import: named export
+import QRCode from 'qrcode.react'; // Corrected import: default export
 
 const OrderConfirmation = () => {
   const { user } = useContext(AppContext);
