@@ -6,6 +6,12 @@ import { useNavigate } from 'react-router-dom';
 const allStores = [
   { name: 'Fresh Groceries', description: 'Organic fruits, vegetables, and daily essentials.' },
   { name: 'Local Bakery', description: 'Freshly baked bread, cakes, and pastries.' },
+  { name: 'The Corner Butcher', description: 'High-quality, locally sourced meats and poultry.' },
+  { name: 'Morning Brew Cafe', description: 'Artisanal coffee, teas, and delicious breakfast bites.' },
+  { name: 'Bloom & Petal', description: 'Beautiful bouquets and arrangements for any occasion.' },
+  { name: 'The Reading Nook', description: 'A cozy bookstore with a wide selection of genres.' },
+  { name: 'Paws & Whiskers', description: 'Everything you need for your furry friends.' },
+  { name: 'Main Street Hardware', description: 'Tools, supplies, and expert advice for your home projects.' },
 ];
 
 const Stores = () => {
@@ -33,9 +39,9 @@ const Stores = () => {
         </div>
 
         {filteredStores.length > 0 ? (
-          <div className="flex flex-col md:flex-row gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {filteredStores.map((store) => (
-              <div key={store.name} className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-6 flex-1 hover:-translate-y-1 transition-transform duration-300 m-2">
+              <div key={store.name} className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-6 flex-1 hover:-translate-y-1 transition-transform duration-300">
                 <FontAwesomeIcon icon={faStore} className="text-4xl text-[var(--accent)] mb-4" />
                 <h3 className="text-2xl font-semibold mb-3 md:text-3xl">{store.name}</h3>
                 <p className="text-base md:text-lg">{store.description}</p>
