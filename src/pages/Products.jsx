@@ -3,13 +3,12 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCartPlus, faHeart, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
 import { Link } from 'react-router-dom';
-import { stores, allProducts } from '../data/mockData';
 import { ChevronDown } from 'lucide-react';
 import SkeletonCard from '../components/SkeletonCard';
-import Pagination from '../components/Pagination'; // Import Pagination
+import Pagination from '../components/Pagination';
 
 const Products = () => {
-  const { addToCart, addToWishlist, simulateLoading } = useContext(AppContext);
+  const { addToCart, addToWishlist, simulateLoading, allAppProducts, appStores } = useContext(AppContext); // Use allAppProducts and appStores
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStore, setSelectedStore] = useState('all');
   const [sortBy, setSortBy] = useState('name-asc');
@@ -24,18 +23,14 @@ const Products = () => {
       setLoading(false);
     };
     loadData();
-  }, [searchTerm, selectedStore, sortBy, simulateLoading]);
+  }, [searchTerm, selectedStore, sortBy, simulateLoading, allAppProducts]); // Re-run loading when allAppProducts changes
 
   const filteredAndSortedProducts = useMemo(() => {
-    let products = allProducts;
+    let products = allAppProducts; // Use allAppProducts
 
     if (selectedStore !== 'all') {
       const storeId = parseInt(selectedStore);
-      const store = stores.find(s => s.id === storeId);
-      if (store) {
-        const productIds = new Set(store.products.map(p => p.id));
-        products = products.filter(p => productIds.has(p.id));
-      }
+      products = products.filter(p => p.storeId === storeId);
     }
 
     if (searchTerm) {
@@ -59,7 +54,7 @@ const Products = () => {
     });
 
     return products;
-  }, [searchTerm, selectedStore, sortBy]);
+  }, [searchTerm, selectedStore, sortBy, allAppProducts]);
 
   // Calculate pagination values
   const totalPages = Math.ceil(filteredAndSortedProducts.length / itemsPerPage);
@@ -105,7 +100,7 @@ const Products = () => {
               aria-label="Filter products by store"
             >
               <option value="all">All Stores</option>
-              {stores.map(store => (
+              {appStores.map(store => ( // Use appStores
                 <option key={store.id} value={store.id}>{store.name}</option>
               ))}
             </select>

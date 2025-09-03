@@ -5,10 +5,10 @@ import { faPlus, faEdit, faTrash, faBoxOpen } from '@fortawesome/free-solid-svg-
 import Modal from '../components/Modal';
 import ProductForm from '../components/ProductForm';
 import SkeletonCard from '../components/SkeletonCard';
-import Pagination from '../components/Pagination'; // Import Pagination
+import Pagination from '../components/Pagination';
 
 const ManageProducts = () => {
-  const { vendorProducts, addVendorProduct, editVendorProduct, deleteVendorProduct, simulateLoading } = useContext(AppContext);
+  const { vendorProducts, addVendorProduct, editVendorProduct, deleteVendorProduct, simulateLoading, user } = useContext(AppContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -37,10 +37,7 @@ const ManageProducts = () => {
 
   const handleFormSubmit = (productData) => {
     if (editingProduct) {
-      const productIndex = vendorProducts.findIndex(p => p.id === editingProduct.id);
-      if (productIndex !== -1) {
-        editVendorProduct(productIndex, productData);
-      }
+      editVendorProduct(editingProduct.id, productData); // Pass product ID for editing
     } else {
       addVendorProduct(productData);
     }
@@ -108,10 +105,10 @@ const ManageProducts = () => {
             </div>
           ) : currentProducts.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" role="list">
-              {currentProducts.map((product, index) => {
+              {currentProducts.map((product) => {
                 const discount = calculateDiscount(product.price, product.originalPrice);
                 return (
-                  <div key={product.id || index} className="bg-black/10 border border-white/10 rounded-2xl overflow-hidden shadow-lg flex flex-col" role="listitem" aria-label={`Product: ${product.name}`}>
+                  <div key={product.id} className="bg-black/10 border border-white/10 rounded-2xl overflow-hidden shadow-lg flex flex-col" role="listitem" aria-label={`Product: ${product.name}`}>
                     <div className="relative">
                       <img src={product.image} alt={product.name} className="w-full h-48 object-cover" />
                       {discount > 0 && (
@@ -132,7 +129,7 @@ const ManageProducts = () => {
                         <button onClick={() => handleOpenModal(product)} className="flex-1 bg-white/10 text-[var(--text)] py-2 px-4 rounded-lg font-medium hover:bg-white/20 transition-colors flex items-center justify-center gap-2" aria-label={`Edit ${product.name}`}>
                           <FontAwesomeIcon icon={faEdit} aria-hidden="true" /> Edit
                         </button>
-                        <button onClick={() => deleteVendorProduct(index)} className="bg-red-500/20 text-red-400 py-2 px-4 rounded-lg font-medium hover:bg-red-500/40 transition-colors flex items-center justify-center gap-2" aria-label={`Delete ${product.name}`}>
+                        <button onClick={() => deleteVendorProduct(product.id)} className="bg-red-500/20 text-red-400 py-2 px-4 rounded-lg font-medium hover:bg-red-500/40 transition-colors flex items-center justify-center gap-2" aria-label={`Delete ${product.name}`}>
                           <FontAwesomeIcon icon={faTrash} aria-hidden="true" />
                         </button>
                       </div>

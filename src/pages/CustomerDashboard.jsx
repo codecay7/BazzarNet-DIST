@@ -3,19 +3,18 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShoppingBag, faBoxOpen, faHeart, faMapMarkerAlt, faCheckCircle, faReceipt } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
 import { useNavigate } from 'react-router-dom';
-import { allProducts } from '../data/mockData';
-import SkeletonText from '../components/SkeletonText'; // Import SkeletonText
-import SkeletonCard from '../components/SkeletonCard'; // Import SkeletonCard
+import SkeletonText from '../components/SkeletonText';
+import SkeletonCard from '../components/SkeletonCard';
 
 const CustomerDashboard = () => {
-  const { user, cart, wishlist, simulateLoading } = useContext(AppContext);
+  const { user, cart, wishlist, simulateLoading, allAppProducts } = useContext(AppContext); // Use allAppProducts
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true); // Add loading state
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      await simulateLoading(1000); // Simulate a network request
+      await simulateLoading(1000);
       setLoading(false);
     };
     loadData();
@@ -34,7 +33,7 @@ const CustomerDashboard = () => {
     ]
   };
 
-  const featuredProducts = allProducts.slice(0, 3);
+  const featuredProducts = allAppProducts.slice(0, 3); // Use allAppProducts for featured products
 
   const stats = [
     { icon: faShoppingBag, label: 'Items in Cart', value: cart.length, path: '/cart' },

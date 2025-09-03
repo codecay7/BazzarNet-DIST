@@ -2,20 +2,20 @@ import React, { useContext, useMemo, useState, useEffect } from 'react';
 import { AppContext } from '../context/AppContext';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, LineChart, Line, Legend } from 'recharts';
 import { Wallet, Package, Users, Tag, Search, Calendar as CalendarIcon } from 'lucide-react';
-import { salesData, allProducts } from '../data/mockData';
+import { salesData } from '../data/mockData'; // Removed allProducts import
 import StatCard from './StatCard';
 import { useNavigate } from 'react-router-dom';
-import SkeletonText from './SkeletonText'; // Import SkeletonText
+import SkeletonText from './SkeletonText';
 
 const VendorDashboard = () => {
-  const { user, orders, vendorProducts, simulateLoading } = useContext(AppContext);
+  const { user, orders, vendorProducts, simulateLoading, allAppProducts } = useContext(AppContext); // Use allAppProducts
   const navigate = useNavigate();
-  const [loading, setLoading] = useState(true); // Add loading state
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      await simulateLoading(1000); // Simulate a network request
+      await simulateLoading(1000);
       setLoading(false);
     };
     loadData();
@@ -25,7 +25,7 @@ const VendorDashboard = () => {
   const totalRevenue = orders.reduce((sum, order) => sum + order.total, 0);
   const totalOrders = orders.length;
   const uniqueCustomers = new Set(orders.map(o => o.customer.name)).size;
-  const totalProducts = vendorProducts.length;
+  const totalProducts = vendorProducts.length; // Use vendorProducts for count
 
   const fastSellingItems = useMemo(() => {
     const salesCount = {};
@@ -39,10 +39,10 @@ const VendorDashboard = () => {
       .sort(([, a], [, b]) => b - a)
       .slice(0, 5)
       .map(([id, sales]) => {
-        const product = allProducts.find(p => p.id === parseInt(id));
+        const product = allAppProducts.find(p => p.id === parseInt(id)); // Find product from allAppProducts
         return { ...product, sales };
       });
-  }, [orders]);
+  }, [orders, allAppProducts]); // Add allAppProducts to dependency array
 
   return (
     <div className="w-full max-w-[1400px] mx-auto my-10 px-4 md:px-8">

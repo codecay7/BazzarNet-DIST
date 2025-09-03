@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { mockOrders as allMockOrders } from '../data/mockData';
+import { mockOrders as allMockOrders, allProducts as initialAllProducts, stores as initialStores } from '../data/mockData';
 
 export const AppContext = createContext();
 
@@ -12,13 +12,24 @@ export const AppProvider = ({ children }) => {
   const [isVendor, setIsVendor] = useState(false);
   const [cart, setCart] = useState([]);
   const [wishlist, setWishlist] = useState([]);
-  const [vendorProducts, setVendorProducts] = useState([]);
+  const [allAppProducts, setAllAppProducts] = useState(initialAllProducts); // Central source of truth for all products
+  const [vendorProducts, setVendorProducts] = useState([]); // Products specific to the logged-in vendor
   const [orders, setOrders] = useState(allMockOrders);
+  const [appStores, setAppStores] = useState(initialStores); // Central source of truth for all stores
 
   // Set initial theme on mount
   useEffect(() => {
     document.body.setAttribute('data-theme', 'dark');
   }, []);
+
+  // Effect to update vendorProducts when allAppProducts or user changes
+  useEffect(() => {
+    if (isLoggedIn && isVendor && user?.storeId) {
+      setVendorProducts(allAppProducts.filter(p => p.storeId === user.storeId));
+    } else {
+      setVendorProducts([]);
+    }
+  }, [isLoggedIn, isVendor, user, allAppProducts]);
 
   // Theme Toggle
   const toggleTheme = () => {
@@ -52,12 +63,19 @@ export const AppProvider = ({ children }) => {
     return true;
   };
 
-  const loginAsVendor = (name, store) => {
-    if (!name || !store) {
+  const loginAsVendor = (name, storeName) => {
+    if (!name || !storeName) {
       toast.error('Please enter both your name and store name.');
       return false;
     }
-    const userData = { name, store, role: 'vendor' };
+    // Find the store ID based on the store name (mocking a lookup)
+    const store = initialStores.find(s => s.name === storeName);
+    if (!store) {
+      toast.error('Store not found. Please register your store first.');
+      return false;
+    }
+
+    const userData = { name, store: storeName, role: 'vendor', storeId: store.id };
     setUser(userData);
     setIsLoggedIn(true);
     setIsVendor(true);
@@ -71,16 +89,17 @@ export const AppProvider = ({ children }) => {
     setUser(null);
     setIsLoggedIn(false);
     setIsVendor(false);
+    setVendorProducts([]); // Clear vendor-specific products on logout
     toast.success('You have been logged out.');
   };
 
   // Cart Functions
   const addToCart = (product) => {
     setCart((prevCart) => {
-      const existingProduct = prevCart.find((item) => item.name === product.name);
+      const existingProduct = prevCart.find((item) => item.id === product.id);
       if (existingProduct) {
         return prevCart.map((item) =>
-          item.name === product.name ? { ...item, quantity: item.quantity + 1 } : item
+          item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
         );
       }
       return [...prevCart, { ...product, quantity: 1 }];
@@ -88,19 +107,19 @@ export const AppProvider = ({ children }) => {
     toast.success(`${product.name} added to cart!`);
   };
 
-  const removeFromCart = (productName) => {
-    setCart((prevCart) => prevCart.filter((item) => item.name !== productName));
-    toast.error(`${productName} removed from cart.`);
+  const removeFromCart = (productId) => {
+    setCart((prevCart) => prevCart.filter((item) => item.id !== productId));
+    toast.error(`Item removed from cart.`);
   };
   
-  const updateCartQuantity = (productName, quantity) => {
+  const updateCartQuantity = (productId, quantity) => {
     if (quantity <= 0) {
-      removeFromCart(productName);
+      removeFromCart(productId);
       return;
     }
     setCart((prevCart) =>
       prevCart.map((item) =>
-        item.name === productName ? { ...item, quantity } : item
+        item.id === productId ? { ...item, quantity } : item
       )
     );
   };
@@ -113,7 +132,7 @@ export const AppProvider = ({ children }) => {
   // Wishlist Functions
   const addToWishlist = (product) => {
     setWishlist((prevWishlist) => {
-        if (prevWishlist.find(item => item.name === product.name)) {
+        if (prevWishlist.find(item => item.id === product.id)) {
             toast.error(`${product.name} is already in your wishlist.`);
             return prevWishlist;
         }
@@ -122,31 +141,36 @@ export const AppProvider = ({ children }) => {
     });
   };
 
-  const removeFromWishlist = (productName) => {
-    setWishlist((prevWishlist) => prevWishlist.filter((item) => item.name !== productName));
-    toast.error(`${productName} removed from wishlist.`);
+  const removeFromWishlist = (productId) => {
+    setWishlist((prevWishlist) => prevWishlist.filter((item) => item.id !== productId));
+    toast.error(`Item removed from wishlist.`);
   };
 
   const moveToCart = (product) => {
     addToCart(product);
-    removeFromWishlist(product.name);
+    removeFromWishlist(product.id);
   };
 
-  // Vendor Functions
+  // Vendor Product Management Functions (now updating allAppProducts)
   const addVendorProduct = (newProduct) => {
-    setVendorProducts([...vendorProducts, newProduct]);
+    if (!user?.storeId) {
+      toast.error('Vendor not associated with a store.');
+      return;
+    }
+    const productWithStoreId = { ...newProduct, storeId: user.storeId };
+    setAllAppProducts(prevProducts => [...prevProducts, productWithStoreId]);
     toast.success(`${newProduct.name} added to your store!`);
   };
 
-  const editVendorProduct = (index, updatedProduct) => {
-    const newProducts = vendorProducts.map((product, i) => (i === index ? updatedProduct : product));
-    setVendorProducts(newProducts);
+  const editVendorProduct = (productId, updatedProduct) => {
+    setAllAppProducts(prevProducts =>
+      prevProducts.map(p => (p.id === productId ? { ...updatedProduct, storeId: p.storeId } : p))
+    );
     toast.success('Product updated!');
   };
 
-  const deleteVendorProduct = (index) => {
-    const newProducts = vendorProducts.filter((_, i) => i !== index);
-    setVendorProducts(newProducts);
+  const deleteVendorProduct = (productId) => {
+    setAllAppProducts(prevProducts => prevProducts.filter(p => p.id !== productId));
     toast.error('Product deleted.');
   };
 
@@ -191,13 +215,15 @@ export const AppProvider = ({ children }) => {
     addToWishlist,
     removeFromWishlist,
     moveToCart,
-    vendorProducts,
+    allAppProducts, // Expose the central product list
+    vendorProducts, // Expose filtered vendor products
     addVendorProduct,
     editVendorProduct,
     deleteVendorProduct,
     orders,
     updateOrderStatus,
-    simulateLoading, // Expose simulateLoading
+    simulateLoading,
+    appStores, // Expose the central stores list
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

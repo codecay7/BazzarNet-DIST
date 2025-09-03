@@ -4,9 +4,9 @@ export const stores = [
     name: 'Fresh Groceries', 
     description: 'Organic fruits, vegetables, and daily essentials.',
     products: [
-      { id: 101, name: 'Fresh Apples', price: 150.00, originalPrice: null, stock: 100, category: 'Fruits', image: 'https://images.unsplash.com/photo-1560806887-1e4cd0b5cbd6?w=200&h=200&fit=crop', description: 'Crisp and juicy apples, perfect for a healthy snack or baking.', rating: 4.5, reviews: 120 },
-      { id: 102, name: 'Organic Milk', price: 80.00, originalPrice: 90.00, stock: 50, category: 'Dairy', image: 'https://images.unsplash.com/photo-1559598467-f8b76c8155d0?w=200&h=200&fit=crop', description: 'Fresh, creamy organic milk from grass-fed cows.', rating: 4, reviews: 95 },
-      { id: 103, name: 'Avocados', price: 120.00, originalPrice: null, stock: 75, category: 'Vegetables', image: 'https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=200&h=200&fit=crop', description: 'Creamy and delicious avocados.', rating: 5, reviews: 300 },
+      { id: 101, name: 'Fresh Apples', price: 150.00, originalPrice: null, stock: 100, category: 'Fruits', image: 'https://images.unsplash.com/photo-1560806887-1e4cd0b5cbd6?w=200&h=200&fit=crop', description: 'Crisp and juicy apples, perfect for a healthy snack or baking.', rating: 4.5, reviews: 120, storeId: 1 },
+      { id: 102, name: 'Organic Milk', price: 80.00, originalPrice: 90.00, stock: 50, category: 'Dairy', image: 'https://images.unsplash.com/photo-1559598467-f8b76c8155d0?w=200&h=200&fit=crop', description: 'Fresh, creamy organic milk from grass-fed cows.', rating: 4, reviews: 95, storeId: 1 },
+      { id: 103, name: 'Avocados', price: 120.00, originalPrice: null, stock: 75, category: 'Vegetables', image: 'https://images.unsplash.com/photo-1523049673857-eb18f1d7b578?w=200&h=200&fit=crop', description: 'Creamy and delicious avocados.', rating: 5, reviews: 300, storeId: 1 },
     ]
   },
   { 
@@ -14,8 +14,8 @@ export const stores = [
     name: 'Local Bakery', 
     description: 'Freshly baked bread, cakes, and pastries.',
     products: [
-      { id: 201, name: 'Sourdough Bread', price: 250.00, originalPrice: null, stock: 30, category: 'Bakery', image: 'https://images.unsplash.com/photo-1534620808146-d33874f689d8?w=200&h=200&fit=crop', description: 'Artisanal sourdough bread with a chewy crust.', rating: 5, reviews: 250 },
-      { id: 202, name: 'Croissants', price: 100.00, originalPrice: 120.00, stock: 60, category: 'Bakery', image: 'https://images.unsplash.com/photo-1598373154423-0c41813df157?w=200&h=200&fit=crop', description: 'Buttery and flaky, fresh from the oven.', rating: 4.5, reviews: 150 },
+      { id: 201, name: 'Sourdough Bread', price: 250.00, originalPrice: null, stock: 30, category: 'Bakery', image: 'https://images.unsplash.com/photo-1534620808146-d33874f689d8?w=200&h=200&fit=crop', description: 'Artisanal sourdough bread with a chewy crust.', rating: 5, reviews: 250, storeId: 2 },
+      { id: 202, name: 'Croissants', price: 100.00, originalPrice: 120.00, stock: 60, category: 'Bakery', image: 'https://images.unsplash.com/photo-1598373154423-0c41813df157?w=200&h=200&fit=crop', description: 'Buttery and flaky, fresh from the oven.', rating: 4.5, reviews: 150, storeId: 2 },
     ]
   },
 ];

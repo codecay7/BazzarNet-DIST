@@ -3,12 +3,11 @@ import { useParams, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCartPlus, faHeart, faStar, faStarHalfAlt } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
-import { allProducts } from '../data/mockData';
 
 const ProductDetail = () => {
-  const { addToCart, addToWishlist } = useContext(AppContext);
+  const { addToCart, addToWishlist, allAppProducts } = useContext(AppContext); // Use allAppProducts
   const { id } = useParams();
-  const product = allProducts.find(p => p.id === parseInt(id));
+  const product = allAppProducts.find(p => p.id === parseInt(id)); // Find product from allAppProducts
 
   if (!product) {
     return (
