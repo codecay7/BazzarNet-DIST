@@ -17,6 +17,8 @@ import OrderConfirmation from './pages/OrderConfirmation';
 import Wishlist from './pages/Wishlist';
 import ManageProducts from './pages/ManageProducts';
 import Orders from './pages/Orders';
+import OrderDetails from './pages/OrderDetails';
+import StoreSettings from './pages/StoreSettings';
 import FAQ from './pages/FAQ';
 import About from './pages/About';
 import Profile from './pages/Profile';
@@ -37,6 +39,9 @@ const App = () => {
             {isVendor ? (
               <>
                 <Route path="/manage-products" element={<ManageProducts />} />
+                <Route path="/orders/:orderId" element={<OrderDetails />} />
+                <Route path="/settings" element={<StoreSettings />} />
+                {/* Redirect customer routes for vendors */}
                 <Route path="/products" element={<Navigate to="/dashboard" />} />
                 <Route path="/products/:id" element={<Navigate to="/dashboard" />} />
                 <Route path="/stores" element={<Navigate to="/dashboard" />} />
@@ -60,7 +65,10 @@ const App = () => {
                 <Route path="/wishlist" element={<Wishlist />} />
                 <Route path="/faq" element={<FAQ />} />
                 <Route path="/about" element={<About />} />
+                {/* Redirect vendor routes for customers */}
                 <Route path="/manage-products" element={<Navigate to="/dashboard" />} />
+                <Route path="/orders/:orderId" element={<Navigate to="/dashboard" />} />
+                <Route path="/settings" element={<Navigate to="/dashboard" />} />
               </>
             )}
             

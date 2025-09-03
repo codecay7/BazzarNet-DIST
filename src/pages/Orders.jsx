@@ -1,18 +1,18 @@
 import React, { useContext, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faMapMarkerAlt, faBoxOpen, faCheckCircle, faChevronDown, faChevronUp } from '@fortawesome/free-solid-svg-icons';
+import { faMapMarkerAlt, faBoxOpen, faCheckCircle, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
 import { mockOrders as allMockOrders } from '../data/mockData';
-import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 
 const Orders = () => {
   const { isVendor } = useContext(AppContext);
   const [searchTerm, setSearchTerm] = useState('');
-  const [expandedOrder, setExpandedOrder] = useState(null);
+  const navigate = useNavigate();
 
   const getStatusInfo = (status) => {
     switch (status) {
-      case 'Out for Delivery':
+      case 'Shipped':
         return { icon: faMapMarkerAlt, color: 'text-blue-400' };
       case 'Delivered':
         return { icon: faCheckCircle, color: 'text-green-400' };
@@ -25,10 +25,6 @@ const Orders = () => {
     order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
     order.items.some(item => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
   );
-
-  const toggleOrderDetails = (orderId) => {
-    setExpandedOrder(expandedOrder === orderId ? null : orderId);
-  };
 
   return (
     <section className="w-full max-w-[1200px] my-10">
@@ -49,7 +45,6 @@ const Orders = () => {
           <div className="space-y-6">
             {filteredOrders.map(order => {
               const statusInfo = getStatusInfo(order.status);
-              const isExpanded = expandedOrder === order.id;
               return (
                 <div key={order.id} className="bg-black/10 rounded-2xl p-6 transition-all duration-300">
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
@@ -64,39 +59,12 @@ const Orders = () => {
                       </div>
                       <button
                         className="bg-[var(--accent)] w-full md:w-fit text-white border-none py-2 px-6 rounded-lg flex items-center justify-center gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300"
-                        onClick={() => toggleOrderDetails(order.id)}
+                        onClick={() => navigate(`/orders/${order.id.replace('#', '')}`)}
                       >
-                        View Details <FontAwesomeIcon icon={isExpanded ? faChevronUp : faChevronDown} />
+                        View Details <FontAwesomeIcon icon={faChevronRight} />
                       </button>
                     </div>
                   </div>
-                  <AnimatePresence>
-                    {isExpanded && (
-                      <motion.div
-                        initial={{ opacity: 0, height: 0 }}
-                        animate={{ opacity: 1, height: 'auto' }}
-                        exit={{ opacity: 0, height: 0 }}
-                        transition={{ duration: 0.3, ease: 'easeInOut' }}
-                        className="overflow-hidden"
-                      >
-                        <div className="mt-6 pt-4 border-t border-white/20">
-                          <h4 className="font-semibold text-lg mb-3">Items in this order:</h4>
-                          <div className="space-y-4">
-                            {order.items.map(item => (
-                              <div key={item.id} className="flex items-center gap-4 bg-black/10 p-3 rounded-lg">
-                                <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-md" />
-                                <div className="flex-grow">
-                                  <p className="font-semibold">{item.name}</p>
-                                  <p className="text-sm opacity-80">Quantity: {item.quantity}</p>
-                                </div>
-                                <p className="font-semibold">₹{(item.price * item.quantity).toFixed(2)}</p>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
                 </div>
               );
             })}
