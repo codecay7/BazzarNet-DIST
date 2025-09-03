@@ -47,21 +47,23 @@ const CustomerOrderDetails = () => {
         {/* Order Tracker */}
         <div className="bg-black/10 p-6 rounded-xl mb-8">
           <h3 className="text-xl font-semibold mb-6">Order Status: <span className="text-[var(--accent)]">{order.status}</span></h3>
-          <div className="flex items-center" role="progressbar" aria-valuenow={steps.filter(s => s.completed).length} aria-valuemin="0" aria-valuemax={steps.length} aria-label={`Order ${order.id} progress`}>
-            {steps.map((step, index) => (
-              <React.Fragment key={step.name}>
-                <div className="flex flex-col items-center">
-                  <div className={`w-12 h-12 rounded-full flex items-center justify-center border-2 ${step.completed ? 'bg-[var(--accent)] border-[var(--accent)] text-white' : 'bg-transparent border-gray-500 text-gray-500'}`} aria-hidden="true">
-                    <FontAwesomeIcon icon={step.icon} size="lg" />
+          {steps && steps.length > 0 && ( // Defensive check added here
+            <div className="flex items-center" role="progressbar" aria-valuenow={steps.filter(s => s.completed).length} aria-valuemin="0" aria-valuemax={steps.length} aria-label={`Order ${order.id} progress`}>
+              {steps.map((step, index) => (
+                <React.Fragment key={step.name}>
+                  <div className="flex flex-col items-center">
+                    <div className={`w-12 h-12 rounded-full flex items-center justify-center border-2 ${step.completed ? 'bg-[var(--accent)] border-[var(--accent)] text-white' : 'bg-transparent border-gray-500 text-gray-500'}`} aria-hidden="true">
+                      <FontAwesomeIcon icon={step.icon} size="lg" />
+                    </div>
+                    <p className={`text-sm mt-2 text-center ${step.completed ? 'font-semibold' : 'opacity-70'}`}>{step.name}</p>
                   </div>
-                  <p className={`text-sm mt-2 text-center ${step.completed ? 'font-semibold' : 'opacity-70'}`}>{step.name}</p>
-                </div>
-                {index < steps.length - 1 && (
-                  <div className={`flex-1 h-1 mx-2 ${step.completed ? 'bg-[var(--accent)]' : 'bg-gray-500'}`} aria-hidden="true"></div>
-                )}
-              </React.Fragment>
-            ))}
-          </div>
+                  {index < steps.length - 1 && (
+                    <div className={`flex-1 h-1 mx-2 ${step.completed ? 'bg-[var(--accent)]' : 'bg-gray-500'}`} aria-hidden="true"></div>
+                  )}
+                </React.Fragment>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* Payment & Transaction Details */}
