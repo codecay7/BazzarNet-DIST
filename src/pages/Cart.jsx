@@ -29,7 +29,7 @@ const Cart = () => {
                 <div key={item.name} className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                   <div>
                     <h3 className="text-xl font-semibold">{item.name}</h3>
-                    <p className="text-base">$ {item.price.toFixed(2)}</p>
+                    <p className="text-base">₹{item.price.toFixed(2)}</p>
                   </div>
                   <div className="flex items-center gap-4">
                     <div className="flex items-center gap-2">
@@ -48,7 +48,7 @@ const Cart = () => {
               ))}
             </div>
             <div className="mt-5 border-t border-white/20 pt-5 flex flex-col md:flex-row justify-between items-center">
-              <p className="text-lg font-bold">Total: ${total.toFixed(2)}</p>
+              <p className="text-lg font-bold">Total: ₹{total.toFixed(2)}</p>
               <button
                 className="bg-[var(--accent)] text-white border-none py-2 px-6 rounded-lg flex items-center gap-2 font-medium hover:bg-[var(--accent-dark)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.15)] hover:-translate-y-0.5 active:translate-y-0 active:shadow-[0_2px_10px_rgba(0,0,0,0.1)] transition-all duration-300 mt-4 md:mt-0"
                 onClick={() => navigate('/checkout')}

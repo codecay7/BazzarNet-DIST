@@ -11,9 +11,9 @@ const VendorDashboard = () => {
 
   // Mock data for demonstration
   const stats = [
-    { icon: faDollarSign, label: 'Total Revenue', value: '$1,250', color: 'text-green-400' },
+    { icon: faDollarSign, label: 'Total Revenue', value: '₹1,250', color: 'text-green-400' },
     { icon: faBoxOpen, label: 'Total Orders', value: '75', color: 'text-blue-400' },
-    { icon: faChartLine, label: 'Sales this Month', value: '$450', color: 'text-purple-400' },
+    { icon: faChartLine, label: 'Sales this Month', value: '₹450', color: 'text-purple-400' },
   ];
 
   const salesData = [
@@ -94,7 +94,7 @@ const VendorDashboard = () => {
                 <div key={order.id} className="flex justify-between items-center">
                   <div>
                     <p className="font-semibold">{order.customer}</p>
-                    <p className="text-sm opacity-80">{order.id} - ${order.total.toFixed(2)}</p>
+                    <p className="text-sm opacity-80">{order.id} - ₹{order.total.toFixed(2)}</p>
                   </div>
                   <span className={`text-xs font-medium px-3 py-1 rounded-full ${getStatusClass(order.status)}`}>
                     {order.status}

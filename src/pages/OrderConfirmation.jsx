@@ -32,14 +32,14 @@ const OrderConfirmation = () => {
         <div className="text-left max-w-md mx-auto bg-black/10 p-6 rounded-lg">
             <h3 className="text-xl font-semibold mb-4 border-b border-white/20 pb-2">Order Summary</h3>
             <p className="mb-2"><strong>Order ID:</strong> #{orderId}</p>
-            <p className="mb-4"><strong>Total:</strong> ${total.toFixed(2)}</p>
+            <p className="mb-4"><strong>Total:</strong> ₹{total.toFixed(2)}</p>
             <div className="mb-4">
                 <h4 className="font-semibold">Items:</h4>
                 <ul>
                     {cart.map(item => (
                         <li key={item.id} className="flex justify-between py-1">
                             <span>{item.name} x {item.quantity}</span>
-                            <span>${(item.price * item.quantity).toFixed(2)}</span>
+                            <span>₹{(item.price * item.quantity).toFixed(2)}</span>
                         </li>
                     ))}
                 </ul>

@@ -55,7 +55,7 @@ const Orders = () => {
                   <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
                     <div className="flex-1">
                       <h3 className="text-xl font-semibold md:text-2xl mb-2">Order {order.id}</h3>
-                      <p className="text-base md:text-lg"><strong>Total:</strong> ${order.total.toFixed(2)}</p>
+                      <p className="text-base md:text-lg"><strong>Total:</strong> ₹{order.total.toFixed(2)}</p>
                     </div>
                     <div className="w-full md:w-auto flex flex-col items-start md:items-end gap-3">
                       <div className={`flex items-center gap-2 font-semibold ${statusInfo.color}`}>
@@ -89,7 +89,7 @@ const Orders = () => {
                                   <p className="font-semibold">{item.name}</p>
                                   <p className="text-sm opacity-80">Quantity: {item.quantity}</p>
                                 </div>
-                                <p className="font-semibold">${(item.price * item.quantity).toFixed(2)}</p>
+                                <p className="font-semibold">₹{(item.price * item.quantity).toFixed(2)}</p>
                               </div>
                             ))}
                           </div>

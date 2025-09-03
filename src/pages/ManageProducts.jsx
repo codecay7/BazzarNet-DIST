@@ -94,7 +94,7 @@ const VendorDashboard = () => {
                 ) : (
                   <>
                     <h4 className="text-xl font-semibold">{product.name}</h4>
-                    <p className="text-base">$ {product.price.toFixed(2)} | Description: {product.description}</p>
+                    <p className="text-base">₹{product.price.toFixed(2)} | Description: {product.description}</p>
                     <div className="flex gap-2">
                       <button
                         className="bg-[var(--accent)] text-white border-none py-2 px-4 rounded-lg flex items-center gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300"

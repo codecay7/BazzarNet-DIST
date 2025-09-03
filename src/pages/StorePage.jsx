@@ -36,7 +36,7 @@ const StorePage = () => {
               <Link to={`/products/${product.id}`} className="flex-grow">
                 <img src={product.image} alt={product.name} className="w-full h-48 object-cover rounded-lg mb-4" />
                 <h3 className="text-xl font-semibold mb-2">{product.name}</h3>
-                <p className="text-lg font-bold text-[var(--accent)]">${product.price.toFixed(2)}</p>
+                <p className="text-lg font-bold text-[var(--accent)]">₹{product.price.toFixed(2)}</p>
               </Link>
               <div className="flex gap-2 mt-4">
                 <button

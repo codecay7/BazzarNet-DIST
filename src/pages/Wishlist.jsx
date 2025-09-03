@@ -24,7 +24,7 @@ const Wishlist = () => {
             {wishlist.map((item, index) => (
               <div key={index} className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-5 flex flex-col gap-2">
                 <h3 className="text-xl font-semibold">{item.name}</h3>
-                <p className="text-base">${item.price.toFixed(2)}</p>
+                <p className="text-base">₹{item.price.toFixed(2)}</p>
                 <div className="flex gap-2">
                   <button
                     className="bg-[var(--accent)] text-white border-none py-2 px-4 rounded-lg flex items-center gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300"
