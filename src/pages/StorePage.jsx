@@ -5,11 +5,11 @@ import { AppContext } from '../context/AppContext';
 import { Link, useParams } from 'react-router-dom';
 import { stores } from '../data/mockData';
 
-const Products = () => {
+const StorePage = () => {
   const { addToCart, addToWishlist } = useContext(AppContext);
-  const { storeName } = useParams();
+  const { storeId } = useParams();
   
-  const store = stores.find(s => s.name === decodeURIComponent(storeName));
+  const store = stores.find(s => s.id === parseInt(storeId));
 
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -31,12 +31,12 @@ const Products = () => {
           if (sortBy === 'price-desc') {
             return b.price - a.price;
           }
-          return a.name.localeCompare(b.name); // Default sort by name
+          return a.name.localeCompare(b.name);
         });
 
         setProducts(filteredProducts);
         setLoading(false);
-      }, 500); // Simulate network delay
+      }, 500);
 
       return () => clearTimeout(timer);
     }
@@ -124,4 +124,4 @@ const Products = () => {
   );
 };
 
-export default Products;
+export default StorePage;

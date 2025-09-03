@@ -7,7 +7,7 @@ import PublicLayout from './components/PublicLayout';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Stores from './pages/Stores';
-import Products from './pages/Products';
+import StorePage from './pages/StorePage';
 import ProductDetail from './pages/ProductDetail';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
@@ -36,7 +36,7 @@ const App = () => {
               <>
                 <Route path="/manage-products" element={<ManageProducts />} />
                 <Route path="/stores" element={<Navigate to="/dashboard" />} />
-                <Route path="/stores/:storeName" element={<Navigate to="/dashboard" />} />
+                <Route path="/stores/:storeId" element={<Navigate to="/dashboard" />} />
                 <Route path="/products/:id" element={<Navigate to="/dashboard" />} />
                 <Route path="/cart" element={<Navigate to="/dashboard" />} />
                 <Route path="/checkout" element={<Navigate to="/dashboard" />} />
@@ -48,7 +48,7 @@ const App = () => {
             ) : (
               <>
                 <Route path="/stores" element={<Stores />} />
-                <Route path="/stores/:storeName" element={<Products />} />
+                <Route path="/stores/:storeId" element={<StorePage />} />
                 <Route path="/products/:id" element={<ProductDetail />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/checkout" element={<Checkout />} />
