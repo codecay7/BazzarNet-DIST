@@ -5,12 +5,19 @@ import { AppContext } from '../context/AppContext';
 import { useNavigate } from 'react-router-dom';
 
 const Checkout = () => {
-  const { checkout } = useContext(AppContext);
+  const { cart, checkout } = useContext(AppContext);
   const navigate = useNavigate();
 
   const handleCheckout = () => {
-    checkout();
-    navigate('/');
+    const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+    const orderDetails = {
+        orderId: Math.floor(Math.random() * 100000),
+        total,
+        cart,
+    };
+    
+    checkout(); // Clears the cart
+    navigate('/confirmation', { state: { orderDetails } });
   };
 
   return (
