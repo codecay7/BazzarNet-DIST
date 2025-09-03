@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faHome, faShoppingBag, faStore, faTruck, faUser, faSignOutAlt,
-  faQuestionCircle, faInfoCircle, faHeart, faShoppingCart
+  faHeart, faShoppingCart
 } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
 import { Link, useNavigate } from 'react-router-dom';
@@ -32,8 +32,6 @@ const MobileNav = () => {
     { name: 'Cart', path: '/cart', icon: faShoppingCart },
     { name: 'Wishlist', path: '/wishlist', icon: faHeart },
     { name: 'Orders', path: '/orders', icon: faTruck },
-    { name: 'FAQ', path: '/faq', icon: faQuestionCircle },
-    { name: 'About', path: '/about', icon: faInfoCircle },
     { name: 'Profile', path: '/profile', icon: faUser },
   ];
 
