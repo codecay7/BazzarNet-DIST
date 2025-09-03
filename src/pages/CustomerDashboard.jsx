@@ -133,13 +133,13 @@ const CustomerDashboard = () => {
                       {getOrderSteps(latestOrder.status).map((step, index) => (
                         <React.Fragment key={step.name}>
                           <div className="flex flex-col items-center">
-                            <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${step.completed ? 'bg-[var(--accent)] border-[var(--accent)] text-white' : 'bg-transparent border-gray-500 text-gray-500'}`} aria-hidden="true">
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${step.completed ? 'bg-[var(--accent)] border-[var(--accent)] text-white' : 'bg-transparent border-white/30 text-white/50'}`} aria-hidden="true">
                               <FontAwesomeIcon icon={faCheckCircle} />
                             </div>
                             <p className={`text-xs mt-2 ${step.completed ? 'font-semibold' : 'opacity-70'}`}>{step.name}</p>
                           </div>
                           {index < getOrderSteps(latestOrder.status).length - 1 && (
-                            <div className={`flex-1 h-1 mx-2 ${step.completed ? 'bg-[var(--accent)]' : 'bg-gray-500'}`} aria-hidden="true"></div>
+                            <div className={`flex-1 h-1 mx-2 ${step.completed ? 'bg-[var(--accent)]' : 'bg-white/10'}`} aria-hidden="true"></div>
                           )}
                         </React.Fragment>
                       ))}
