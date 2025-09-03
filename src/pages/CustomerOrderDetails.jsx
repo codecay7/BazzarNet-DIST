@@ -4,6 +4,16 @@ import { AppContext } from '../context/AppContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBox, faTruck, faHome } from '@fortawesome/free-solid-svg-icons';
 
+// Helper function to format ISO timestamp
+const formatTimestamp = (isoString) => {
+  const date = new Date(isoString);
+  const optionsDate = { year: 'numeric', month: 'long', day: 'numeric' };
+  const optionsTime = { hour: '2-digit', minute: '2-digit', hour12: true };
+  const formattedDate = date.toLocaleDateString(undefined, optionsDate);
+  const formattedTime = date.toLocaleTimeString(undefined, optionsTime);
+  return `${formattedDate} at ${formattedTime}`;
+};
+
 const CustomerOrderDetails = () => {
   const { orderId } = useParams();
   const { orders } = useContext(AppContext);
@@ -28,7 +38,8 @@ const CustomerOrderDetails = () => {
     <section className="w-full max-w-[1200px] my-10">
       <div className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-8 mx-4">
         <h2 className="text-3xl font-bold mb-2">Order Details</h2>
-        <p className="text-lg text-[var(--text)] opacity-80 mb-8">Order ID: {order.id}</p>
+        <p className="text-lg text-[var(--text)] opacity-80 mb-2">Order ID: {order.id}</p>
+        <p className="text-lg text-[var(--text)] opacity-80 mb-8">Order Placed: {formatTimestamp(order.timestamp)}</p> {/* Display formatted timestamp */}
 
         {/* Order Tracker */}
         <div className="bg-black/10 p-6 rounded-xl mb-8">
@@ -50,12 +61,19 @@ const CustomerOrderDetails = () => {
           </div>
         </div>
 
+        {/* Payment & Transaction Details */}
+        <div className="bg-black/10 p-6 rounded-xl mb-8">
+          <h3 className="text-xl font-semibold mb-4">Payment Information</h3>
+          <p className="mb-2"><strong>Payment Method:</strong> {order.paymentMethod}</p>
+          <p><strong>Transaction ID:</strong> {order.transactionId}</p>
+        </div>
+
         {/* Items List */}
         <div className="bg-black/10 p-6 rounded-xl">
           <h3 className="text-xl font-semibold mb-4">Items in Your Order</h3>
           <div className="space-y-4" role="list">
             {order.items.map(item => (
-              <div key={item.id} className="flex items-center gap-4 bg-black/10 p-3 rounded-lg" role="listitem" aria-label={`Item: ${item.name}, Quantity: ${item.quantity}, Price: ₹${(item.price * item.quantity).toFixed(2)}`}>
+              <div key={item.id} className="flex items-center gap-4 bg-black/10 p-3 rounded-lg" role="listitem" aria-label={`Item: ${item.name}, Quantity: ${item.quantity}, Price: ₹{(item.price * item.quantity).toFixed(2)}`}>
                 <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-md" />
                 <div className="flex-grow">
                   <p className="font-semibold">{item.name}</p>

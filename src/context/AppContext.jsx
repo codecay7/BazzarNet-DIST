@@ -165,7 +165,8 @@ export const AppProvider = ({ children }) => {
       id: `#BN${Math.floor(10000 + Math.random() * 90000)}`, // Generate a new order ID
       customer: { name: user.name, email: user.email },
       customerEmail: user.email,
-      date: new Date().toISOString().slice(0, 10),
+      timestamp: new Date().toISOString(), // Store full ISO timestamp
+      transactionId: `TXN${Math.floor(1000000000 + Math.random() * 9000000000)}`, // Mock transaction ID
       status: 'Pending', // Initial status
       otp: otp, // Store the OTP with the order
       shipping: { trackingNumber: 'N/A', carrier: 'BazzarNet Delivery' }, // Default shipping

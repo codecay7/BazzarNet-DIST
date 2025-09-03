@@ -4,6 +4,16 @@ import { AppContext } from '../context/AppContext';
 import toast from 'react-hot-toast';
 import { ChevronDown } from 'lucide-react';
 
+// Helper function to format ISO timestamp
+const formatTimestamp = (isoString) => {
+  const date = new Date(isoString);
+  const optionsDate = { year: 'numeric', month: 'long', day: 'numeric' };
+  const optionsTime = { hour: '2-digit', minute: '2-digit', hour12: true };
+  const formattedDate = date.toLocaleDateString(undefined, optionsDate);
+  const formattedTime = date.toLocaleTimeString(undefined, optionsTime);
+  return `${formattedDate} at ${formattedTime}`;
+};
+
 const OrderDetails = () => {
   const { orderId } = useParams();
   const { orders, updateOrderStatus, confirmDeliveryWithOtp } = useContext(AppContext);
@@ -50,11 +60,16 @@ const OrderDetails = () => {
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <p><strong>Order ID:</strong> {order.id}</p>
                 <p><strong>Customer:</strong> {order.customer.name}</p>
-                <p><strong>Date:</strong> {order.date}</p>
+                <p><strong>Order Placed:</strong> {formatTimestamp(order.timestamp)}</p> {/* Display formatted timestamp */}
                 <p><strong>Total:</strong> ₹{order.total.toFixed(2)}</p>
                 <p><strong>Status:</strong> <span className="font-semibold text-[var(--accent)]">{status}</span></p>
                 <p><strong>Delivery OTP:</strong> <span className="font-semibold text-[var(--accent)]">{order.otp}</span></p> {/* Display OTP for vendor */}
               </div>
+            </div>
+            <div className="bg-black/10 p-6 rounded-xl">
+              <h3 className="text-xl font-semibold mb-4">Payment & Transaction Details</h3>
+              <p className="mb-2"><strong>Payment Method:</strong> {order.paymentMethod}</p>
+              <p><strong>Transaction ID:</strong> {order.transactionId}</p>
             </div>
             <div className="bg-black/10 p-6 rounded-xl">
               <h3 className="text-xl font-semibold mb-4">Items</h3>

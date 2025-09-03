@@ -3,7 +3,17 @@ import { Link, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
-import QRCode from 'react-qr-code'; // Import QRCode from react-qr-code
+import QRCode from 'react-qr-code';
+
+// Helper function to format ISO timestamp
+const formatTimestamp = (isoString) => {
+  const date = new Date(isoString);
+  const optionsDate = { year: 'numeric', month: 'long', day: 'numeric' };
+  const optionsTime = { hour: '2-digit', minute: '2-digit', hour12: true };
+  const formattedDate = date.toLocaleDateString(undefined, optionsDate);
+  const formattedTime = date.toLocaleTimeString(undefined, optionsTime);
+  return `${formattedDate} at ${formattedTime}`;
+};
 
 const OrderConfirmation = () => {
   const { user } = useContext(AppContext);
@@ -21,7 +31,7 @@ const OrderConfirmation = () => {
     );
   }
 
-  const { id: orderId, total, cart, otp } = orderDetails; // Destructure OTP
+  const { id: orderId, total, cart, otp, timestamp, paymentMethod, transactionId } = orderDetails; // Destructure new fields
 
   // Data to encode in QR code (e.g., order ID and OTP)
   const qrCodeValue = JSON.stringify({ orderId, otp });
@@ -36,6 +46,9 @@ const OrderConfirmation = () => {
         <div className="text-left max-w-md mx-auto bg-black/10 p-6 rounded-lg" aria-labelledby="order-summary-heading">
             <h3 id="order-summary-heading" className="text-xl font-semibold mb-4 border-b border-white/20 pb-2">Order Summary</h3>
             <p className="mb-2"><strong>Order ID:</strong> {orderId}</p>
+            <p className="mb-2"><strong>Order Date:</strong> {formatTimestamp(timestamp)}</p> {/* Display formatted timestamp */}
+            <p className="mb-2"><strong>Payment Method:</strong> {paymentMethod}</p> {/* Display payment method */}
+            <p className="mb-4"><strong>Transaction ID:</strong> {transactionId}</p> {/* Display transaction ID */}
             <p className="mb-4"><strong>Total:</strong> ₹{total.toFixed(2)}</p>
             <div className="mb-4">
                 <h4 className="font-semibold">Items:</h4>
@@ -55,7 +68,7 @@ const OrderConfirmation = () => {
         <div className="bg-black/10 p-6 rounded-lg max-w-md mx-auto mt-8">
             <h3 className="text-xl font-semibold mb-4">Delivery Confirmation</h3>
             <p className="mb-4">Please show this QR code to the delivery person to confirm your order.</p>
-            <div className="flex justify-center mb-4 p-2 bg-white rounded-lg"> {/* Added white background for QR code visibility */}
+            <div className="flex justify-center mb-4 p-2 bg-white rounded-lg">
                 <QRCode value={qrCodeValue} size={180} level="H" className="rounded-lg" aria-label={`QR code for order ${orderId} with OTP ${otp}`} />
             </div>
             <p className="text-lg font-bold">OTP: <span className="text-[var(--accent)]">{otp}</span></p>
