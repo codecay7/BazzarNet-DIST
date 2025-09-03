@@ -1,14 +1,15 @@
 import React, { useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBars } from '@fortawesome/free-solid-svg-icons';
+import { faBars, faTimes } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
+import MobileNav from './MobileNav';
 
 const Header = () => {
-  const { toggleSidebar, cart, theme, toggleTheme, isVendor } = useContext(AppContext);
+  const { sidebarOpen, toggleSidebar, cart, theme, toggleTheme, isVendor } = useContext(AppContext);
   const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
 
   return (
-    <header className="flex items-center py-4 bg-[var(--card-bg)] backdrop-blur-[5px] sticky top-0 z-[1000] rounded-b-2xl shadow-[0_4px_20px_var(--shadow)] overflow-x-hidden">
+    <header className="relative flex items-center py-4 bg-[var(--card-bg)] backdrop-blur-[5px] sticky top-0 z-[1000] rounded-b-2xl shadow-[0_4px_20px_var(--shadow)]">
       <div className="container mx-auto px-5 flex items-center justify-between flex-wrap gap-5">
         <div className="flex items-center gap-5 flex-shrink-0">
           <button
@@ -16,7 +17,7 @@ const Header = () => {
             onClick={toggleSidebar}
             aria-label="Toggle navigation menu"
           >
-            <FontAwesomeIcon icon={faBars} className="text-xl" />
+            <FontAwesomeIcon icon={sidebarOpen ? faTimes : faBars} className="text-xl" />
           </button>
           <div className="flex items-center gap-2">
             <span className="text-2xl font-bold text-[var(--accent)] md:text-3xl">BazzarNet</span>
@@ -33,6 +34,7 @@ const Header = () => {
           </button>
         </div>
       </div>
+      <MobileNav />
     </header>
   );
 };
