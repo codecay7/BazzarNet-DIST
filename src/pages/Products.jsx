@@ -47,7 +47,12 @@ const Products = () => {
   }, [searchTerm, sortBy, store, navigate]);
 
   if (!store) {
-    return null; // or a loading/redirecting indicator
+    return (
+        <div className="text-center py-20">
+            <FontAwesomeIcon icon={faSpinner} className="text-4xl text-[var(--accent)] animate-spin" />
+            <p className="mt-4">Loading Store...</p>
+        </div>
+    );
   }
 
   return (

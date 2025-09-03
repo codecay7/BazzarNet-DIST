@@ -2,13 +2,13 @@ import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStore } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
-import { stores as allStores } from '../data/mockData';
+import { stores } from '../data/mockData';
 
 const Stores = () => {
   const navigate = useNavigate();
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredStores = allStores.filter(store =>
+  const filteredStores = stores.filter(store =>
     store.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     store.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
