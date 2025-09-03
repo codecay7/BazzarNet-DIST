@@ -1,4 +1,4 @@
-import React, { useContext } from 'react';
+import React, { useContext, useMemo } from 'react'; // Import useMemo
 import { useParams, Link } from 'react-router-dom';
 import { AppContext } from '../context/AppContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -28,11 +28,14 @@ const CustomerOrderDetails = () => {
     );
   }
 
-  const steps = [
-    { name: 'Ordered', completed: true, icon: faBox },
-    { name: 'Shipped', completed: ['Shipped', 'Delivered'].includes(order.status), icon: faTruck },
-    { name: 'Delivered', completed: order.status === 'Delivered', icon: faHome },
-  ];
+  const steps = useMemo(() => {
+    const currentStatus = order?.status || ''; // Defensive check for order.status
+    return [
+      { name: 'Ordered', completed: true, icon: faBox },
+      { name: 'Shipped', completed: ['Shipped', 'Delivered'].includes(currentStatus), icon: faTruck },
+      { name: 'Delivered', completed: currentStatus === 'Delivered', icon: faHome },
+    ];
+  }, [order?.status]); // Dependency on order.status
 
   return (
     <section className="w-full max-w-[1200px] my-10">
