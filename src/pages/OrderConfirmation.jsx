@@ -3,7 +3,8 @@ import { Link, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
-import QRCode from 'qrcode.react'; // Corrected import: default export
+import * as QrCodeModule from 'qrcode.react'; // Import all exports
+const QRCode = QrCodeModule.QRCode || QrCodeModule.default; // Attempt to get named 'QRCode' or 'default'
 
 const OrderConfirmation = () => {
   const { user } = useContext(AppContext);
@@ -25,6 +26,20 @@ const OrderConfirmation = () => {
 
   // Data to encode in QR code (e.g., order ID and OTP)
   const qrCodeValue = JSON.stringify({ orderId, otp });
+
+  // Ensure QRCode is actually a component before rendering
+  if (!QRCode) {
+    console.error("QRCode component not found from 'qrcode.react'");
+    return (
+      <div className="text-center py-20">
+        <h2 className="text-2xl font-bold mb-4">Error loading QR code component.</h2>
+        <p>Please try again or contact support.</p>
+        <Link to="/dashboard" className="bg-[var(--accent)] text-white py-2 px-6 rounded-lg font-medium hover:bg-[var(--accent-dark)] transition-all duration-300">
+            Back to Dashboard
+        </Link>
+      </div>
+    );
+  }
 
   return (
     <section className="w-full max-w-[1200px] my-10">
