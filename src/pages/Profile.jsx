@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faStore, faPen, faSave } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
@@ -8,6 +8,7 @@ import { Building2, Mail, Phone, FileText, Landmark } from 'lucide-react';
 const Profile = () => {
   const { user, isVendor } = useContext(AppContext);
   const [isEditing, setIsEditing] = useState(false);
+  const fileInputRef = useRef(null);
   
   const [profileData, setProfileData] = useState({
     name: user?.name || 'Guest',
@@ -22,7 +23,8 @@ const Profile = () => {
     bankAccount: '123456789012',
     bankName: 'BazzarNet Bank',
     ifsc: 'BAZZ0001234',
-    upiId: 'vendor@bazzarnetupi'
+    upiId: 'vendor@bazzarnetupi',
+    profileImage: null,
   });
 
   const handleInputChange = (e) => {
@@ -30,8 +32,18 @@ const Profile = () => {
     setProfileData(prev => ({ ...prev, [name]: value }));
   };
 
+  const handleImageChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      const newImage = e.target.files[0];
+      setProfileData(prev => ({
+        ...prev,
+        profileImage: URL.createObjectURL(newImage)
+      }));
+    }
+  };
+
   const handleSaveChanges = () => {
-    toast.success('Payment information updated successfully!');
+    toast.success('Profile updated successfully!');
     setIsEditing(false);
   };
 
@@ -43,8 +55,22 @@ const Profile = () => {
         <div className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-8 mx-4">
           <div className="flex flex-col md:flex-row justify-between items-start mb-8">
             <div className="flex items-center gap-6">
-              <div className="w-24 h-24 bg-[var(--accent)] rounded-full flex items-center justify-center border-4 border-white/30 shadow-lg flex-shrink-0">
-                <FontAwesomeIcon icon={faStore} className="text-white text-4xl" />
+              <div className="relative w-24 h-24 flex-shrink-0">
+                {profileData.profileImage ? (
+                  <img src={profileData.profileImage} alt="Store Logo" className="w-24 h-24 rounded-full object-cover border-4 border-white/30 shadow-lg" />
+                ) : (
+                  <div className="w-24 h-24 bg-[var(--accent)] rounded-full flex items-center justify-center border-4 border-white/30 shadow-lg">
+                    <FontAwesomeIcon icon={faStore} className="text-white text-4xl" />
+                  </div>
+                )}
+                {isEditing && (
+                  <>
+                    <input type="file" ref={fileInputRef} onChange={handleImageChange} className="hidden" accept="image/*" />
+                    <button type="button" onClick={() => fileInputRef.current.click()} className="absolute bottom-0 right-0 bg-white/80 rounded-full p-1.5 text-gray-800 hover:bg-white shadow-md">
+                      <FontAwesomeIcon icon={faPen} size="sm" />
+                    </button>
+                  </>
+                )}
               </div>
               <div>
                 <h2 className="text-3xl font-bold">{profileData.store}</h2>
@@ -55,7 +81,7 @@ const Profile = () => {
               className="bg-[var(--accent)] w-full md:w-fit mt-4 md:mt-0 text-white border-none py-2 px-6 rounded-lg flex items-center justify-center gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300"
               onClick={() => isEditing ? handleSaveChanges() : setIsEditing(true)}
             >
-              <FontAwesomeIcon icon={isEditing ? faSave : faPen} /> {isEditing ? 'Save Changes' : 'Edit Payment Info'}
+              <FontAwesomeIcon icon={isEditing ? faSave : faPen} /> {isEditing ? 'Save Changes' : 'Edit Profile'}
             </button>
           </div>
 
@@ -138,16 +164,30 @@ const Profile = () => {
     <section className="w-full max-w-[1200px] my-10">
       <div className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-8 mx-4">
         <div className="flex flex-col items-center text-center max-w-lg mx-auto">
-          <div className="w-24 h-24 bg-[var(--accent)] rounded-full flex items-center justify-center mb-4 border-4 border-white/30 shadow-lg">
-            <FontAwesomeIcon icon={faUser} className="text-white text-4xl" />
+          <div className="relative w-24 h-24 mb-4">
+            {profileData.profileImage ? (
+              <img src={profileData.profileImage} alt="User" className="w-24 h-24 rounded-full object-cover border-4 border-white/30 shadow-lg" />
+            ) : (
+              <div className="w-24 h-24 bg-[var(--accent)] rounded-full flex items-center justify-center border-4 border-white/30 shadow-lg">
+                <FontAwesomeIcon icon={faUser} className="text-white text-4xl" />
+              </div>
+            )}
+            {isEditing && (
+              <>
+                <input type="file" ref={fileInputRef} onChange={handleImageChange} className="hidden" accept="image/*" />
+                <button type="button" onClick={() => fileInputRef.current.click()} className="absolute bottom-0 right-0 bg-white/80 rounded-full p-1.5 text-gray-800 hover:bg-white shadow-md">
+                  <FontAwesomeIcon icon={faPen} size="sm" />
+                </button>
+              </>
+            )}
           </div>
           <h2 className="text-3xl font-bold mb-1">{user?.name}</h2>
           <p className="text-lg text-[var(--text)] opacity-80 mb-6">@{user?.username}</p>
           <button
             className="bg-[var(--accent)] w-fit text-white border-none py-2 px-6 rounded-lg flex items-center gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300"
-            onClick={() => toast.info('Edit functionality coming soon!')}
+            onClick={() => isEditing ? handleSaveChanges() : setIsEditing(true)}
           >
-            <FontAwesomeIcon icon={faPen} /> Edit Profile
+            <FontAwesomeIcon icon={isEditing ? faSave : faPen} /> {isEditing ? 'Save Changes' : 'Edit Profile'}
           </button>
         </div>
       </div>
