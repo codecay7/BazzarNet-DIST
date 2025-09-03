@@ -57,3 +57,27 @@ export const mockOrders = [
       status: 'Delivered' 
     },
 ];
+
+// New mock data for the vendor dashboard
+export const dashboardStats = {
+  totalRevenue: { value: '₹12,34,567', change: '+10% this month' },
+  totalOrders: { value: '1,234', change: '+5% this month' },
+  newCustomers: { value: '789', change: '+8% this month' },
+  products: { value: '56', change: '-2 this month', changeType: 'decrease' },
+};
+
+export const salesData = [
+  { name: 'Feb', sales: 200000 },
+  { name: 'Mar', sales: 300000 },
+  { name: 'Apr', sales: 500000 },
+  { name: 'May', sales: 250000 },
+  { name: 'Jun', sales: 400000 },
+  { name: 'Jul', sales: 450000 },
+  { name: 'Aug', sales: 520000 },
+];
+
+export const topProductsData = [
+  { name: 'Wooden Chair', sales: 15 },
+  { name: 'Ceramic Vase', sales: 98 },
+  { name: 'Desk Lamp', sales: 12 },
+];

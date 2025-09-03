@@ -5,6 +5,7 @@ import { AppContext } from './context/AppContext';
 import Layout from './components/Layout';
 import PublicLayout from './components/PublicLayout';
 import Login from './pages/Login';
+import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import Products from './pages/Products';
 import Stores from './pages/Stores';
@@ -69,6 +70,7 @@ const App = () => {
           // --- Logged Out Routes ---
           <>
             <Route path="/login" element={<Login />} />
+            <Route path="/register" element={<Register />} />
             <Route element={<PublicLayout />}>
               <Route path="/" element={<Dashboard />} />
               <Route path="/faq" element={<FAQ />} />

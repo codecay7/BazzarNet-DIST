@@ -2,7 +2,7 @@ import React, { useState, useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faSignInAlt } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Login = () => {
@@ -124,6 +124,9 @@ const Login = () => {
             </motion.form>
           )}
         </AnimatePresence>
+        <p className="text-center text-sm mt-6">
+          Don't have an account? <Link to="/register" className="text-[var(--accent)] font-semibold">Sign up here.</Link>
+        </p>
       </div>
     </div>
   );
