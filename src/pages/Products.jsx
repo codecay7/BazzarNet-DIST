@@ -2,13 +2,12 @@ import React, { useContext, useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCartPlus, faHeart, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
-import { Link, useParams, useNavigate } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import { stores } from '../data/mockData';
 
 const Products = () => {
   const { addToCart, addToWishlist } = useContext(AppContext);
   const { storeName } = useParams();
-  const navigate = useNavigate();
   
   const store = stores.find(s => s.name === decodeURIComponent(storeName));
 
@@ -18,40 +17,42 @@ const Products = () => {
   const [sortBy, setSortBy] = useState('name');
 
   useEffect(() => {
-    if (!store) {
-        navigate('/stores');
-        return;
+    if (store) {
+      setLoading(true);
+      const timer = setTimeout(() => {
+        let filteredProducts = store.products.filter(p => 
+          p.name.toLowerCase().includes(searchTerm.toLowerCase())
+        );
+
+        filteredProducts.sort((a, b) => {
+          if (sortBy === 'price-asc') {
+            return a.price - b.price;
+          }
+          if (sortBy === 'price-desc') {
+            return b.price - a.price;
+          }
+          return a.name.localeCompare(b.name); // Default sort by name
+        });
+
+        setProducts(filteredProducts);
+        setLoading(false);
+      }, 500); // Simulate network delay
+
+      return () => clearTimeout(timer);
     }
-
-    setLoading(true);
-    const timer = setTimeout(() => {
-      let filteredProducts = store.products.filter(p => 
-        p.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-
-      filteredProducts.sort((a, b) => {
-        if (sortBy === 'price-asc') {
-          return a.price - b.price;
-        }
-        if (sortBy === 'price-desc') {
-          return b.price - a.price;
-        }
-        return a.name.localeCompare(b.name); // Default sort by name
-      });
-
-      setProducts(filteredProducts);
-      setLoading(false);
-    }, 500); // Simulate network delay
-
-    return () => clearTimeout(timer);
-  }, [searchTerm, sortBy, store, navigate]);
+  }, [searchTerm, sortBy, store]);
 
   if (!store) {
     return (
-        <div className="text-center py-20">
-            <FontAwesomeIcon icon={faSpinner} className="text-4xl text-[var(--accent)] animate-spin" />
-            <p className="mt-4">Loading Store...</p>
+      <section className="w-full max-w-[1200px] my-10">
+        <div className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-8 mx-4 text-center">
+            <h2 className="text-3xl font-bold mb-4">Store Not Found</h2>
+            <p className="text-lg mb-6">We couldn't find the store you're looking for.</p>
+            <Link to="/stores" className="bg-[var(--accent)] text-white py-2 px-6 rounded-lg font-medium hover:bg-[var(--accent-dark)] transition-all duration-300">
+                Back to All Stores
+            </Link>
         </div>
+      </section>
     );
   }
 
