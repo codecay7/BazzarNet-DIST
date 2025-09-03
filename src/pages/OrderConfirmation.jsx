@@ -3,8 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
-import * as QrCodeModule from 'qrcode.react'; // Import all exports
-const QRCode = QrCodeModule.QRCode || QrCodeModule.default; // Attempt to get named 'QRCode' or 'default'
+import QRCode from 'react-qr-code'; // Import QRCode from react-qr-code
 
 const OrderConfirmation = () => {
   const { user } = useContext(AppContext);
@@ -26,20 +25,6 @@ const OrderConfirmation = () => {
 
   // Data to encode in QR code (e.g., order ID and OTP)
   const qrCodeValue = JSON.stringify({ orderId, otp });
-
-  // Ensure QRCode is actually a component before rendering
-  if (!QRCode) {
-    console.error("QRCode component not found from 'qrcode.react'");
-    return (
-      <div className="text-center py-20">
-        <h2 className="text-2xl font-bold mb-4">Error loading QR code component.</h2>
-        <p>Please try again or contact support.</p>
-        <Link to="/dashboard" className="bg-[var(--accent)] text-white py-2 px-6 rounded-lg font-medium hover:bg-[var(--accent-dark)] transition-all duration-300">
-            Back to Dashboard
-        </Link>
-      </div>
-    );
-  }
 
   return (
     <section className="w-full max-w-[1200px] my-10">
@@ -70,8 +55,8 @@ const OrderConfirmation = () => {
         <div className="bg-black/10 p-6 rounded-lg max-w-md mx-auto mt-8">
             <h3 className="text-xl font-semibold mb-4">Delivery Confirmation</h3>
             <p className="mb-4">Please show this QR code to the delivery person to confirm your order.</p>
-            <div className="flex justify-center mb-4">
-                <QRCode value={qrCodeValue} size={180} level="H" renderAs="svg" className="rounded-lg" aria-label={`QR code for order ${orderId} with OTP ${otp}`} />
+            <div className="flex justify-center mb-4 p-2 bg-white rounded-lg"> {/* Added white background for QR code visibility */}
+                <QRCode value={qrCodeValue} size={180} level="H" className="rounded-lg" aria-label={`QR code for order ${orderId} with OTP ${otp}`} />
             </div>
             <p className="text-lg font-bold">OTP: <span className="text-[var(--accent)]">{otp}</span></p>
             <p className="text-sm opacity-80 mt-2">The delivery person will scan this QR or ask for the OTP.</p>
