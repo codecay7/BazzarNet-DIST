@@ -114,11 +114,9 @@ const Header = () => {
                   <NavLink to="/orders" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm hover:bg-white/10">
                     <FontAwesomeIcon icon={faBox} /> Orders
                   </NavLink>
-                  <button onClick={toggleTheme} className="flex items-center justify-between gap-3 px-4 py-2 text-sm hover:bg-white/10 w-full">
-                    <div className="flex items-center gap-3">
-                      <FontAwesomeIcon icon={theme === 'light' ? faMoon : faSun} />
-                    </div>
-                    <span className="text-xs opacity-70">{theme === 'light' ? 'Dark' : 'Light'}</span>
+                  <button onClick={toggleTheme} className="flex items-center gap-3 px-4 py-2 text-sm hover:bg-white/10 w-full">
+                    <FontAwesomeIcon icon={theme === 'light' ? faMoon : faSun} />
+                    <span>{theme === 'light' ? 'Dark' : 'Light'} Mode</span>
                   </button>
                   <div className="h-px bg-white/10 my-1"></div>
                   <button onClick={handleLogout} className="flex items-center gap-3 px-4 py-2 text-sm text-red-400 hover:bg-white/10">
