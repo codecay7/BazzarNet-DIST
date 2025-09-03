@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faStore, faPen, faSave } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
 import toast from 'react-hot-toast';
-import { Building2, Mail, Phone, FileText, Landmark } from 'lucide-react';
+import { Building2, Mail, Phone, FileText, Landmark, ChevronDown } from 'lucide-react';
 
 const Profile = () => {
   const { user, isVendor } = useContext(AppContext);
@@ -26,6 +26,11 @@ const Profile = () => {
     upiId: 'vendor@bazzarnetupi',
     profileImage: null,
   });
+
+  const categories = [
+    'Groceries', 'Bakery', 'Butcher', 'Cafe', 'Electronics', 
+    'Furniture', 'Decor', 'Clothing', 'Other'
+  ];
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -89,8 +94,24 @@ const Profile = () => {
             <div className="lg:col-span-2 space-y-6">
               <div className="bg-black/10 p-6 rounded-xl">
                 <h3 className="text-xl font-semibold mb-4 flex items-center gap-2"><Building2 size={20} /> Business Details</h3>
-                <p className="opacity-80">{profileData.description}</p>
-                <p className="mt-3"><strong className="opacity-80">Category:</strong> {profileData.category}</p>
+                {isEditing ? (
+                  <textarea name="description" value={profileData.description} onChange={handleInputChange} className={`${inputClasses} mb-3`} rows="3" />
+                ) : (
+                  <p className="opacity-80">{profileData.description}</p>
+                )}
+                <div className="mt-3 flex items-center gap-2">
+                  <strong className="opacity-80 flex-shrink-0">Category:</strong>
+                  {isEditing ? (
+                    <div className="relative flex-grow">
+                      <select name="category" value={profileData.category} onChange={handleInputChange} className={`${inputClasses} appearance-none pr-8`}>
+                        {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
+                      </select>
+                      <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-[var(--text)]"><ChevronDown size={20} /></div>
+                    </div>
+                  ) : (
+                    <span>{profileData.category}</span>
+                  )}
+                </div>
               </div>
               <div className="bg-black/10 p-6 rounded-xl">
                 <h3 className="text-xl font-semibold mb-4 flex items-center gap-2"><FileText size={20} /> Legal Information</h3>

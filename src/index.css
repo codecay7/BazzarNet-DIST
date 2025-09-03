@@ -57,6 +57,11 @@ input[type="range"]::-webkit-slider-thumb:active {
   background: var(--accent-dark);
 }
 
+/* Fix for dropdown option text color */
+select option {
+  color: black;
+}
+
 @media (max-width: 768px) {
   h1 { font-size: 2.2rem; }
   h2 { font-size: 1.8rem; }
