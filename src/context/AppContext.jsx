@@ -179,6 +179,11 @@ export const AppProvider = ({ children }) => {
     removeFromWishlist(product.id);
   };
 
+  const moveToWishlist = (product) => {
+    addToWishlist(product);
+    removeFromCart(product.id);
+  };
+
   // Vendor Product Management Functions (now updating allAppProducts)
   const addVendorProduct = (newProduct) => {
     if (!user?.storeId) {
@@ -243,6 +248,7 @@ export const AppProvider = ({ children }) => {
     addToWishlist,
     removeFromWishlist,
     moveToCart,
+    moveToWishlist, // Expose the new function
     allAppProducts, // Expose the central product list
     vendorProducts, // Expose filtered vendor products
     addVendorProduct,

@@ -1,11 +1,11 @@
 import React, { useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCreditCard, faShoppingBag } from '@fortawesome/free-solid-svg-icons';
+import { faCreditCard, faShoppingBag, faHeart } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
 import { useNavigate, Link } from 'react-router-dom';
 
 const Cart = () => {
-  const { cart, removeFromCart, updateCartQuantity } = useContext(AppContext);
+  const { cart, removeFromCart, updateCartQuantity, moveToWishlist } = useContext(AppContext);
   const navigate = useNavigate();
 
   const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
@@ -26,20 +26,30 @@ const Cart = () => {
           <>
             <div className="grid grid-cols-1 gap-4" role="list">
               {cart.map((item) => (
-                <div key={item.name} className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4" role="listitem" aria-label={`Item: ${item.name}, Price: ₹${item.price.toFixed(2)}, Quantity: ${item.quantity}`}>
-                  <div>
-                    <h3 className="text-xl font-semibold">{item.name}</h3>
-                    <p className="text-base">₹{item.price.toFixed(2)}</p>
-                  </div>
+                <div key={item.id} className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4" role="listitem" aria-label={`Item: ${item.name}, Price: ₹${item.price.toFixed(2)}, Quantity: ${item.quantity}`}>
                   <div className="flex items-center gap-4">
+                    <img src={item.image} alt={item.name} className="w-20 h-20 object-cover rounded-lg" />
+                    <div>
+                      <h3 className="text-xl font-semibold">{item.name}</h3>
+                      <p className="text-base">₹{item.price.toFixed(2)}</p>
+                    </div>
+                  </div>
+                  <div className="flex flex-col sm:flex-row items-center gap-4 mt-4 md:mt-0">
                     <div className="flex items-center gap-2">
-                        <button onClick={() => updateCartQuantity(item.name, item.quantity - 1)} className="w-8 h-8 rounded-full bg-[var(--accent)] text-white font-bold" aria-label={`Decrease quantity of ${item.name}`}>-</button>
+                        <button onClick={() => updateCartQuantity(item.id, item.quantity - 1)} className="w-8 h-8 rounded-full bg-[var(--accent)] text-white font-bold" aria-label={`Decrease quantity of ${item.name}`}>-</button>
                         <span aria-live="polite" aria-atomic="true">{item.quantity}</span>
-                        <button onClick={() => updateCartQuantity(item.name, item.quantity + 1)} className="w-8 h-8 rounded-full bg-[var(--accent)] text-white font-bold" aria-label={`Increase quantity of ${item.name}`}>+</button>
+                        <button onClick={() => updateCartQuantity(item.id, item.quantity + 1)} className="w-8 h-8 rounded-full bg-[var(--accent)] text-white font-bold" aria-label={`Increase quantity of ${item.name}`}>+</button>
                     </div>
                     <button
+                      className="bg-white/10 text-[var(--text)] border-none py-2 px-4 rounded-lg flex items-center gap-2 font-medium hover:bg-white/20 transition-all duration-300"
+                      onClick={() => moveToWishlist(item)}
+                      aria-label={`Move ${item.name} to wishlist`}
+                    >
+                      <FontAwesomeIcon icon={faHeart} aria-hidden="true" /> Move to Wishlist
+                    </button>
+                    <button
                       className="bg-red-500 text-white border-none py-2 px-4 rounded-lg font-medium hover:bg-red-600 transition-all duration-300"
-                      onClick={() => removeFromCart(item.name)}
+                      onClick={() => removeFromCart(item.id)}
                       aria-label={`Remove ${item.name} from cart`}
                     >
                       Remove
