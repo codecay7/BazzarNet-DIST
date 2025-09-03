@@ -7,6 +7,8 @@ import PublicLayout from './components/PublicLayout';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Products from './pages/Products';
+import Stores from './pages/Stores';
+import StorePage from './pages/StorePage';
 import ProductDetail from './pages/ProductDetail';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
@@ -36,6 +38,8 @@ const App = () => {
                 <Route path="/manage-products" element={<ManageProducts />} />
                 <Route path="/products" element={<Navigate to="/dashboard" />} />
                 <Route path="/products/:id" element={<Navigate to="/dashboard" />} />
+                <Route path="/stores" element={<Navigate to="/dashboard" />} />
+                <Route path="/stores/:storeId" element={<Navigate to="/dashboard" />} />
                 <Route path="/cart" element={<Navigate to="/dashboard" />} />
                 <Route path="/checkout" element={<Navigate to="/dashboard" />} />
                 <Route path="/confirmation" element={<Navigate to="/dashboard" />} />
@@ -47,6 +51,8 @@ const App = () => {
               <>
                 <Route path="/products" element={<Products />} />
                 <Route path="/products/:id" element={<ProductDetail />} />
+                <Route path="/stores" element={<Stores />} />
+                <Route path="/stores/:storeId" element={<StorePage />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/checkout" element={<Checkout />} />
                 <Route path="/confirmation" element={<OrderConfirmation />} />
@@ -66,7 +72,7 @@ const App = () => {
             <Route element={<PublicLayout />}>
               <Route path="/" element={<Dashboard />} />
               <Route path="/faq" element={<FAQ />} />
-              <Route path="/about" element={<About />} />
+              <Route path="/about"={<About />} />
             </Route>
             <Route path="*" element={<Navigate to="/" />} />
           </>

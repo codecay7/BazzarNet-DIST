@@ -28,6 +28,7 @@ const MobileNav = () => {
   const userLinks = [
     { name: 'Dashboard', path: '/dashboard', icon: faHome },
     { name: 'Products', path: '/products', icon: faShoppingBag },
+    { name: 'Stores', path: '/stores', icon: faStore },
     { name: 'Cart', path: '/cart', icon: faShoppingCart },
     { name: 'Wishlist', path: '/wishlist', icon: faHeart },
     { name: 'Orders', path: '/orders', icon: faTruck },

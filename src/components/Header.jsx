@@ -39,6 +39,7 @@ const Header = () => {
   const userLinks = [
     { name: 'Dashboard', path: '/dashboard' },
     { name: 'Products', path: '/products' },
+    { name: 'Stores', path: '/stores' },
   ];
 
   const links = isVendor ? vendorLinks : userLinks;
