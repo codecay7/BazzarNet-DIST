@@ -3,6 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShoppingBag, faBoxOpen, faHeart, faMapMarkerAlt, faCheckCircle, faReceipt } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
 import { useNavigate } from 'react-router-dom';
+import { allProducts } from '../data/mockData';
 
 const CustomerDashboard = () => {
   const { user, cart, wishlist } = useContext(AppContext);
@@ -21,11 +22,7 @@ const CustomerDashboard = () => {
     ]
   };
 
-  const featuredProducts = [
-    { id: 1, name: 'Fresh Apples', image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=100&h=100&fit=crop' },
-    { id: 2, name: 'Sourdough Bread', image: 'https://images.unsplash.com/photo-1560806887-1e4cd0b5cbd6?w=100&h=100&fit=crop' },
-    { id: 3, name: 'Organic Milk', price: 3.99, image: 'https://images.unsplash.com/photo-1601004890684-d8cbf18f86f6?w=100&h=100&fit=crop' },
-  ];
+  const featuredProducts = allProducts.slice(0, 3);
 
   const stats = [
     { icon: faShoppingBag, label: 'Items in Cart', value: cart.length, path: '/cart' },

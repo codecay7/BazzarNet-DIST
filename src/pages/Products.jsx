@@ -2,27 +2,30 @@ import React, { useContext, useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCartPlus, faHeart, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
-import { Link } from 'react-router-dom';
-
-// Mock data
-const allProducts = [
-    { id: 1, name: 'Fresh Apples', price: 2.99, image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=200&h=200&fit=crop' },
-    { id: 2, name: 'Sourdough Bread', price: 4.50, image: 'https://images.unsplash.com/photo-1560806887-1e4cd0b5cbd6?w=200&h=200&fit=crop' },
-    { id: 3, name: 'Organic Milk', price: 3.99, image: 'https://images.unsplash.com/photo-1601004890684-d8cbf18f86f6?w=200&h=200&fit=crop' },
-];
+import { Link, useParams, useNavigate } from 'react-router-dom';
+import { stores } from '../data/mockData';
 
 const Products = () => {
   const { addToCart, addToWishlist } = useContext(AppContext);
+  const { storeName } = useParams();
+  const navigate = useNavigate();
+  
+  const store = stores.find(s => s.name === decodeURIComponent(storeName));
+
   const [products, setProducts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
   const [sortBy, setSortBy] = useState('name');
 
-  // Simulate fetching data
   useEffect(() => {
+    if (!store) {
+        navigate('/stores');
+        return;
+    }
+
     setLoading(true);
     const timer = setTimeout(() => {
-      let filteredProducts = allProducts.filter(p => 
+      let filteredProducts = store.products.filter(p => 
         p.name.toLowerCase().includes(searchTerm.toLowerCase())
       );
 
@@ -41,14 +44,17 @@ const Products = () => {
     }, 500); // Simulate network delay
 
     return () => clearTimeout(timer);
-  }, [searchTerm, sortBy]);
+  }, [searchTerm, sortBy, store, navigate]);
+
+  if (!store) {
+    return null; // or a loading/redirecting indicator
+  }
 
   return (
     <section className="w-full max-w-[1200px] my-10">
       <div className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-8 mx-4">
-        <h2 className="text-3xl font-bold mb-5 md:text-4xl">Products</h2>
+        <h2 className="text-3xl font-bold mb-5 md:text-4xl">Products from {store.name}</h2>
         
-        {/* Search and Filter Controls */}
         <div className="flex flex-col md:flex-row gap-4 mb-8">
           <input
             type="text"

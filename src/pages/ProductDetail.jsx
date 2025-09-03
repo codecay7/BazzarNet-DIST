@@ -3,24 +3,18 @@ import { useParams, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCartPlus, faHeart, faStar, faStarHalfAlt } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
-
-// Mock data - in a real app, this would come from an API
-const products = [
-    { id: 1, name: 'Fresh Apples', price: 2.99, image: 'https://images.unsplash.com/photo-1600585154340-be6161a56a0c?w=400&h=400&fit=crop', description: 'Crisp and juicy apples, perfect for a healthy snack or baking. Sourced from local organic farms.', rating: 4.5, reviews: 120 },
-    { id: 2, name: 'Sourdough Bread', price: 4.50, image: 'https://images.unsplash.com/photo-1560806887-1e4cd0b5cbd6?w=400&h=400&fit=crop', description: 'Artisanal sourdough bread with a chewy crust and soft interior. Baked fresh daily by our local bakery partner.', rating: 5, reviews: 250 },
-    { id: 3, name: 'Organic Milk', price: 3.99, image: 'https://images.unsplash.com/photo-1601004890684-d8cbf18f86f6?w=400&h=400&fit=crop', description: 'Fresh, creamy organic milk from grass-fed cows. A wholesome choice for your family.', rating: 4, reviews: 95 },
-];
+import { allProducts } from '../data/mockData';
 
 const ProductDetail = () => {
   const { addToCart, addToWishlist } = useContext(AppContext);
   const { id } = useParams();
-  const product = products.find(p => p.id === parseInt(id));
+  const product = allProducts.find(p => p.id === parseInt(id));
 
   if (!product) {
     return (
       <div className="text-center py-20">
         <h2 className="text-2xl font-bold mb-4">Product not found</h2>
-        <Link to="/products" className="text-[var(--accent)] hover:underline">Back to Products</Link>
+        <Link to="/stores" className="text-[var(--accent)] hover:underline">Back to Stores</Link>
       </div>
     );
   }

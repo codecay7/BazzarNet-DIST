@@ -2,17 +2,7 @@ import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStore } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
-
-const allStores = [
-  { name: 'Fresh Groceries', description: 'Organic fruits, vegetables, and daily essentials.' },
-  { name: 'Local Bakery', description: 'Freshly baked bread, cakes, and pastries.' },
-  { name: 'The Corner Butcher', description: 'High-quality, locally sourced meats and poultry.' },
-  { name: 'Morning Brew Cafe', description: 'Artisanal coffee, teas, and delicious breakfast bites.' },
-  { name: 'Bloom & Petal', description: 'Beautiful bouquets and arrangements for any occasion.' },
-  { name: 'The Reading Nook', description: 'A cozy bookstore with a wide selection of genres.' },
-  { name: 'Paws & Whiskers', description: 'Everything you need for your furry friends.' },
-  { name: 'Main Street Hardware', description: 'Tools, supplies, and expert advice for your home projects.' },
-];
+import { stores as allStores } from '../data/mockData';
 
 const Stores = () => {
   const navigate = useNavigate();
@@ -47,7 +37,7 @@ const Stores = () => {
                 <p className="text-base md:text-lg">{store.description}</p>
                 <button
                   className="bg-[var(--accent)] text-white border-none py-2 px-6 rounded-lg flex items-center gap-2 font-medium hover:bg-[var(--accent-dark)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.15)] hover:-translate-y-0.5 active:translate-y-0 active:shadow-[0_2px_10px_rgba(0,0,0,0.1)] transition-all duration-300 mt-4"
-                  onClick={() => navigate('/products')}
+                  onClick={() => navigate(`/stores/${encodeURIComponent(store.name)}/products`)}
                 >
                   View Products
                 </button>
