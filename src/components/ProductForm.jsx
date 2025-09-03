@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import toast from 'react-hot-toast';
 
 const ProductForm = ({ onSubmit, initialData = null }) => {
   const [product, setProduct] = useState({
@@ -43,11 +44,20 @@ const ProductForm = ({ onSubmit, initialData = null }) => {
 
   const handleSubmit = (e) => {
     e.preventDefault();
+    
+    const priceValue = parseFloat(product.price);
+    const originalPriceValue = product.originalPrice ? parseFloat(product.originalPrice) : null;
+
+    if (originalPriceValue !== null && originalPriceValue <= priceValue) {
+      toast.error('Original price must be greater than the current price.');
+      return;
+    }
+
     const submittedProduct = {
       ...product,
       id: initialData?.id || Date.now(),
-      price: parseFloat(product.price),
-      originalPrice: product.originalPrice ? parseFloat(product.originalPrice) : null,
+      price: priceValue,
+      originalPrice: originalPriceValue,
       stock: parseInt(product.stock),
       image: product.image || 'https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=200&h=200&fit=crop', // Default image if none provided
     };
