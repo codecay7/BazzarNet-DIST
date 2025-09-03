@@ -54,7 +54,18 @@ export const AppProvider = ({ children }) => {
       toast.error('Please enter both your name and username.');
       return false;
     }
-    const userData = { name, username, role: 'user' };
+    const userData = { 
+      name, 
+      username, 
+      role: 'user',
+      address: { // Default Indian address structure for new users
+        houseNo: '123 Customer Apt',
+        landmark: 'Near Main Market',
+        city: 'Bengaluru',
+        state: 'Karnataka',
+        pinCode: '560001'
+      }
+    };
     setUser(userData);
     setIsLoggedIn(true);
     setIsVendor(false);
@@ -75,7 +86,19 @@ export const AppProvider = ({ children }) => {
       return false;
     }
 
-    const userData = { name, store: storeName, role: 'vendor', storeId: store.id };
+    const userData = { 
+      name, 
+      store: storeName, 
+      role: 'vendor', 
+      storeId: store.id,
+      address: { // Default Indian address structure for new vendors
+        houseNo: '456 Vendor Plaza',
+        landmark: 'Opposite Central Park',
+        city: 'Mumbai',
+        state: 'Maharashtra',
+        pinCode: '400001'
+      }
+    };
     setUser(userData);
     setIsLoggedIn(true);
     setIsVendor(true);

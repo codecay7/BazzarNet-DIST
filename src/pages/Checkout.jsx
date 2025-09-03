@@ -5,6 +5,16 @@ import { AppContext } from '../context/AppContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
+import { ChevronDown } from 'lucide-react';
+
+const indianStates = [
+  "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
+  "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand",
+  "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur",
+  "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab",
+  "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura",
+  "Uttar Pradesh", "Uttarakhand", "West Bengal"
+];
 
 const Checkout = () => {
   const { cart, checkout, user } = useContext(AppContext);
@@ -12,8 +22,16 @@ const Checkout = () => {
   const [currentStep, setCurrentStep] = useState('address'); // 'address', 'summary', 'payment'
   const [paymentMethod, setPaymentMethod] = useState('card');
 
+  const initialAddress = user?.address || {
+    houseNo: '',
+    landmark: '',
+    city: '',
+    state: '',
+    pinCode: ''
+  };
+
   const [cardFormData, setCardFormData] = useState({
-    shippingAddress: user?.address || '', // Pre-fill if user has an address in profile
+    shippingAddress: initialAddress,
     cardNumber: '',
     expiryDate: '',
     cvv: '',
@@ -21,7 +39,7 @@ const Checkout = () => {
   const [cardErrors, setCardErrors] = useState({});
 
   const [upiFormData, setUpiFormData] = useState({
-    shippingAddress: user?.address || '', // Pre-fill if user has an address in profile
+    shippingAddress: initialAddress,
     upiId: '',
   });
   const [upiErrors, setUpiErrors] = useState({});
@@ -31,25 +49,60 @@ const Checkout = () => {
   // Handlers for form changes
   const handleCardChange = (e) => {
     const { name, value } = e.target;
-    setCardFormData(prev => ({ ...prev, [name]: value }));
+    if (name.startsWith('shippingAddress.')) {
+      const field = name.split('.')[1];
+      setCardFormData(prev => ({
+        ...prev,
+        shippingAddress: {
+          ...prev.shippingAddress,
+          [field]: value
+        }
+      }));
+    } else {
+      setCardFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleUpiChange = (e) => {
     const { name, value } = e.target;
-    setUpiFormData(prev => ({ ...prev, [name]: value }));
+    if (name.startsWith('shippingAddress.')) {
+      const field = name.split('.')[1];
+      setUpiFormData(prev => ({
+        ...prev,
+        shippingAddress: {
+          ...prev.shippingAddress,
+          [field]: value
+        }
+      }));
+    } else {
+      setUpiFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   // Validation functions for each step
   const validateAddress = () => {
     let newErrors = {};
-    const address = paymentMethod === 'card' ? cardFormData.shippingAddress : upiFormData.shippingAddress;
-    if (!address.trim()) {
-      newErrors.shippingAddress = 'Shipping Address is required.';
+    const currentShippingAddress = paymentMethod === 'card' ? cardFormData.shippingAddress : upiFormData.shippingAddress;
+
+    if (!currentShippingAddress.houseNo.trim()) {
+      newErrors.houseNo = 'House No. is required.';
     }
+    if (!currentShippingAddress.city.trim()) {
+      newErrors.city = 'City is required.';
+    }
+    if (!currentShippingAddress.state.trim()) {
+      newErrors.state = 'State is required.';
+    }
+    if (!currentShippingAddress.pinCode.trim()) {
+      newErrors.pinCode = 'Pin Code is required.';
+    } else if (!/^\d{6}$/.test(currentShippingAddress.pinCode)) {
+      newErrors.pinCode = 'Pin Code must be 6 digits.';
+    }
+
     if (paymentMethod === 'card') {
-      setCardErrors(prev => ({ ...prev, shippingAddress: newErrors.shippingAddress }));
+      setCardErrors(prev => ({ ...prev, shippingAddress: newErrors }));
     } else {
-      setUpiErrors(prev => ({ ...prev, shippingAddress: newErrors.shippingAddress }));
+      setUpiErrors(prev => ({ ...prev, shippingAddress: newErrors }));
     }
     return Object.keys(newErrors).length === 0;
   };
@@ -140,6 +193,9 @@ const Checkout = () => {
     );
   }
 
+  const currentAddressErrors = paymentMethod === 'card' ? cardErrors.shippingAddress : upiErrors.shippingAddress;
+  const currentShippingAddress = paymentMethod === 'card' ? cardFormData.shippingAddress : upiFormData.shippingAddress;
+
   return (
     <section className="w-full max-w-[1200px] my-10">
       <div className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-8 mx-4">
@@ -167,19 +223,88 @@ const Checkout = () => {
               aria-labelledby="address-heading"
             >
               <h3 id="address-heading" className="text-2xl font-bold mb-2 text-center">Shipping Address</h3>
-              <label htmlFor="shippingAddress" className="sr-only">Shipping Address</label>
-              <textarea
-                id="shippingAddress"
-                name="shippingAddress"
-                value={paymentMethod === 'card' ? cardFormData.shippingAddress : upiFormData.shippingAddress}
-                onChange={paymentMethod === 'card' ? handleCardChange : handleUpiChange}
-                placeholder="Enter your shipping address"
-                rows="4"
-                className={inputClasses}
-                aria-invalid={!!(paymentMethod === 'card' ? cardErrors.shippingAddress : upiErrors.shippingAddress)}
-                aria-describedby={(paymentMethod === 'card' ? cardErrors.shippingAddress : upiErrors.shippingAddress) ? "shippingAddress-error" : undefined}
-              ></textarea>
-              {(paymentMethod === 'card' ? cardErrors.shippingAddress : upiErrors.shippingAddress) && <p id="shippingAddress-error" className="text-red-400 text-xs -mt-3">{(paymentMethod === 'card' ? cardErrors.shippingAddress : upiErrors.shippingAddress)}</p>}
+              
+              <div>
+                <label htmlFor="houseNo" className="block text-sm font-medium mb-1">House No., Street</label>
+                <input
+                  type="text"
+                  id="houseNo"
+                  name="shippingAddress.houseNo"
+                  value={currentShippingAddress.houseNo}
+                  onChange={paymentMethod === 'card' ? handleCardChange : handleUpiChange}
+                  placeholder="House No., Street Name"
+                  className={inputClasses}
+                  aria-invalid={!!currentAddressErrors?.houseNo}
+                  aria-describedby={currentAddressErrors?.houseNo ? "houseNo-error" : undefined}
+                />
+                {currentAddressErrors?.houseNo && <p id="houseNo-error" className="text-red-400 text-xs -mt-3">{currentAddressErrors.houseNo}</p>}
+              </div>
+
+              <div>
+                <label htmlFor="landmark" className="block text-sm font-medium mb-1">Landmark (Optional)</label>
+                <input
+                  type="text"
+                  id="landmark"
+                  name="shippingAddress.landmark"
+                  value={currentShippingAddress.landmark}
+                  onChange={paymentMethod === 'card' ? handleCardChange : handleUpiChange}
+                  placeholder="e.g., Near City Hospital"
+                  className={inputClasses}
+                />
+              </div>
+
+              <div>
+                <label htmlFor="city" className="block text-sm font-medium mb-1">City</label>
+                <input
+                  type="text"
+                  id="city"
+                  name="shippingAddress.city"
+                  value={currentShippingAddress.city}
+                  onChange={paymentMethod === 'card' ? handleCardChange : handleUpiChange}
+                  placeholder="City"
+                  className={inputClasses}
+                  aria-invalid={!!currentAddressErrors?.city}
+                  aria-describedby={currentAddressErrors?.city ? "city-error" : undefined}
+                />
+                {currentAddressErrors?.city && <p id="city-error" className="text-red-400 text-xs -mt-3">{currentAddressErrors.city}</p>}
+              </div>
+
+              <div className="relative">
+                <label htmlFor="state" className="block text-sm font-medium mb-1">State</label>
+                <select
+                  id="state"
+                  name="shippingAddress.state"
+                  value={currentShippingAddress.state}
+                  onChange={paymentMethod === 'card' ? handleCardChange : handleUpiChange}
+                  className={`${inputClasses} appearance-none pr-8`}
+                  aria-invalid={!!currentAddressErrors?.state}
+                  aria-describedby={currentAddressErrors?.state ? "state-error" : undefined}
+                >
+                  <option value="" disabled>Select State</option>
+                  {indianStates.map(state => (
+                    <option key={state} value={state}>{state}</option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 top-8 flex items-center px-2 text-[var(--text)]" aria-hidden="true"><ChevronDown size={20} /></div>
+                {currentAddressErrors?.state && <p id="state-error" className="text-red-400 text-xs mt-1">{currentAddressErrors.state}</p>}
+              </div>
+
+              <div>
+                <label htmlFor="pinCode" className="block text-sm font-medium mb-1">Pin Code</label>
+                <input
+                  type="text"
+                  id="pinCode"
+                  name="shippingAddress.pinCode"
+                  value={currentShippingAddress.pinCode}
+                  onChange={paymentMethod === 'card' ? handleCardChange : handleUpiChange}
+                  placeholder="e.g., 110001"
+                  className={inputClasses}
+                  maxLength="6"
+                  aria-invalid={!!currentAddressErrors?.pinCode}
+                  aria-describedby={currentAddressErrors?.pinCode ? "pinCode-error" : undefined}
+                />
+                {currentAddressErrors?.pinCode && <p id="pinCode-error" className="text-red-400 text-xs -mt-3">{currentAddressErrors.pinCode}</p>}
+              </div>
               
               <button
                 type="button"
@@ -228,7 +353,12 @@ const Checkout = () => {
 
               <div className="bg-black/10 p-6 rounded-xl mb-6">
                 <h4 className="font-semibold text-lg mb-3 border-b border-white/20 pb-2">Shipping Address</h4>
-                <p className="opacity-80">{paymentMethod === 'card' ? cardFormData.shippingAddress : upiFormData.shippingAddress}</p>
+                <p className="opacity-80">
+                  {currentShippingAddress.houseNo}
+                  {currentShippingAddress.landmark && `, ${currentShippingAddress.landmark}`}
+                  , {currentShippingAddress.city}
+                  , {currentShippingAddress.state} - {currentShippingAddress.pinCode}
+                </p>
                 <button
                   type="button"
                   onClick={() => setCurrentStep('address')}

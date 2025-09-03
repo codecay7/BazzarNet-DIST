@@ -5,6 +5,15 @@ import { AppContext } from '../context/AppContext';
 import toast from 'react-hot-toast';
 import { Building2, Mail, Phone, FileText, Landmark, ChevronDown } from 'lucide-react';
 
+const indianStates = [
+  "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
+  "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand",
+  "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur",
+  "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab",
+  "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura",
+  "Uttar Pradesh", "Uttarakhand", "West Bengal"
+];
+
 const Profile = () => {
   const { user, isVendor } = useContext(AppContext);
   const [isEditing, setIsEditing] = useState(false);
@@ -15,7 +24,13 @@ const Profile = () => {
     store: user?.store || '',
     email: isVendor ? `${user?.store?.toLowerCase().replace(/\s/g, '')}@bazzar.net` : `${user?.username}@email.com`,
     phone: '+91 98765 43210',
-    address: '123 Commerce House, Market Lane, Mumbai',
+    address: user?.address || { // Initialize address as an object
+      houseNo: '123 Commerce House',
+      landmark: 'Near City Hospital',
+      city: 'Mumbai',
+      state: 'Maharashtra',
+      pinCode: '400001'
+    },
     pan: 'ABCDE1234F',
     gst: '27ABCDE1234F1Z5',
     category: 'Groceries',
@@ -34,7 +49,18 @@ const Profile = () => {
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
-    setProfileData(prev => ({ ...prev, [name]: value }));
+    if (name.startsWith('address.')) {
+      const field = name.split('.')[1];
+      setProfileData(prev => ({
+        ...prev,
+        address: {
+          ...prev.address,
+          [field]: value
+        }
+      }));
+    } else {
+      setProfileData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const handleImageChange = (e) => {
@@ -53,6 +79,16 @@ const Profile = () => {
   };
 
   const inputClasses = "w-full p-2 rounded-lg bg-white/10 border border-black/30 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] text-[var(--text)]";
+
+  const displayAddress = (address) => {
+    if (!address) return 'N/A';
+    const parts = [address.houseNo];
+    if (address.landmark) parts.push(address.landmark);
+    parts.push(address.city);
+    parts.push(address.state);
+    parts.push(address.pinCode);
+    return parts.filter(Boolean).join(', ');
+  };
 
   if (isVendor) {
     return (
@@ -150,7 +186,7 @@ const Profile = () => {
               </div>
             </div>
             <div className="bg-black/10 p-6 rounded-xl">
-              <h3 className="text-xl font-semibold mb-4">Contact</h3>
+              <h3 className="text-xl font-semibold mb-4">Contact & Address</h3>
               <div className="space-y-4">
                 <div className="flex items-start gap-3">
                   <Mail size={20} className="mt-1 text-[var(--accent)]" aria-hidden="true" />
@@ -170,7 +206,23 @@ const Profile = () => {
                   <Building2 size={20} className="mt-1 text-[var(--accent)]" aria-hidden="true" />
                   <div>
                     <p className="text-sm opacity-70">Address</p>
-                    <p className="font-medium">{profileData.address}</p>
+                    {isEditing ? (
+                      <div className="space-y-2">
+                        <input type="text" name="address.houseNo" value={profileData.address.houseNo} onChange={handleInputChange} className={inputClasses} placeholder="House No., Street" aria-label="House Number and Street" />
+                        <input type="text" name="address.landmark" value={profileData.address.landmark} onChange={handleInputChange} className={inputClasses} placeholder="Landmark (Optional)" aria-label="Landmark" />
+                        <input type="text" name="address.city" value={profileData.address.city} onChange={handleInputChange} className={inputClasses} placeholder="City" aria-label="City" />
+                        <div className="relative">
+                          <select name="address.state" value={profileData.address.state} onChange={handleInputChange} className={`${inputClasses} appearance-none pr-8`} aria-label="State">
+                            <option value="" disabled>Select State</option>
+                            {indianStates.map(state => <option key={state} value={state}>{state}</option>)}
+                          </select>
+                          <div className="pointer-events-none absolute inset-y-0 right-0 top-0 flex items-center px-2 text-[var(--text)]" aria-hidden="true"><ChevronDown size={20} /></div>
+                        </div>
+                        <input type="text" name="address.pinCode" value={profileData.address.pinCode} onChange={handleInputChange} className={inputClasses} placeholder="Pin Code" maxLength="6" aria-label="Pin Code" />
+                      </div>
+                    ) : (
+                      <p className="font-medium">{displayAddress(profileData.address)}</p>
+                    )}
                   </div>
                 </div>
               </div>
