@@ -73,6 +73,11 @@ const Products = () => {
     setCurrentPage(1);
   }, [searchTerm, selectedStore, sortBy]);
 
+  const calculateDiscount = (price, originalPrice) => {
+    if (!originalPrice || originalPrice <= price) return 0;
+    return Math.round(((originalPrice - price) / originalPrice) * 100);
+  };
+
   return (
     <section className="w-full max-w-[1200px] my-10">
       <div className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-8 mx-4">
@@ -133,35 +138,50 @@ const Products = () => {
           </div>
         ) : currentProducts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8" role="list">
-            {currentProducts.map((product) => (
-              <div key={product.id} className="bg-black/10 border border-white/10 rounded-2xl p-6 hover:-translate-y-1 transition-transform duration-300 flex flex-col shadow-lg" role="listitem">
-                <Link to={`/products/${product.id}`} className="flex-grow" aria-label={`View details for ${product.name}`}>
-                  <img
-                    src={product.image}
-                    alt={product.name}
-                    className="w-full h-48 object-cover rounded-lg mb-4"
-                  />
-                  <h3 className="text-xl font-semibold mb-2">{product.name}</h3>
-                  <p className="text-lg font-bold text-[var(--accent)]">₹{product.price.toFixed(2)}</p>
-                </Link>
-                <div className="flex gap-2 mt-4">
-                  <button
-                    className="flex-1 bg-[var(--accent)] text-white border-none py-2 px-4 rounded-lg flex items-center justify-center gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300"
-                    onClick={() => addToCart(product)}
-                    aria-label={`Add ${product.name} to cart`}
-                  >
-                    <FontAwesomeIcon icon={faCartPlus} aria-hidden="true" /> Cart
-                  </button>
-                  <button
-                    className="bg-white/10 text-[var(--text)] border-none py-2 px-4 rounded-lg flex items-center justify-center gap-2 font-medium hover:bg-white/20 transition-all duration-300"
-                    onClick={() => addToWishlist(product)}
-                    aria-label={`Add ${product.name} to wishlist`}
-                  >
-                    <FontAwesomeIcon icon={faHeart} aria-hidden="true" />
-                  </button>
+            {currentProducts.map((product) => {
+              const discount = calculateDiscount(product.price, product.originalPrice);
+              return (
+                <div key={product.id} className="bg-black/10 border border-white/10 rounded-2xl overflow-hidden shadow-lg flex flex-col" role="listitem">
+                  <Link to={`/products/${product.id}`} className="flex-grow" aria-label={`View details for ${product.name}`}>
+                    <div className="relative">
+                      <img
+                        src={product.image}
+                        alt={product.name}
+                        className="w-full h-48 object-cover"
+                      />
+                      {discount > 0 && (
+                        <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded" aria-label={`${discount} percent off`}>{discount}% OFF</span>
+                      )}
+                    </div>
+                    <div className="p-4 flex-grow flex flex-col">
+                      <h3 className="text-xl font-semibold mb-2">{product.name}</h3>
+                      <div className="flex items-baseline gap-2 mb-2">
+                        <p className="text-lg font-bold text-[var(--accent)]">₹{product.price.toFixed(2)}</p>
+                        {product.originalPrice && discount > 0 && (
+                          <p className="text-sm text-gray-400 line-through">₹{product.originalPrice.toFixed(2)}</p>
+                        )}
+                      </div>
+                    </div>
+                  </Link>
+                  <div className="flex gap-2 mt-4 p-4 pt-0">
+                    <button
+                      className="flex-1 bg-[var(--accent)] text-white border-none py-2 px-4 rounded-lg flex items-center justify-center gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300"
+                      onClick={() => addToCart(product)}
+                      aria-label={`Add ${product.name} to cart`}
+                    >
+                      <FontAwesomeIcon icon={faCartPlus} aria-hidden="true" /> Cart
+                    </button>
+                    <button
+                      className="bg-white/10 text-[var(--text)] border-none py-2 px-4 rounded-lg flex items-center justify-center gap-2 font-medium hover:bg-white/20 transition-all duration-300"
+                      onClick={() => addToWishlist(product)}
+                      aria-label={`Add ${product.name} to wishlist`}
+                    >
+                      <FontAwesomeIcon icon={faHeart} aria-hidden="true" />
+                    </button>
+                  </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         ) : (
           <p className="text-center text-lg opacity-80 py-10">No products found matching your criteria.</p>
