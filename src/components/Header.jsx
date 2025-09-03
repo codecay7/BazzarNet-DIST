@@ -33,12 +33,11 @@ const Header = () => {
 
   const vendorLinks = [
     { name: 'Dashboard', path: '/dashboard' },
-    { name: 'Manage Store', path: '/vendor' },
+    { name: 'Manage Store', path: '/manage-products' },
   ];
 
   const userLinks = [
     { name: 'Dashboard', path: '/dashboard' },
-    { name: 'Stores', path: '/stores' },
     { name: 'Products', path: '/products' },
   ];
 

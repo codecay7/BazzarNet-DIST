@@ -6,8 +6,7 @@ import Layout from './components/Layout';
 import PublicLayout from './components/PublicLayout';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
-import Stores from './pages/Stores';
-import StorePage from './pages/StorePage';
+import Products from './pages/Products';
 import ProductDetail from './pages/ProductDetail';
 import Cart from './pages/Cart';
 import Checkout from './pages/Checkout';
@@ -35,8 +34,7 @@ const App = () => {
             {isVendor ? (
               <>
                 <Route path="/manage-products" element={<ManageProducts />} />
-                <Route path="/stores" element={<Navigate to="/dashboard" />} />
-                <Route path="/stores/:storeId" element={<Navigate to="/dashboard" />} />
+                <Route path="/products" element={<Navigate to="/dashboard" />} />
                 <Route path="/products/:id" element={<Navigate to="/dashboard" />} />
                 <Route path="/cart" element={<Navigate to="/dashboard" />} />
                 <Route path="/checkout" element={<Navigate to="/dashboard" />} />
@@ -47,8 +45,7 @@ const App = () => {
               </>
             ) : (
               <>
-                <Route path="/stores" element={<Stores />} />
-                <Route path="/stores/:storeId" element={<StorePage />} />
+                <Route path="/products" element={<Products />} />
                 <Route path="/products/:id" element={<ProductDetail />} />
                 <Route path="/cart" element={<Cart />} />
                 <Route path="/checkout" element={<Checkout />} />
@@ -56,7 +53,6 @@ const App = () => {
                 <Route path="/wishlist" element={<Wishlist />} />
                 <Route path="/faq" element={<FAQ />} />
                 <Route path="/about" element={<About />} />
-                <Route path="/products" element={<Navigate to="/stores" />} />
                 <Route path="/manage-products" element={<Navigate to="/dashboard" />} />
               </>
             )}

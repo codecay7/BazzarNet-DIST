@@ -20,14 +20,13 @@ const MobileNav = () => {
 
   const vendorLinks = [
     { name: 'Dashboard', path: '/dashboard', icon: faHome },
-    { name: 'Manage Store', path: '/vendor', icon: faStore },
+    { name: 'Manage Store', path: '/manage-products', icon: faStore },
     { name: 'Orders', path: '/orders', icon: faTruck },
     { name: 'Profile', path: '/profile', icon: faUser },
   ];
 
   const userLinks = [
     { name: 'Dashboard', path: '/dashboard', icon: faHome },
-    { name: 'Stores', path: '/stores', icon: faStore },
     { name: 'Products', path: '/products', icon: faShoppingBag },
     { name: 'Cart', path: '/cart', icon: faShoppingCart },
     { name: 'Wishlist', path: '/wishlist', icon: faHeart },
