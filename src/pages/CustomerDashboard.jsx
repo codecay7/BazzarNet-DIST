@@ -22,9 +22,9 @@ const CustomerDashboard = () => {
 
   // Dynamically find the latest order for the logged-in user
   const latestOrder = useMemo(() => {
-    if (!user || !user.username || orders.length === 0) return null;
+    if (!user || !user.email || orders.length === 0) return null;
     
-    const userOrders = orders.filter(order => order.customerUsername === user.username);
+    const userOrders = orders.filter(order => order.customerEmail === user.email); // Filter by customerEmail
     if (userOrders.length === 0) return null;
 
     // Sort by date to get the latest order
@@ -46,7 +46,7 @@ const CustomerDashboard = () => {
   const stats = [
     { icon: faShoppingBag, label: 'Items in Cart', value: cart.length, path: '/cart' },
     { icon: faHeart, label: 'Wishlisted Items', value: wishlist.length, path: '/wishlist' },
-    { icon: faReceipt, label: 'Total Orders', value: orders.filter(order => order.customerUsername === user?.username).length, path: '/orders' }, // Dynamic total orders
+    { icon: faReceipt, label: 'Total Orders', value: orders.filter(order => order.customerEmail === user?.email).length, path: '/orders' }, // Dynamic total orders
   ];
 
   return (

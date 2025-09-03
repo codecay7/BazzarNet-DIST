@@ -22,7 +22,7 @@ const Profile = () => {
   const [profileData, setProfileData] = useState({
     name: user?.name || 'Guest',
     store: user?.store || '',
-    email: isVendor ? `${user?.store?.toLowerCase().replace(/\s/g, '')}@bazzar.net` : `${user?.username}@email.com`,
+    email: user?.email || (isVendor ? `${user?.store?.toLowerCase().replace(/\s/g, '')}@bazzar.net` : 'guest@email.com'), // Use user.email
     phone: '+91 98765 43210',
     address: user?.address || { // Initialize address as an object
       houseNo: '123 Commerce House',
@@ -256,7 +256,7 @@ const Profile = () => {
             )}
           </div>
           <h2 className="text-3xl font-bold mb-1">{user?.name}</h2>
-          <p className="text-lg text-[var(--text)] opacity-80 mb-6">@{user?.username}</p>
+          <p className="text-lg text-[var(--text)] opacity-80 mb-6">{user?.email}</p> {/* Display email instead of username */}
           <button
             className="bg-[var(--accent)] w-fit text-white border-none py-2 px-6 rounded-lg flex items-center gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300"
             onClick={() => isEditing ? handleSaveChanges() : setIsEditing(true)}

@@ -49,14 +49,16 @@ export const AppProvider = ({ children }) => {
   };
 
   // Login Functions
-  const loginAsUser = (name, username) => {
-    if (!name || !username) {
-      toast.error('Please enter both your name and username.');
+  const loginAsUser = (name, email, password) => {
+    if (!name || !email || !password) {
+      toast.error('Please enter your name, email, and password.');
       return false;
     }
+    // Mock authentication: In a real app, you'd verify credentials with a backend.
+    // For this demo, any non-empty password is "valid".
     const userData = { 
       name, 
-      username, 
+      email, 
       role: 'user',
       address: { // Default Indian address structure for new users
         houseNo: '123 Customer Apt',
@@ -74,9 +76,9 @@ export const AppProvider = ({ children }) => {
     return true;
   };
 
-  const loginAsVendor = (name, storeName) => {
-    if (!name || !storeName) {
-      toast.error('Please enter both your name and store name.');
+  const loginAsVendor = (name, storeName, email, password) => {
+    if (!name || !storeName || !email || !password) {
+      toast.error('Please enter your name, store name, email, and password.');
       return false;
     }
     // Find the store ID based on the store name (mocking a lookup)
@@ -86,9 +88,12 @@ export const AppProvider = ({ children }) => {
       return false;
     }
 
+    // Mock authentication: In a real app, you'd verify credentials with a backend.
+    // For this demo, any non-empty password is "valid".
     const userData = { 
       name, 
       store: storeName, 
+      email,
       role: 'vendor', 
       storeId: store.id,
       address: { // Default Indian address structure for new vendors

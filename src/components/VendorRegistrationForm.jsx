@@ -18,7 +18,7 @@ const VendorRegistrationForm = () => {
     address: '',
     description: '',
     category: 'Groceries',
-    password: '',
+    password: '', // Added password field
   });
   const [errors, setErrors] = useState({});
 
@@ -64,7 +64,7 @@ const VendorRegistrationForm = () => {
     if (!formData.category) {
       newErrors.category = 'Category is required.';
     }
-    if (!formData.password) {
+    if (!formData.password) { // Password validation
       newErrors.password = 'Password is required.';
     } else if (formData.password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters long.';
@@ -79,7 +79,7 @@ const VendorRegistrationForm = () => {
       // In a real app, this would be a registration call.
       // For now, we'll just log the vendor in.
       toast.success('Registration successful! Logging you in.');
-      if (loginAsVendor(formData.fullName, formData.businessName)) {
+      if (loginAsVendor(formData.fullName, formData.businessName, formData.email, formData.password)) {
         navigate('/dashboard');
       }
     } else {

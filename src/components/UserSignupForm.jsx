@@ -10,7 +10,7 @@ const UserSignupForm = () => {
   const { loginAsUser } = useContext(AppContext);
   const navigate = useNavigate();
   const [name, setName] = useState('');
-  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
 
@@ -19,10 +19,10 @@ const UserSignupForm = () => {
     if (!name.trim()) {
       newErrors.name = 'Full Name is required.';
     }
-    if (!username.trim()) {
-      newErrors.username = 'Username is required.';
-    } else if (username.trim().length < 3) {
-      newErrors.username = 'Username must be at least 3 characters long.';
+    if (!email.trim()) {
+      newErrors.email = 'Email is required.';
+    } else if (!/\S+@\S+\.\S+/.test(email)) {
+      newErrors.email = 'Email address is invalid.';
     }
     if (!password) {
       newErrors.password = 'Password is required.';
@@ -39,7 +39,7 @@ const UserSignupForm = () => {
       // In a real app, this would be a registration call.
       // For now, we'll just log the user in.
       toast.success('Registration successful! Logging you in.');
-      if (loginAsUser(name, username)) {
+      if (loginAsUser(name, email, password)) {
         navigate('/dashboard');
       }
     } else {
@@ -76,18 +76,18 @@ const UserSignupForm = () => {
       />
       {errors.name && <p id="fullName-error" className="text-red-400 text-xs mb-3">{errors.name}</p>}
       
-      <label htmlFor="username" className="mb-1 text-sm font-medium">Username</label>
+      <label htmlFor="email" className="mb-1 text-sm font-medium">Email</label>
       <input 
-        type="text" 
-        id="username"
-        value={username} 
-        onChange={(e) => setUsername(e.target.value)} 
-        placeholder="e.g., johndoe" 
+        type="email" 
+        id="email"
+        value={email} 
+        onChange={(e) => setEmail(e.target.value)} 
+        placeholder="e.g., johndoe@example.com" 
         className="w-full p-3 mb-1 text-[var(--text)] border border-white/30 rounded-lg bg-white/10 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]" 
-        aria-invalid={!!errors.username}
-        aria-describedby={errors.username ? "username-error" : undefined}
+        aria-invalid={!!errors.email}
+        aria-describedby={errors.email ? "email-error" : undefined}
       />
-      {errors.username && <p id="username-error" className="text-red-400 text-xs mb-3">{errors.username}</p>}
+      {errors.email && <p id="email-error" className="text-red-400 text-xs mb-3">{errors.email}</p>}
       
       <label htmlFor="password" className="mb-1 text-sm font-medium">Password</label>
       <input 

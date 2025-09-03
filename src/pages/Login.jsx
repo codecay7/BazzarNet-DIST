@@ -11,12 +11,17 @@ const Login = () => {
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('user');
 
+  // User Login State
   const [userName, setUserName] = useState('');
-  const [userUsername, setUserUsername] = useState('');
+  const [userEmail, setUserEmail] = useState('');
+  const [userPassword, setUserPassword] = useState('');
   const [userErrors, setUserErrors] = useState({});
 
+  // Vendor Login State
   const [vendorName, setVendorName] = useState('');
   const [vendorStore, setVendorStore] = useState('');
+  const [vendorEmail, setVendorEmail] = useState('');
+  const [vendorPassword, setVendorPassword] = useState('');
   const [vendorErrors, setVendorErrors] = useState({});
 
   const validateUserLogin = () => {
@@ -24,8 +29,15 @@ const Login = () => {
     if (!userName.trim()) {
       newErrors.name = 'Name is required.';
     }
-    if (!userUsername.trim()) {
-      newErrors.username = 'Username is required.';
+    if (!userEmail.trim()) {
+      newErrors.email = 'Email is required.';
+    } else if (!/\S+@\S+\.\S+/.test(userEmail)) {
+      newErrors.email = 'Email address is invalid.';
+    }
+    if (!userPassword) {
+      newErrors.password = 'Password is required.';
+    } else if (userPassword.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters long.';
     }
     setUserErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -39,6 +51,16 @@ const Login = () => {
     if (!vendorStore.trim()) {
       newErrors.store = 'Store Name is required.';
     }
+    if (!vendorEmail.trim()) {
+      newErrors.email = 'Email is required.';
+    } else if (!/\S+@\S+\.\S+/.test(vendorEmail)) {
+      newErrors.email = 'Email address is invalid.';
+    }
+    if (!vendorPassword) {
+      newErrors.password = 'Password is required.';
+    } else if (vendorPassword.length < 6) {
+      newErrors.password = 'Password must be at least 6 characters long.';
+    }
     setVendorErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
@@ -46,7 +68,7 @@ const Login = () => {
   const handleUserLogin = (e) => {
     e.preventDefault();
     if (validateUserLogin()) {
-      if (loginAsUser(userName, userUsername)) {
+      if (loginAsUser(userName, userEmail, userPassword)) {
         navigate('/dashboard');
       }
     } else {
@@ -57,7 +79,7 @@ const Login = () => {
   const handleVendorLogin = (e) => {
     e.preventDefault();
     if (validateVendorLogin()) {
-      if (loginAsVendor(vendorName, vendorStore)) {
+      if (loginAsVendor(vendorName, vendorStore, vendorEmail, vendorPassword)) {
         navigate('/dashboard');
       }
     } else {
@@ -128,18 +150,32 @@ const Login = () => {
               />
               {userErrors.name && <p id="userName-error" className="text-red-400 text-xs text-left -mt-1 mb-2">{userErrors.name}</p>}
               
-              <label htmlFor="userUsername" className="sr-only">Username</label>
+              <label htmlFor="userEmail" className="sr-only">Email</label>
               <input
-                type="text"
-                id="userUsername"
-                value={userUsername}
-                onChange={(e) => setUserUsername(e.target.value)}
-                placeholder="Username"
+                type="email"
+                id="userEmail"
+                value={userEmail}
+                onChange={(e) => setUserEmail(e.target.value)}
+                placeholder="Email"
                 className={inputClasses}
-                aria-invalid={!!userErrors.username}
-                aria-describedby={userErrors.username ? "userUsername-error" : undefined}
+                aria-invalid={!!userErrors.email}
+                aria-describedby={userErrors.email ? "userEmail-error" : undefined}
               />
-              {userErrors.username && <p id="userUsername-error" className="text-red-400 text-xs text-left -mt-1 mb-2">{userErrors.username}</p>}
+              {userErrors.email && <p id="userEmail-error" className="text-red-400 text-xs text-left -mt-1 mb-2">{userErrors.email}</p>}
+
+              <label htmlFor="userPassword" className="sr-only">Password</label>
+              <input
+                type="password"
+                id="userPassword"
+                value={userPassword}
+                onChange={(e) => setUserPassword(e.target.value)}
+                placeholder="Password"
+                className={inputClasses}
+                aria-invalid={!!userErrors.password}
+                aria-describedby={userErrors.password ? "userPassword-error" : undefined}
+              />
+              {userErrors.password && <p id="userPassword-error" className="text-red-400 text-xs text-left -mt-1 mb-2">{userErrors.password}</p>}
+
               <button
                 type="submit"
                 className="bg-[var(--accent)] text-white border-none py-3 px-6 rounded-lg flex items-center justify-center w-full gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300 mt-4"
@@ -185,6 +221,33 @@ const Login = () => {
                 aria-describedby={vendorErrors.store ? "vendorStore-error" : undefined}
               />
               {vendorErrors.store && <p id="vendorStore-error" className="text-red-400 text-xs text-left -mt-1 mb-2">{vendorErrors.store}</p>}
+
+              <label htmlFor="vendorEmail" className="sr-only">Email</label>
+              <input
+                type="email"
+                id="vendorEmail"
+                value={vendorEmail}
+                onChange={(e) => setVendorEmail(e.target.value)}
+                placeholder="Email"
+                className={inputClasses}
+                aria-invalid={!!vendorErrors.email}
+                aria-describedby={vendorErrors.email ? "vendorEmail-error" : undefined}
+              />
+              {vendorErrors.email && <p id="vendorEmail-error" className="text-red-400 text-xs text-left -mt-1 mb-2">{vendorErrors.email}</p>}
+
+              <label htmlFor="vendorPassword" className="sr-only">Password</label>
+              <input
+                type="password"
+                id="vendorPassword"
+                value={vendorPassword}
+                onChange={(e) => setVendorPassword(e.target.value)}
+                placeholder="Password"
+                className={inputClasses}
+                aria-invalid={!!vendorErrors.password}
+                aria-describedby={vendorErrors.password ? "vendorPassword-error" : undefined}
+              />
+              {vendorErrors.password && <p id="vendorPassword-error" className="text-red-400 text-xs text-left -mt-1 mb-2">{vendorErrors.password}</p>}
+
               <button
                 type="submit"
                 className="bg-[var(--accent)] text-white border-none py-3 px-6 rounded-lg flex items-center justify-center w-full gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300 mt-4"
