@@ -124,9 +124,7 @@ const CustomerDashboard = () => {
                         <p className="font-semibold text-lg">Order {latestOrder.id}</p>
                         <p className="text-sm opacity-80">{latestOrder.items.map(item => item.name).join(', ')}</p>
                       </div>
-                      <button className="bg-[var(--accent)] text-white py-2 px-4 rounded-lg font-medium flex items-center gap-2 hover:bg-[var(--accent-dark)] transition-colors" onClick={() => navigate(`/my-orders/${latestOrder.id.replace('#', '')}`)} aria-label={`Track Order ${latestOrder.id}`}>
-                        <FontAwesomeIcon icon={faMapMarkerAlt} aria-hidden="true" /> Track
-                      </button>
+                      {/* Removed the "Track" button */}
                     </div>
                     {/* Progress Bar */}
                     <div className="flex items-center" role="progressbar" aria-valuenow={getOrderSteps(latestOrder.status).filter(s => s.completed).length} aria-valuemin="0" aria-valuemax={getOrderSteps(latestOrder.status).length} aria-label={`Order ${latestOrder.id} progress`}>
