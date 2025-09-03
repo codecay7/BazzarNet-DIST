@@ -117,7 +117,6 @@ const Header = () => {
                   <button onClick={toggleTheme} className="flex items-center justify-between gap-3 px-4 py-2 text-sm hover:bg-white/10 w-full">
                     <div className="flex items-center gap-3">
                       <FontAwesomeIcon icon={theme === 'light' ? faMoon : faSun} />
-                      <span>Toggle Theme</span>
                     </div>
                     <span className="text-xs opacity-70">{theme === 'light' ? 'Dark' : 'Light'}</span>
                   </button>
