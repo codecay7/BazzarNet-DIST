@@ -2,11 +2,19 @@ import React, { useContext } from 'react';
 import { AppContext } from '../context/AppContext';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, LineChart, Line, Legend } from 'recharts';
 import { Wallet, Package, Users, Tag, Search, Calendar as CalendarIcon } from 'lucide-react';
-import { dashboardStats, salesData, topProductsData } from '../data/mockData';
+import { salesData, topProductsData } from '../data/mockData';
 import StatCard from './StatCard';
+import { useNavigate } from 'react-router-dom';
 
 const VendorDashboard = () => {
-  const { user } = useContext(AppContext);
+  const { user, orders, vendorProducts } = useContext(AppContext);
+  const navigate = useNavigate();
+
+  // Calculate real-time stats
+  const totalRevenue = orders.reduce((sum, order) => sum + order.total, 0);
+  const totalOrders = orders.length;
+  const uniqueCustomers = new Set(orders.map(o => o.customer.name)).size;
+  const totalProducts = vendorProducts.length;
 
   return (
     <div className="w-full max-w-[1400px] mx-auto my-10 px-4 md:px-8">
@@ -27,11 +35,14 @@ const VendorDashboard = () => {
         <div className="flex flex-col md:flex-row justify-between items-center mb-4">
           <h2 className="text-2xl font-bold">Dashboard Overview</h2>
           <div className="flex items-center gap-4 mt-4 md:mt-0">
-            <select className="bg-black/10 border border-white/10 rounded-lg px-3 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]">
-              <option>This Month</option>
-              <option>Last Month</option>
-              <option>This Year</option>
-            </select>
+            <div className="relative">
+              <select className="w-full appearance-none bg-black/10 border border-white/10 rounded-lg pl-3 pr-8 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]">
+                <option>This Month</option>
+                <option>Last Month</option>
+                <option>This Year</option>
+              </select>
+              <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-[var(--text)] opacity-50"><Tag size={16} /></div>
+            </div>
             <div className="relative">
               <CalendarIcon className="absolute left-3 top-1/2 -translate-y-1/2 text-[var(--text)] opacity-50" size={20} />
               <input type="text" placeholder="dd/mm/yyyy" className="w-36 bg-black/10 border border-white/10 rounded-lg pl-10 pr-4 py-2 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]" />
@@ -39,10 +50,14 @@ const VendorDashboard = () => {
           </div>
         </div>
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-          <StatCard icon={<Wallet />} title="Total Revenue" value={dashboardStats.totalRevenue.value} change={dashboardStats.totalRevenue.change} />
-          <StatCard icon={<Package />} title="Total Orders" value={dashboardStats.totalOrders.value} change={dashboardStats.totalOrders.change} />
-          <StatCard icon={<Users />} title="New Customers" value={dashboardStats.newCustomers.value} change={dashboardStats.newCustomers.change} />
-          <StatCard icon={<Tag />} title="Products" value={dashboardStats.products.value} change={dashboardStats.products.change} changeType={dashboardStats.products.changeType} />
+          <StatCard icon={<Wallet />} title="Total Revenue" value={`₹${totalRevenue.toLocaleString('en-IN')}`} change="+12% this month" />
+          <div onClick={() => navigate('/orders')} className="cursor-pointer">
+            <StatCard icon={<Package />} title="Total Orders" value={totalOrders} change="+5% this month" />
+          </div>
+          <StatCard icon={<Users />} title="Customers" value={uniqueCustomers} change="+8% this month" />
+          <div onClick={() => navigate('/manage-products')} className="cursor-pointer">
+            <StatCard icon={<Tag />} title="Products" value={totalProducts} change="+2 this month" />
+          </div>
         </div>
       </div>
 

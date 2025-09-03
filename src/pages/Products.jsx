@@ -4,6 +4,7 @@ import { faCartPlus, faHeart, faSpinner } from '@fortawesome/free-solid-svg-icon
 import { AppContext } from '../context/AppContext';
 import { Link } from 'react-router-dom';
 import { stores, allProducts } from '../data/mockData';
+import { ChevronDown } from 'lucide-react';
 
 const Products = () => {
   const { addToCart, addToWishlist } = useContext(AppContext);
@@ -63,26 +64,32 @@ const Products = () => {
             onChange={(e) => setSearchTerm(e.target.value)}
             className="w-full p-3 rounded-lg bg-white/10 border border-black/30 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] text-[var(--text)]"
           />
-          <select
-            value={selectedStore}
-            onChange={(e) => setSelectedStore(e.target.value)}
-            className="w-full p-3 rounded-lg bg-white/10 border border-black/30 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] text-[var(--text)]"
-          >
-            <option value="all">All Stores</option>
-            {stores.map(store => (
-              <option key={store.id} value={store.id}>{store.name}</option>
-            ))}
-          </select>
-          <select
-            value={sortBy}
-            onChange={(e) => setSortBy(e.target.value)}
-            className="w-full p-3 rounded-lg bg-white/10 border border-black/30 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] text-[var(--text)]"
-          >
-            <option value="name-asc">Sort by Name (A-Z)</option>
-            <option value="name-desc">Sort by Name (Z-A)</option>
-            <option value="price-asc">Sort by Price (Low to High)</option>
-            <option value="price-desc">Sort by Price (High to Low)</option>
-          </select>
+          <div className="relative">
+            <select
+              value={selectedStore}
+              onChange={(e) => setSelectedStore(e.target.value)}
+              className="w-full appearance-none p-3 rounded-lg bg-white/10 border border-black/30 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] text-[var(--text)] pr-8"
+            >
+              <option value="all">All Stores</option>
+              {stores.map(store => (
+                <option key={store.id} value={store.id}>{store.name}</option>
+              ))}
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-[var(--text)]"><ChevronDown size={20} /></div>
+          </div>
+          <div className="relative">
+            <select
+              value={sortBy}
+              onChange={(e) => setSortBy(e.target.value)}
+              className="w-full appearance-none p-3 rounded-lg bg-white/10 border border-black/30 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] text-[var(--text)] pr-8"
+            >
+              <option value="name-asc">Sort by Name (A-Z)</option>
+              <option value="name-desc">Sort by Name (Z-A)</option>
+              <option value="price-asc">Sort by Price (Low to High)</option>
+              <option value="price-desc">Sort by Price (High to Low)</option>
+            </select>
+            <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-[var(--text)]"><ChevronDown size={20} /></div>
+          </div>
         </div>
 
         {/* Products Grid */}

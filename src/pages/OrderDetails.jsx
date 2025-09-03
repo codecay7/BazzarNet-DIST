@@ -2,6 +2,7 @@ import React, { useContext, useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { AppContext } from '../context/AppContext';
 import toast from 'react-hot-toast';
+import { ChevronDown } from 'lucide-react';
 
 const OrderDetails = () => {
   const { orderId } = useParams();
@@ -67,12 +68,15 @@ const OrderDetails = () => {
           <div className="space-y-6">
             <div className="bg-black/10 p-6 rounded-xl">
               <h3 className="text-xl font-semibold mb-4">Update Status</h3>
-              <select value={status} onChange={(e) => setStatus(e.target.value)} className="w-full p-3 mb-4 rounded-lg bg-white/10 border border-black/30">
-                <option>Pending</option>
-                <option>Shipped</option>
-                <option>Delivered</option>
-                <option>Cancelled</option>
-              </select>
+              <div className="relative mb-4">
+                <select value={status} onChange={(e) => setStatus(e.target.value)} className="w-full appearance-none p-3 rounded-lg bg-white/10 border border-black/30 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] pr-8">
+                  <option>Pending</option>
+                  <option>Shipped</option>
+                  <option>Delivered</option>
+                  <option>Cancelled</option>
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-[var(--text)]"><ChevronDown size={20} /></div>
+              </div>
               <button onClick={handleStatusUpdate} className="w-full bg-[var(--accent)] text-white py-2 px-4 rounded-lg font-medium">Save Changes</button>
             </div>
             <div className="bg-black/10 p-6 rounded-xl">

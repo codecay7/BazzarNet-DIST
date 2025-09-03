@@ -3,6 +3,7 @@ import { AppContext } from '../context/AppContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
+import { ChevronDown } from 'lucide-react';
 
 const VendorRegistrationForm = () => {
   const { loginAsVendor } = useContext(AppContext);
@@ -69,14 +70,15 @@ const VendorRegistrationForm = () => {
         <label className="text-sm font-medium">Business Description</label>
         <textarea rows="2" className="w-full p-2 text-[var(--text)] border border-white/30 rounded-lg bg-white/10 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"></textarea>
       </div>
-      <div>
+      <div className="relative">
         <label className="text-sm font-medium">Category</label>
-        <select required className="w-full p-2 text-[var(--text)] border border-white/30 rounded-lg bg-white/10 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]">
+        <select required className="w-full appearance-none p-2 text-[var(--text)] border border-white/30 rounded-lg bg-white/10 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] pr-8">
           <option>Groceries</option>
           <option>Bakery</option>
           <option>Butcher</option>
           <option>Cafe</option>
         </select>
+        <div className="pointer-events-none absolute inset-y-0 right-0 top-5 flex items-center px-2 text-[var(--text)]"><ChevronDown size={20} /></div>
       </div>
       <div>
         <label className="text-sm font-medium">Password</label>

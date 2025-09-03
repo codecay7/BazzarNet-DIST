@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import { ChevronDown } from 'lucide-react';
 
 const ProductForm = ({ onSubmit, initialData = null }) => {
   const [product, setProduct] = useState({
@@ -71,12 +72,13 @@ const ProductForm = ({ onSubmit, initialData = null }) => {
           <label className="block text-sm font-medium mb-1">Product Name</label>
           <input type="text" name="name" value={product.name} onChange={handleChange} required className="w-full p-2 rounded-lg bg-white/10 border border-black/30 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]" />
         </div>
-        <div>
+        <div className="relative">
           <label className="block text-sm font-medium mb-1">Category</label>
-          <select name="category" value={product.category} onChange={handleChange} required className="w-full p-2 rounded-lg bg-white/10 border border-black/30 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]">
+          <select name="category" value={product.category} onChange={handleChange} required className="w-full appearance-none p-2 rounded-lg bg-white/10 border border-black/30 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] pr-8">
             <option value="" disabled>Select a category</option>
             {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
           </select>
+          <div className="pointer-events-none absolute inset-y-0 right-0 top-6 flex items-center px-2 text-[var(--text)]"><ChevronDown size={20} /></div>
         </div>
       </div>
       <div>
