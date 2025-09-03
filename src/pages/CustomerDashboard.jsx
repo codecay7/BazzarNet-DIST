@@ -1,4 +1,4 @@
-import React, { useContext, useState, useEffect } from 'react';
+import React, { useContext, useState, useEffect, useMemo } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShoppingBag, faBoxOpen, faHeart, faMapMarkerAlt, faCheckCircle, faReceipt } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
@@ -7,7 +7,7 @@ import SkeletonText from '../components/SkeletonText';
 import SkeletonCard from '../components/SkeletonCard';
 
 const CustomerDashboard = () => {
-  const { user, cart, wishlist, simulateLoading, allAppProducts } = useContext(AppContext); // Use allAppProducts
+  const { user, cart, wishlist, simulateLoading, allAppProducts, orders } = useContext(AppContext); // Added orders
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
@@ -20,25 +20,33 @@ const CustomerDashboard = () => {
     loadData();
   }, [simulateLoading]);
 
-  // Mock data for demonstration
-  const recentOrder = {
-    id: '#1234',
-    items: 'Apples, Bread',
-    status: 'Out for Delivery',
-    steps: [
+  // Dynamically find the latest order for the logged-in user
+  const latestOrder = useMemo(() => {
+    if (!user || !user.username || orders.length === 0) return null;
+    
+    const userOrders = orders.filter(order => order.customerUsername === user.username);
+    if (userOrders.length === 0) return null;
+
+    // Sort by date to get the latest order
+    return userOrders.sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+  }, [user, orders]);
+
+  // Define steps for the progress bar based on actual order status
+  const getOrderSteps = (status) => {
+    return [
       { name: 'Ordered', completed: true },
-      { name: 'Processing', completed: true },
-      { name: 'Out for Delivery', completed: true },
-      { name: 'Delivered', completed: false },
-    ]
+      { name: 'Processing', completed: ['Processing', 'Shipped', 'Delivered'].includes(status) },
+      { name: 'Out for Delivery', completed: ['Shipped', 'Delivered'].includes(status) },
+      { name: 'Delivered', completed: status === 'Delivered' },
+    ];
   };
 
-  const featuredProducts = allAppProducts.slice(0, 3); // Use allAppProducts for featured products
+  const featuredProducts = allAppProducts.slice(0, 3);
 
   const stats = [
     { icon: faShoppingBag, label: 'Items in Cart', value: cart.length, path: '/cart' },
     { icon: faHeart, label: 'Wishlisted Items', value: wishlist.length, path: '/wishlist' },
-    { icon: faReceipt, label: 'Total Orders', value: 2, path: '/orders' },
+    { icon: faReceipt, label: 'Total Orders', value: orders.filter(order => order.customerUsername === user?.username).length, path: '/orders' }, // Dynamic total orders
   ];
 
   return (
@@ -109,31 +117,37 @@ const CustomerDashboard = () => {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
               <div className="lg:col-span-2 bg-black/10 p-6 rounded-xl">
                 <h2 className="text-2xl font-bold mb-4">Latest Order Tracking</h2>
-                <div className="flex items-center justify-between mb-6">
-                  <div>
-                    <p className="font-semibold text-lg">Order {recentOrder.id}</p>
-                    <p className="text-sm opacity-80">{recentOrder.items}</p>
-                  </div>
-                  <button className="bg-[var(--accent)] text-white py-2 px-4 rounded-lg font-medium flex items-center gap-2 hover:bg-[var(--accent-dark)] transition-colors" aria-label={`Track Order ${recentOrder.id}`}>
-                    <FontAwesomeIcon icon={faMapMarkerAlt} aria-hidden="true" /> Track
-                  </button>
-                </div>
-                {/* Progress Bar */}
-                <div className="flex items-center" role="progressbar" aria-valuenow={recentOrder.steps.filter(s => s.completed).length} aria-valuemin="0" aria-valuemax={recentOrder.steps.length} aria-label={`Order ${recentOrder.id} progress`}>
-                  {recentOrder.steps.map((step, index) => (
-                    <React.Fragment key={step.name}>
-                      <div className="flex flex-col items-center">
-                        <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${step.completed ? 'bg-[var(--accent)] border-[var(--accent)] text-white' : 'bg-transparent border-gray-500 text-gray-500'}`} aria-hidden="true">
-                          <FontAwesomeIcon icon={faCheckCircle} />
-                        </div>
-                        <p className={`text-xs mt-2 ${step.completed ? 'font-semibold' : 'opacity-70'}`}>{step.name}</p>
+                {latestOrder ? (
+                  <>
+                    <div className="flex items-center justify-between mb-6">
+                      <div>
+                        <p className="font-semibold text-lg">Order {latestOrder.id}</p>
+                        <p className="text-sm opacity-80">{latestOrder.items.map(item => item.name).join(', ')}</p>
                       </div>
-                      {index < recentOrder.steps.length - 1 && (
-                        <div className={`flex-1 h-1 mx-2 ${step.completed ? 'bg-[var(--accent)]' : 'bg-gray-500'}`} aria-hidden="true"></div>
-                      )}
-                    </React.Fragment>
-                  ))}
-                </div>
+                      <button className="bg-[var(--accent)] text-white py-2 px-4 rounded-lg font-medium flex items-center gap-2 hover:bg-[var(--accent-dark)] transition-colors" onClick={() => navigate(`/my-orders/${latestOrder.id.replace('#', '')}`)} aria-label={`Track Order ${latestOrder.id}`}>
+                        <FontAwesomeIcon icon={faMapMarkerAlt} aria-hidden="true" /> Track
+                      </button>
+                    </div>
+                    {/* Progress Bar */}
+                    <div className="flex items-center" role="progressbar" aria-valuenow={getOrderSteps(latestOrder.status).filter(s => s.completed).length} aria-valuemin="0" aria-valuemax={getOrderSteps(latestOrder.status).length} aria-label={`Order ${latestOrder.id} progress`}>
+                      {getOrderSteps(latestOrder.status).map((step, index) => (
+                        <React.Fragment key={step.name}>
+                          <div className="flex flex-col items-center">
+                            <div className={`w-10 h-10 rounded-full flex items-center justify-center border-2 ${step.completed ? 'bg-[var(--accent)] border-[var(--accent)] text-white' : 'bg-transparent border-gray-500 text-gray-500'}`} aria-hidden="true">
+                              <FontAwesomeIcon icon={faCheckCircle} />
+                            </div>
+                            <p className={`text-xs mt-2 ${step.completed ? 'font-semibold' : 'opacity-70'}`}>{step.name}</p>
+                          </div>
+                          {index < getOrderSteps(latestOrder.status).length - 1 && (
+                            <div className={`flex-1 h-1 mx-2 ${step.completed ? 'bg-[var(--accent)]' : 'bg-gray-500'}`} aria-hidden="true"></div>
+                          )}
+                        </React.Fragment>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <p className="text-center text-lg opacity-80 py-10">No recent orders found.</p>
+                )}
               </div>
 
               <div className="bg-black/10 p-6 rounded-xl">

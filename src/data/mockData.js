@@ -26,6 +26,7 @@ export const mockOrders = [
     { 
       id: '#BN5214', 
       customer: { name: 'Aarav Sharma', email: 'aarav@example.com' },
+      customerUsername: 'aarav', // Added for linking to user
       date: '2025-08-04',
       shipping: { trackingNumber: 'TRK123456', carrier: 'FedEx' },
       notes: 'Customer requested express delivery.',
@@ -39,6 +40,7 @@ export const mockOrders = [
     { 
       id: '#BN5215', 
       customer: { name: 'Priya Patel', email: 'priya@example.com' },
+      customerUsername: 'priya', // Added for linking to user
       date: '2025-08-03',
       shipping: { trackingNumber: 'TRK654321', carrier: 'Blue Dart' },
       notes: '',
@@ -51,6 +53,7 @@ export const mockOrders = [
     { 
       id: '#BN5216', 
       customer: { name: 'Rohan Mehta', email: 'rohan@example.com' },
+      customerUsername: 'rohan', // Added for linking to user
       date: '2025-08-05',
       shipping: { trackingNumber: 'TRK789012', carrier: 'Delhivery' },
       notes: '',
