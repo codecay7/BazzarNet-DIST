@@ -4,7 +4,7 @@ import toast from 'react-hot-toast';
 export const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
-  const [theme, setTheme] = useState('light');
+  const [theme, setTheme] = useState('dark');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
@@ -12,6 +12,11 @@ export const AppProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
   const [wishlist, setWishlist] = useState([]);
   const [vendorProducts, setVendorProducts] = useState([]);
+
+  // Set initial theme on mount
+  useEffect(() => {
+    document.body.setAttribute('data-theme', 'dark');
+  }, []);
 
   // Theme Toggle
   const toggleTheme = () => {
