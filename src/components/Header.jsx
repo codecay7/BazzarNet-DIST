@@ -1,7 +1,7 @@
 import React, { useContext, useState, useEffect, useRef } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
-  faBars, faTimes, faSignOutAlt, faShoppingCart, faHeart, faUser, faBox, faIdCard, faSun, faMoon, faCog
+  faBars, faTimes, faSignOutAlt, faShoppingCart, faHeart, faUser, faBox, faIdCard, faSun, faMoon, faCreditCard
 } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
 import MobileNav from './MobileNav';
@@ -115,8 +115,8 @@ const Header = () => {
                     <FontAwesomeIcon icon={faBox} /> Orders
                   </NavLink>
                   {isVendor && (
-                    <NavLink to="/settings" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm hover:bg-white/10">
-                      <FontAwesomeIcon icon={faCog} /> Store Settings
+                    <NavLink to="/payments" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm hover:bg-white/10">
+                      <FontAwesomeIcon icon={faCreditCard} /> Payments
                     </NavLink>
                   )}
                   <button onClick={toggleTheme} className="flex items-center gap-3 px-4 py-2 text-sm hover:bg-white/10 w-full">

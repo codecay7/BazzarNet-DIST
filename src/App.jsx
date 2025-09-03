@@ -19,7 +19,7 @@ import ManageProducts from './pages/ManageProducts';
 import Orders from './pages/Orders';
 import OrderDetails from './pages/OrderDetails';
 import CustomerOrderDetails from './pages/CustomerOrderDetails';
-import StoreSettings from './pages/StoreSettings';
+import Payments from './pages/Payments';
 import FAQ from './pages/FAQ';
 import About from './pages/About';
 import Profile from './pages/Profile';
@@ -41,7 +41,7 @@ const App = () => {
               <>
                 <Route path="/manage-products" element={<ManageProducts />} />
                 <Route path="/orders/:orderId" element={<OrderDetails />} />
-                <Route path="/settings" element={<StoreSettings />} />
+                <Route path="/payments" element={<Payments />} />
                 {/* Redirect customer routes for vendors */}
                 <Route path="/products" element={<Navigate to="/dashboard" />} />
                 <Route path="/products/:id" element={<Navigate to="/dashboard" />} />
@@ -54,6 +54,7 @@ const App = () => {
                 <Route path="/faq" element={<Navigate to="/dashboard" />} />
                 <Route path="/about" element={<Navigate to="/dashboard" />} />
                 <Route path="/my-orders/:orderId" element={<Navigate to="/dashboard" />} />
+                <Route path="/settings" element={<Navigate to="/dashboard" />} />
               </>
             ) : (
               <>
@@ -71,6 +72,7 @@ const App = () => {
                 {/* Redirect vendor routes for customers */}
                 <Route path="/manage-products" element={<Navigate to="/dashboard" />} />
                 <Route path="/orders/:orderId" element={<Navigate to="/dashboard" />} />
+                <Route path="/payments" element={<Navigate to="/dashboard" />} />
                 <Route path="/settings" element={<Navigate to="/dashboard" />} />
               </>
             )}

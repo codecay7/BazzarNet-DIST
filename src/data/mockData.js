@@ -48,6 +48,25 @@ export const mockOrders = [
       total: 80.00, 
       status: 'Delivered' 
     },
+    { 
+      id: '#BN5216', 
+      customer: { name: 'Rohan Mehta', email: 'rohan@example.com' },
+      date: '2025-08-05',
+      shipping: { trackingNumber: 'TRK789012', carrier: 'Delhivery' },
+      notes: '',
+      items: [
+        { ...allProducts.find(p => p.id === 103), quantity: 2 },
+        { ...allProducts.find(p => p.id === 202), quantity: 1 },
+      ],
+      total: (120.00 * 2) + 100.00, 
+      status: 'Pending' 
+    },
+];
+
+export const mockPayments = [
+  { id: 'PAY101', orderId: '#BN5214', amount: 550.00, date: '2025-08-05', status: 'Paid' },
+  { id: 'PAY102', orderId: '#BN5215', amount: 80.00, date: '2025-08-04', status: 'Paid' },
+  { id: 'PAY103', orderId: '#BN5216', amount: 340.00, date: '2025-08-06', status: 'Pending' },
 ];
 
 // New mock data for the vendor dashboard
