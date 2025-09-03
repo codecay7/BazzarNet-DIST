@@ -1,5 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
+import { mockOrders as allMockOrders } from '../data/mockData';
 
 export const AppContext = createContext();
 
@@ -12,6 +13,7 @@ export const AppProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
   const [wishlist, setWishlist] = useState([]);
   const [vendorProducts, setVendorProducts] = useState([]);
+  const [orders, setOrders] = useState(allMockOrders);
 
   // Set initial theme on mount
   useEffect(() => {
@@ -143,6 +145,16 @@ export const AppProvider = ({ children }) => {
     toast.error('Product deleted.');
   };
 
+  // Order Functions
+  const updateOrderStatus = (orderId, newStatus) => {
+    setOrders(prevOrders =>
+      prevOrders.map(order =>
+        order.id === orderId ? { ...order, status: newStatus } : order
+      )
+    );
+    toast.success(`Order ${orderId} status updated to ${newStatus}.`);
+  };
+
   // Auto-login from localStorage
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
@@ -178,6 +190,8 @@ export const AppProvider = ({ children }) => {
     addVendorProduct,
     editVendorProduct,
     deleteVendorProduct,
+    orders,
+    updateOrderStatus,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

@@ -1,12 +1,13 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { useParams, Link } from 'react-router-dom';
-import { mockOrders } from '../data/mockData';
+import { AppContext } from '../context/AppContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCheckCircle, faBox, faTruck, faHome } from '@fortawesome/free-solid-svg-icons';
+import { faBox, faTruck, faHome } from '@fortawesome/free-solid-svg-icons';
 
 const CustomerOrderDetails = () => {
   const { orderId } = useParams();
-  const order = mockOrders.find(o => o.id === `#${orderId}`);
+  const { orders } = useContext(AppContext);
+  const order = orders.find(o => o.id === `#${orderId}`);
 
   if (!order) {
     return (

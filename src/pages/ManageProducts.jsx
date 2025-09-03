@@ -1,4 +1,4 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useMemo } from 'react';
 import { AppContext } from '../context/AppContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faPlus, faEdit, faTrash, faBoxOpen } from '@fortawesome/free-solid-svg-icons';
@@ -9,6 +9,7 @@ const ManageProducts = () => {
   const { vendorProducts, addVendorProduct, editVendorProduct, deleteVendorProduct } = useContext(AppContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
+  const [searchTerm, setSearchTerm] = useState('');
 
   const handleOpenModal = (product = null) => {
     setEditingProduct(product);
@@ -37,20 +38,38 @@ const ManageProducts = () => {
     return Math.round(((originalPrice - price) / originalPrice) * 100);
   };
 
+  const filteredProducts = useMemo(() => {
+    if (!searchTerm) {
+      return vendorProducts;
+    }
+    return vendorProducts.filter(product =>
+      product.name.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [vendorProducts, searchTerm]);
+
   return (
     <>
       <section className="w-full max-w-[1200px] my-10">
         <div className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-8 mx-4">
           <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
             <h2 className="text-3xl font-bold md:text-4xl">Your Products</h2>
-            <button onClick={() => handleOpenModal()} className="bg-[var(--accent)] text-white py-2 px-6 rounded-lg font-medium flex items-center gap-2 hover:bg-[var(--accent-dark)] transition-colors">
-              <FontAwesomeIcon icon={faPlus} /> Add Product
-            </button>
+            <div className="flex items-center gap-4 w-full md:w-auto">
+              <input
+                type="text"
+                placeholder="Search your products..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                className="w-full md:w-64 p-2 rounded-lg bg-white/10 border border-black/30 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] text-[var(--text)]"
+              />
+              <button onClick={() => handleOpenModal()} className="bg-[var(--accent)] text-white py-2 px-6 rounded-lg font-medium flex items-center gap-2 hover:bg-[var(--accent-dark)] transition-colors">
+                <FontAwesomeIcon icon={faPlus} /> Add
+              </button>
+            </div>
           </div>
 
-          {vendorProducts.length > 0 ? (
+          {filteredProducts.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {vendorProducts.map((product, index) => {
+              {filteredProducts.map((product, index) => {
                 const discount = calculateDiscount(product.price, product.originalPrice);
                 return (
                   <div key={product.id || index} className="bg-black/10 border border-white/10 rounded-2xl overflow-hidden shadow-lg flex flex-col">
@@ -86,11 +105,8 @@ const ManageProducts = () => {
           ) : (
             <div className="text-center py-16">
               <FontAwesomeIcon icon={faBoxOpen} className="text-6xl text-[var(--accent)] mb-4" />
-              <h3 className="text-2xl font-bold mb-2">No products yet</h3>
-              <p className="text-lg opacity-80 mb-6">Click "Add Product" to get started.</p>
-              <button onClick={() => handleOpenModal()} className="bg-[var(--accent)] text-white py-2 px-6 rounded-lg font-medium flex items-center gap-2 hover:bg-[var(--accent-dark)] transition-colors">
-                <FontAwesomeIcon icon={faPlus} /> Add Your First Product
-              </button>
+              <h3 className="text-2xl font-bold mb-2">No products found</h3>
+              <p className="text-lg opacity-80">Click "Add" to get started.</p>
             </div>
           )}
         </div>

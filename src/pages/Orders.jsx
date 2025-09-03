@@ -2,11 +2,10 @@ import React, { useContext, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faMapMarkerAlt, faBoxOpen, faCheckCircle, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
-import { mockOrders as allMockOrders } from '../data/mockData';
 import { useNavigate } from 'react-router-dom';
 
 const Orders = () => {
-  const { isVendor } = useContext(AppContext);
+  const { isVendor, orders } = useContext(AppContext);
   const [searchTerm, setSearchTerm] = useState('');
   const navigate = useNavigate();
 
@@ -30,7 +29,7 @@ const Orders = () => {
     }
   };
 
-  const filteredOrders = allMockOrders.filter(order =>
+  const filteredOrders = orders.filter(order =>
     order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
     order.items.some(item => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
   );
