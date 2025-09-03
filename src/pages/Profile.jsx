@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faStore, faPen, faSave } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
 import toast from 'react-hot-toast';
-import { Building2, Mail, Phone, FileText, Landmark, ChevronDown } from 'lucide-react';
+import { Building2, Mail, Phone, CreditCard, Landmark, ChevronDown } from 'lucide-react';
 
 const indianStates = [
   "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
@@ -21,24 +21,29 @@ const Profile = () => {
   
   const [profileData, setProfileData] = useState({
     name: user?.name || 'Guest',
-    store: user?.store || '',
-    email: user?.email || (isVendor ? `${user?.store?.toLowerCase().replace(/\s/g, '')}@bazzar.net` : 'guest@email.com'), // Use user.email
-    phone: '+91 98765 43210',
-    address: user?.address || { // Initialize address as an object
+    store: user?.store || '', // Only for vendors
+    email: user?.email || (isVendor ? `${user?.store?.toLowerCase().replace(/\s/g, '')}@bazzar.net` : 'guest@email.com'),
+    phone: user?.phone || '+91 98765 43210', // Added for customer
+    address: user?.address || { 
       houseNo: '123 Commerce House',
       landmark: 'Near City Hospital',
       city: 'Mumbai',
       state: 'Maharashtra',
       pinCode: '400001'
     },
-    pan: 'ABCDE1234F',
-    gst: '27ABCDE1234F1Z5',
-    category: 'Groceries',
-    description: 'Your friendly neighborhood grocery store, bringing fresh produce and daily essentials right to your doorstep with BazzarNet.',
-    bankAccount: '123456789012',
-    bankName: 'BazzarNet Bank',
-    ifsc: 'BAZZ0001234',
-    upiId: 'vendor@bazzarnetupi',
+    pan: 'ABCDE1234F', // Only for vendors
+    gst: '27ABCDE1234F1Z5', // Only for vendors
+    category: 'Groceries', // Only for vendors
+    description: 'Your friendly neighborhood grocery store, bringing fresh produce and daily essentials right to your doorstep with BazzarNet.', // Only for vendors
+    bankAccount: '123456789012', // Only for vendors
+    bankName: 'BazzarNet Bank', // Only for vendors
+    ifsc: 'BAZZ0001234', // Only for vendors
+    upiId: user?.upiId || 'customer@bazzarnetupi', // Added for customer
+    cardDetails: user?.cardDetails || { // Mock card details for customer
+      cardNumber: '**** **** **** 1234',
+      expiry: '12/25',
+      cardHolder: user?.name || 'Guest User'
+    },
     profileImage: null,
   });
 
@@ -58,7 +63,17 @@ const Profile = () => {
           [field]: value
         }
       }));
-    } else {
+    } else if (name.startsWith('cardDetails.')) { // Handle card details
+      const field = name.split('.')[1];
+      setProfileData(prev => ({
+        ...prev,
+        cardDetails: {
+          ...prev.cardDetails,
+          [field]: value
+        }
+      }));
+    }
+    else {
       setProfileData(prev => ({ ...prev, [name]: value }));
     }
   };
@@ -141,6 +156,7 @@ const Profile = () => {
                   {isEditing ? (
                     <div className="relative flex-grow">
                       <select name="category" value={profileData.category} onChange={handleInputChange} className={`${inputClasses} appearance-none pr-8`} aria-label="Business Category">
+                        <option value="" disabled>Select a category</option>
                         {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
                       </select>
                       <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-[var(--text)]" aria-hidden="true"><ChevronDown size={20} /></div>
@@ -199,7 +215,7 @@ const Profile = () => {
                   <Phone size={20} className="mt-1 text-[var(--accent)]" aria-hidden="true" />
                   <div>
                     <p className="text-sm opacity-70">Phone</p>
-                    <p className="font-medium">{profileData.phone}</p>
+                    {isEditing ? <input type="tel" name="phone" value={profileData.phone} onChange={handleInputChange} className={inputClasses} aria-label="Phone Number" /> : <p className="font-medium">{profileData.phone}</p>}
                   </div>
                 </div>
                 <div className="flex items-start gap-3">
@@ -237,7 +253,7 @@ const Profile = () => {
   return (
     <section className="w-full max-w-[1200px] my-10">
       <div className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-8 mx-4">
-        <div className="flex flex-col items-center text-center max-w-lg mx-auto">
+        <div className="flex flex-col items-center text-center max-w-lg mx-auto mb-8">
           <div className="relative w-24 h-24 mb-4">
             {profileData.profileImage ? (
               <img src={profileData.profileImage} alt="User Profile" className="w-24 h-24 rounded-full object-cover border-4 border-white/30 shadow-lg" />
@@ -256,7 +272,7 @@ const Profile = () => {
             )}
           </div>
           <h2 className="text-3xl font-bold mb-1">{user?.name}</h2>
-          <p className="text-lg text-[var(--text)] opacity-80 mb-6">{user?.email}</p> {/* Display email instead of username */}
+          <p className="text-lg text-[var(--text)] opacity-80 mb-6">{user?.email}</p>
           <button
             className="bg-[var(--accent)] w-fit text-white border-none py-2 px-6 rounded-lg flex items-center gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300"
             onClick={() => isEditing ? handleSaveChanges() : setIsEditing(true)}
@@ -264,6 +280,87 @@ const Profile = () => {
           >
             <FontAwesomeIcon icon={isEditing ? faSave : faPen} aria-hidden="true" /> {isEditing ? 'Save Changes' : 'Edit Profile'}
           </button>
+        </div>
+
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+          <div className="bg-black/10 p-6 rounded-xl">
+            <h3 className="text-xl font-semibold mb-4 flex items-center gap-2"><Mail size={20} aria-hidden="true" /> Contact Information</h3>
+            <div className="space-y-4">
+              <div className="flex items-start gap-3">
+                <Mail size={20} className="mt-1 text-[var(--accent)]" aria-hidden="true" />
+                <div>
+                  <p className="text-sm opacity-70">Email</p>
+                  <p className="font-medium break-all">{profileData.email}</p>
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <Phone size={20} className="mt-1 text-[var(--accent)]" aria-hidden="true" />
+                <div>
+                  <p className="text-sm opacity-70">Phone</p>
+                  {isEditing ? <input type="tel" name="phone" value={profileData.phone} onChange={handleInputChange} className={inputClasses} placeholder="Phone Number" aria-label="Phone Number" /> : <p className="font-medium">{profileData.phone}</p>}
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div className="bg-black/10 p-6 rounded-xl">
+            <h3 className="text-xl font-semibold mb-4 flex items-center gap-2"><Building2 size={20} aria-hidden="true" /> Shipping Address</h3>
+            <div className="flex items-start gap-3">
+              <Landmark size={20} className="mt-1 text-[var(--accent)]" aria-hidden="true" />
+              <div>
+                <p className="text-sm opacity-70">Address</p>
+                {isEditing ? (
+                  <div className="space-y-2">
+                    <input type="text" name="address.houseNo" value={profileData.address.houseNo} onChange={handleInputChange} className={inputClasses} placeholder="House No., Street" aria-label="House Number and Street" />
+                    <input type="text" name="address.landmark" value={profileData.address.landmark} onChange={handleInputChange} className={inputClasses} placeholder="Landmark (Optional)" aria-label="Landmark" />
+                    <input type="text" name="address.city" value={profileData.address.city} onChange={handleInputChange} className={inputClasses} placeholder="City" aria-label="City" />
+                    <div className="relative">
+                      <select name="address.state" value={profileData.address.state} onChange={handleInputChange} className={`${inputClasses} appearance-none pr-8`} aria-label="State">
+                        <option value="" disabled>Select State</option>
+                        {indianStates.map(state => <option key={state} value={state}>{state}</option>)}
+                      </select>
+                      <div className="pointer-events-none absolute inset-y-0 right-0 top-0 flex items-center px-2 text-[var(--text)]" aria-hidden="true"><ChevronDown size={20} /></div>
+                    </div>
+                    <input type="text" name="address.pinCode" value={profileData.address.pinCode} onChange={handleInputChange} className={inputClasses} placeholder="Pin Code" maxLength="6" aria-label="Pin Code" />
+                  </div>
+                ) : (
+                  <p className="font-medium">{displayAddress(profileData.address)}</p>
+                )}
+              </div>
+            </div>
+          </div>
+
+          <div className="lg:col-span-2 bg-black/10 p-6 rounded-xl">
+            <h3 className="text-xl font-semibold mb-4 flex items-center gap-2"><CreditCard size={20} aria-hidden="true" /> Payment Methods</h3>
+            <div className="space-y-4">
+              <div className="flex items-start gap-3">
+                <CreditCard size={20} className="mt-1 text-[var(--accent)]" aria-hidden="true" />
+                <div>
+                  <p className="text-sm opacity-70">Card Details</p>
+                  {isEditing ? (
+                    <div className="space-y-2">
+                      <input type="text" name="cardDetails.cardNumber" value={profileData.cardDetails.cardNumber} onChange={handleInputChange} className={inputClasses} placeholder="Card Number" aria-label="Card Number" />
+                      <input type="text" name="cardDetails.expiry" value={profileData.cardDetails.expiry} onChange={handleInputChange} className={inputClasses} placeholder="MM/YY" aria-label="Card Expiry Date" />
+                      <input type="text" name="cardDetails.cardHolder" value={profileData.cardDetails.cardHolder} onChange={handleInputChange} className={inputClasses} placeholder="Card Holder Name" aria-label="Card Holder Name" />
+                    </div>
+                  ) : (
+                    <>
+                      <p className="font-medium">{profileData.cardDetails.cardNumber}</p>
+                      <p className="text-sm opacity-80">Expires: {profileData.cardDetails.expiry}</p>
+                      <p className="text-sm opacity-80">Holder: {profileData.cardDetails.cardHolder}</p>
+                    </>
+                  )}
+                </div>
+              </div>
+              <div className="flex items-start gap-3">
+                <Landmark size={20} className="mt-1 text-[var(--accent)]" aria-hidden="true" /> {/* Reusing Landmark icon for UPI, consider a specific UPI icon if available */}
+                <div>
+                  <p className="text-sm opacity-70">UPI ID</p>
+                  {isEditing ? <input type="text" name="upiId" value={profileData.upiId} onChange={handleInputChange} className={inputClasses} placeholder="UPI ID" aria-label="UPI ID" /> : <p className="font-medium">{profileData.upiId}</p>}
+                </div>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </section>
