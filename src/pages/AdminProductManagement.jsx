@@ -83,7 +83,7 @@ const AdminProductManagement = () => {
 
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = lastItemIndex - itemsPerPage;
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage; // Corrected from lastItemIndex
   const currentProducts = filteredProducts.slice(indexOfFirstItem, indexOfLastItem);
 
   const handlePageChange = (pageNumber) => {

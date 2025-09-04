@@ -2,7 +2,7 @@ import React, { useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faHome, faShoppingBag, faStore, faTruck, faUser, faSignOutAlt,
-  faHeart, faShoppingCart, faUsers, faBoxes, faChartLine, faBullhorn, faCog
+  faHeart, faShoppingCart, faUsers, faBoxes, faChartLine, faBullhorn, faCog, faQuestionCircle
 } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
 import { Link, useNavigate } from 'react-router-dom';
@@ -24,7 +24,6 @@ const MobileNav = () => {
     { name: 'Users', path: '/admin-users', icon: Users },
     { name: 'Products', path: '/admin-products', icon: Package },
     { name: 'Orders', path: '/admin-orders', icon: Receipt },
-    // Add other admin specific links here if needed for mobile nav
   ];
 
   const vendorLinks = [
@@ -83,6 +82,15 @@ const MobileNav = () => {
                   {link.name}
                 </Link>
               ))}
+              <Link
+                to="/help"
+                onClick={toggleSidebar}
+                className="flex items-center text-[var(--text)] w-full justify-center my-2 p-3 no-underline text-lg font-medium hover:bg-white/10 rounded-lg transition-colors duration-200"
+                aria-label="Help and Support"
+              >
+                <FontAwesomeIcon icon={faQuestionCircle} className="mr-3 w-5 text-center" aria-hidden="true" />
+                Help
+              </Link>
               <a
                 href="#"
                 className="flex items-center text-[var(--text)] w-full justify-center my-2 p-3 no-underline text-lg font-medium hover:bg-white/10 rounded-lg transition-colors duration-200"

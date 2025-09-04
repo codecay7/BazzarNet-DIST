@@ -8,9 +8,9 @@ import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
 import AdminDashboard from './pages/AdminDashboard';
-import AdminUserManagement from './pages/AdminUserManagement'; // Import new AdminUserManagement
-import AdminProductManagement from './pages/AdminProductManagement'; // Import new AdminProductManagement
-import AdminOrderManagement from './pages/AdminOrderManagement'; // Import new AdminOrderManagement
+import AdminUserManagement from './pages/AdminUserManagement';
+import AdminProductManagement from './pages/AdminProductManagement';
+import AdminOrderManagement from './pages/AdminOrderManagement';
 import Products from './pages/Products';
 import Stores from './pages/Stores';
 import StorePage from './pages/StorePage';
@@ -27,6 +27,7 @@ import Payments from './pages/Payments';
 import FAQ from './pages/FAQ';
 import About from './pages/About';
 import Profile from './pages/Profile';
+import Help from './pages/Help'; // Import new Help page
 
 const App = () => {
   const { theme, isLoggedIn, isVendor, isAdmin } = useContext(AppContext);
@@ -43,6 +44,7 @@ const App = () => {
                 <Route path="/admin-users" element={<AdminUserManagement />} />
                 <Route path="/admin-products" element={<AdminProductManagement />} />
                 <Route path="/admin-orders" element={<AdminOrderManagement />} />
+                <Route path="/help" element={<Help />} /> {/* Admin can access help */}
                 {/* Redirect any other logged-in routes to admin dashboard for admin */}
                 <Route path="*" element={<Navigate to="/admin-dashboard" />} />
               </>
@@ -51,6 +53,7 @@ const App = () => {
                 <Route path="/dashboard" element={<Dashboard />} />
                 <Route path="/orders" element={<Orders />} />
                 <Route path="/profile" element={<Profile />} />
+                <Route path="/help" element={<Help />} /> {/* Customer/Vendor can access help */}
 
                 {isVendor ? (
                   <>
@@ -105,6 +108,7 @@ const App = () => {
               <Route path="/" element={<Dashboard />} />
               <Route path="/faq" element={<FAQ />} />
               <Route path="/about" element={<About />} />
+              <Route path="/help" element={<Help />} /> {/* Public can also access help */}
             </Route>
             <Route path="*" element={<Navigate to="/" />} />
           </>
