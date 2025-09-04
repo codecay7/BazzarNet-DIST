@@ -2,8 +2,9 @@ import express from 'express';
 import cors from 'cors';
 import env from './config/env.js';
 import connectDB from './config/db.js';
-import authRoutes from './routes/authRoutes.js'; // Import auth routes
-import { notFound, errorHandler } from './middleware/errorMiddleware.js'; // Import error middleware
+import authRoutes from './routes/authRoutes.js';
+import userRoutes from './routes/userRoutes.js'; // Import user routes
+import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 
 // Initialize Express app
 const app = express();
@@ -21,7 +22,8 @@ app.get('/', (req, res) => {
 });
 
 // Mount API routes
-app.use('/api/auth', authRoutes); // Mount authentication routes
+app.use('/api/auth', authRoutes);
+app.use('/api/users', userRoutes); // Mount user routes
 
 // Error handling middleware (must be last)
 app.use(notFound);
