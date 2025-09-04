@@ -3,7 +3,8 @@ import cors from 'cors';
 import env from './config/env.js';
 import connectDB from './config/db.js';
 import authRoutes from './routes/authRoutes.js';
-import userRoutes from './routes/userRoutes.js'; // Import user routes
+import userRoutes from './routes/userRoutes.js';
+import adminRoutes from './routes/adminRoutes.js'; // Import admin routes
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 
 // Initialize Express app
@@ -23,7 +24,8 @@ app.get('/', (req, res) => {
 
 // Mount API routes
 app.use('/api/auth', authRoutes);
-app.use('/api/users', userRoutes); // Mount user routes
+app.use('/api/users', userRoutes);
+app.use('/api/admin', adminRoutes); // Mount admin routes
 
 // Error handling middleware (must be last)
 app.use(notFound);

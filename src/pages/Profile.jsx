@@ -1,9 +1,10 @@
-import React, { useContext, useState, useRef } from 'react';
+import React, { useContext, useState, useRef, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faStore, faPen, faSave } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
 import toast from 'react-hot-toast';
-import { Building2, Mail, Phone, CreditCard, Landmark, ChevronDown } from 'lucide-react';
+import { Building2, Mail, Phone, CreditCard, Landmark, ChevronDown, FileText } from 'lucide-react'; // Added FileText
+import * as api from '../services/api'; // Import API service
 
 const indianStates = [
   "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
@@ -15,42 +16,77 @@ const indianStates = [
 ];
 
 const Profile = () => {
-  const { user, isVendor } = useContext(AppContext);
+  const { user, isVendor, loginAsUser, loginAsVendor } = useContext(AppContext); // Get login functions to update user in context
   const [isEditing, setIsEditing] = useState(false);
   const fileInputRef = useRef(null);
-  
+  const [loading, setLoading] = useState(true);
+
   const [profileData, setProfileData] = useState({
-    name: user?.name || 'Guest',
+    name: user?.name || '',
     store: user?.store || '', // Only for vendors
-    email: user?.email || (isVendor ? `${user?.store?.toLowerCase().replace(/\s/g, '')}@bazzar.net` : 'guest@email.com'),
-    phone: user?.phone || '+91 98765 43210', // Added for customer
+    email: user?.email || '',
+    phone: user?.phone || '',
     address: user?.address || { 
-      houseNo: '123 Commerce House',
-      landmark: 'Near City Hospital',
-      city: 'Mumbai',
-      state: 'Maharashtra',
-      pinCode: '400001'
+      houseNo: '',
+      landmark: '',
+      city: '',
+      state: '',
+      pinCode: ''
     },
-    pan: 'ABCDE1234F', // Only for vendors
-    gst: '27ABCDE1234F1Z5', // Only for vendors
-    category: 'Groceries', // Only for vendors
-    description: 'Your friendly neighborhood grocery store, bringing fresh produce and daily essentials right to your doorstep with BazzarNet.', // Only for vendors
-    bankAccount: '123456789012', // Only for vendors
-    bankName: 'BazzarNet Bank', // Only for vendors
-    ifsc: 'BAZZ0001234', // Only for vendors
-    upiId: user?.upiId || 'customer@bazzarnetupi', // Added for customer
+    pan: user?.pan || '', // Only for vendors
+    gst: user?.gst || '', // Only for vendors
+    category: user?.category || '', // Only for vendors
+    description: user?.description || '', // Only for vendors
+    bankAccount: user?.bankAccount || '', // Only for vendors
+    bankName: user?.bankName || '', // Only for vendors
+    ifsc: user?.ifsc || '', // Only for vendors
+    upiId: user?.upiId || '', // Added for customer
     cardDetails: user?.cardDetails || { // Mock card details for customer
-      cardNumber: '**** **** **** 1234',
-      expiry: '12/25',
-      cardHolder: user?.name || 'Guest User'
+      cardNumber: '',
+      expiry: '',
+      cardHolder: ''
     },
-    profileImage: null,
+    profileImage: user?.profileImage || null,
   });
 
   const categories = [
     'Groceries', 'Bakery', 'Butcher', 'Cafe', 'Electronics', 
     'Furniture', 'Decor', 'Clothing', 'Other'
   ];
+
+  useEffect(() => {
+    const fetchProfile = async () => {
+      setLoading(true);
+      try {
+        const fetchedUser = await api.userProfile.getMe();
+        setProfileData({
+          name: fetchedUser.name || '',
+          store: fetchedUser.store || '',
+          email: fetchedUser.email || '',
+          phone: fetchedUser.phone || '',
+          address: fetchedUser.address || { houseNo: '', landmark: '', city: '', state: '', pinCode: '' },
+          pan: fetchedUser.pan || '',
+          gst: fetchedUser.gst || '',
+          category: fetchedUser.category || '',
+          description: fetchedUser.description || '',
+          bankAccount: fetchedUser.bankAccount || '',
+          bankName: fetchedUser.bankName || '',
+          ifsc: fetchedUser.ifsc || '',
+          upiId: fetchedUser.upiId || '',
+          cardDetails: fetchedUser.cardDetails || { cardNumber: '', expiry: '', cardHolder: '' },
+          profileImage: fetchedUser.profileImage || null,
+        });
+      } catch (error) {
+        toast.error(`Failed to load profile: ${error.message}`);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (user) { // Only fetch if a user is logged in
+      fetchProfile();
+    }
+  }, [user]); // Re-fetch if user object changes (e.g., after login)
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -81,16 +117,30 @@ const Profile = () => {
   const handleImageChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       const newImage = e.target.files[0];
+      // In a real app, you'd upload this to a server and get a URL back
+      // For now, we'll just use a local URL
       setProfileData(prev => ({
         ...prev,
         profileImage: URL.createObjectURL(newImage)
       }));
+      toast.info('Profile image updated locally. Save changes to persist.');
     }
   };
 
-  const handleSaveChanges = () => {
-    toast.success('Profile updated successfully!');
-    setIsEditing(false);
+  const handleSaveChanges = async () => {
+    try {
+      const updatedUser = await api.userProfile.updateProfile(profileData);
+      // Update the user in AppContext as well
+      if (isVendor) {
+        loginAsVendor(updatedUser.name, updatedUser.store, updatedUser.email, user.password); // Re-login vendor to update context
+      } else {
+        loginAsUser(updatedUser.name, updatedUser.email, user.password); // Re-login user to update context
+      }
+      toast.success('Profile updated successfully!');
+      setIsEditing(false);
+    } catch (error) {
+      toast.error(`Failed to update profile: ${error.message}`);
+    }
   };
 
   const inputClasses = "w-full p-2 rounded-lg bg-white/10 border border-black/30 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] text-[var(--text)]";
@@ -104,6 +154,33 @@ const Profile = () => {
     parts.push(address.pinCode);
     return parts.filter(Boolean).join(', ');
   };
+
+  if (loading) {
+    return (
+      <section className="w-full max-w-[1200px] my-10">
+        <div className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-8 mx-4 animate-pulse">
+          <div className="flex flex-col md:flex-row justify-between items-start mb-8">
+            <div className="flex items-center gap-6">
+              <div className="w-24 h-24 rounded-full bg-gray-700 flex-shrink-0"></div>
+              <div>
+                <div className="h-8 bg-gray-700 rounded w-48 mb-2"></div>
+                <div className="h-6 bg-gray-700 rounded w-32"></div>
+              </div>
+            </div>
+            <div className="h-10 bg-gray-700 rounded-lg w-32 mt-4 md:mt-0"></div>
+          </div>
+          <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
+            <div className="lg:col-span-2 space-y-6">
+              <div className="bg-black/10 p-6 rounded-xl h-48"></div>
+              <div className="bg-black/10 p-6 rounded-xl h-32"></div>
+              <div className="bg-black/10 p-6 rounded-xl h-48"></div>
+            </div>
+            <div className="bg-black/10 p-6 rounded-xl h-96"></div>
+          </div>
+        </div>
+      </section>
+    );
+  }
 
   if (isVendor) {
     return (
@@ -171,11 +248,11 @@ const Profile = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div>
                     <p className="text-sm opacity-70 mb-1">PAN</p>
-                    <p className="font-medium">{profileData.pan}</p>
+                    {isEditing ? <input type="text" name="pan" value={profileData.pan} onChange={handleInputChange} className={inputClasses} aria-label="PAN Number" /> : <p className="font-medium">{profileData.pan}</p>}
                   </div>
                   <div>
                     <p className="text-sm opacity-70 mb-1">GSTIN</p>
-                    <p className="font-medium">{profileData.gst}</p>
+                    {isEditing ? <input type="text" name="gst" value={profileData.gst} onChange={handleInputChange} className={inputClasses} aria-label="GSTIN Number" /> : <p className="font-medium">{profileData.gst}</p>}
                   </div>
                 </div>
               </div>
@@ -271,8 +348,8 @@ const Profile = () => {
               </>
             )}
           </div>
-          <h2 className="text-3xl font-bold mb-1">{user?.name}</h2>
-          <p className="text-lg text-[var(--text)] opacity-80 mb-6">{user?.email}</p>
+          <h2 className="text-3xl font-bold mb-1">{profileData.name}</h2>
+          <p className="text-lg text-[var(--text)] opacity-80 mb-6">{profileData.email}</p>
           <button
             className="bg-[var(--accent)] w-fit text-white border-none py-2 px-6 rounded-lg flex items-center gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300"
             onClick={() => isEditing ? handleSaveChanges() : setIsEditing(true)}

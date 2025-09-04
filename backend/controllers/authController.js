@@ -1,8 +1,8 @@
 import User from '../models/User.js';
 import Store from '../models/Store.js';
 import { generateToken } from '../utils/jwt.js';
-import asyncHandler from '../middleware/asyncHandler.js'; // We'll create this next
-import { sendEmail } from '../services/emailService.js'; // We'll create this next
+import asyncHandler from '../middleware/asyncHandler.js';
+import { sendEmail } from '../services/emailService.js';
 
 // @desc    Register a new customer user
 // @route   POST /api/auth/register/customer
@@ -144,4 +144,14 @@ const login = asyncHandler(async (req, res) => {
   }
 });
 
-export { registerUser, registerVendor, login };
+// @desc    Logout user / clear token (client-side)
+// @route   POST /api/auth/logout
+// @access  Public (or Private if token invalidation is needed)
+const logout = asyncHandler(async (req, res) => {
+  // For JWTs stored client-side (e.g., localStorage), logout is primarily client-driven.
+  // If using HTTP-only cookies, you would clear the cookie here.
+  // For this setup, we simply confirm logout.
+  res.status(200).json({ message: 'Logged out successfully' });
+});
+
+export { registerUser, registerVendor, login, logout };

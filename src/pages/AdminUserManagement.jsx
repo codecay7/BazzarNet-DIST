@@ -3,52 +3,68 @@ import { AppContext } from '../context/AppContext';
 import { User, Store, Search, ToggleLeft, ToggleRight, Trash2, CheckCircle, XCircle } from 'lucide-react';
 import SkeletonText from '../components/SkeletonText';
 import Pagination from '../components/Pagination';
+import toast from 'react-hot-toast';
+import * as api from '../services/api'; // Import API service
 
 const AdminUserManagement = () => {
-  const { allAppUsers, deleteUser, updateUserStatus, simulateLoading } = useContext(AppContext);
+  const { simulateLoading } = useContext(AppContext); // Removed allAppUsers, deleteUser, updateUserStatus from context
+  const [users, setUsers] = useState([]); // Manage users locally
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterRole, setFilterRole] = useState('all'); // 'all', 'user', 'vendor'
+  const [filterRole, setFilterRole] = useState('all'); // 'all', 'customer', 'vendor'
   const [filterStatus, setFilterStatus] = useState('all'); // 'all', 'active', 'inactive'
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
-  useEffect(() => {
-    const loadData = async () => {
-      setLoading(true);
-      await simulateLoading(800);
+  const fetchUsers = async () => {
+    setLoading(true);
+    try {
+      const params = {
+        search: searchTerm,
+        role: filterRole,
+        status: filterStatus,
+      };
+      const fetchedUsers = await api.admin.getUsers(params);
+      setUsers(fetchedUsers);
+    } catch (error) {
+      toast.error(`Failed to load users: ${error.message}`);
+    } finally {
       setLoading(false);
-    };
-    loadData();
-  }, [searchTerm, filterRole, filterStatus, allAppUsers.length, simulateLoading]);
+    }
+  };
 
-  const filteredUsers = useMemo(() => {
-    let users = allAppUsers;
+  useEffect(() => {
+    fetchUsers();
+  }, [searchTerm, filterRole, filterStatus]); // Re-fetch when filters change
 
-    if (searchTerm) {
-      users = users.filter(user =>
-        user.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        user.id.toString().includes(searchTerm)
+  const handleUpdateUserStatus = async (userId, newStatus) => {
+    try {
+      const response = await api.admin.updateUserStatus(userId, newStatus);
+      setUsers(prevUsers =>
+        prevUsers.map(u => (u._id === userId ? { ...u, isActive: newStatus } : u))
       );
+      toast.success(response.message);
+    } catch (error) {
+      toast.error(`Failed to update user status: ${error.message}`);
     }
+  };
 
-    if (filterRole !== 'all') {
-      users = users.filter(user => user.role === filterRole);
+  const handleDeleteUser = async (userId, userName) => {
+    if (window.confirm(`Are you sure you want to delete ${userName}? This action cannot be undone.`)) {
+      try {
+        const response = await api.admin.deleteUser(userId);
+        setUsers(prevUsers => prevUsers.filter(u => u._id !== userId));
+        toast.success(response.message);
+      } catch (error) {
+        toast.error(`Failed to delete user: ${error.message}`);
+      }
     }
+  };
 
-    if (filterStatus !== 'all') {
-      const isActive = filterStatus === 'active';
-      users = users.filter(user => user.isActive === isActive);
-    }
-
-    return users;
-  }, [allAppUsers, searchTerm, filterRole, filterStatus]);
-
-  const totalPages = Math.ceil(filteredUsers.length / itemsPerPage);
+  const totalPages = Math.ceil(users.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
   const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentUsers = filteredUsers.slice(indexOfFirstItem, indexOfLastItem);
+  const currentUsers = users.slice(indexOfFirstItem, indexOfLastItem);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -56,7 +72,7 @@ const AdminUserManagement = () => {
   };
 
   useEffect(() => {
-    setCurrentPage(1);
+    setCurrentPage(1); // Reset page to 1 when filters change
   }, [searchTerm, filterRole, filterStatus]);
 
   return (
@@ -85,7 +101,7 @@ const AdminUserManagement = () => {
               aria-label="Filter by role"
             >
               <option value="all">All Roles</option>
-              <option value="user">Customers</option>
+              <option value="customer">Customers</option>
               <option value="vendor">Vendors</option>
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-[var(--text)]" aria-hidden="true"><User size={20} /></div>
@@ -121,7 +137,7 @@ const AdminUserManagement = () => {
               </div>
             ))}
           </div>
-        ) : filteredUsers.length > 0 ? (
+        ) : users.length > 0 ? (
           <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
             <table className="min-w-full divide-y divide-white/10">
               <thead>
@@ -136,8 +152,8 @@ const AdminUserManagement = () => {
               </thead>
               <tbody className="divide-y divide-white/5">
                 {currentUsers.map((user) => (
-                  <tr key={user.id} className="hover:bg-black/5 transition-colors duration-200">
-                    <td className="px-4 py-4 whitespace-nowrap text-sm">{user.id}</td>
+                  <tr key={user._id} className="hover:bg-black/5 transition-colors duration-200">
+                    <td className="px-4 py-4 whitespace-nowrap text-sm">{user._id.substring(0, 6)}...</td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">{user.name}</td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm">{user.email}</td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm capitalize">
@@ -157,7 +173,7 @@ const AdminUserManagement = () => {
                     <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex justify-end gap-2">
                         <button
-                          onClick={() => updateUserStatus(user.id, !user.isActive)}
+                          onClick={() => handleUpdateUserStatus(user._id, !user.isActive)}
                           className={`p-2 rounded-full transition-colors duration-200 ${
                             user.isActive ? 'bg-red-500/20 hover:bg-red-500/40 text-red-400' : 'bg-green-500/20 hover:bg-green-500/40 text-green-400'
                           }`}
@@ -167,7 +183,7 @@ const AdminUserManagement = () => {
                           {user.isActive ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
                         </button>
                         <button
-                          onClick={() => deleteUser(user.id)}
+                          onClick={() => handleDeleteUser(user._id, user.name)}
                           className="p-2 rounded-full bg-red-500/20 hover:bg-red-500/40 text-red-400 transition-colors duration-200"
                           title="Delete User"
                           aria-label={`Delete ${user.name}`}
@@ -185,7 +201,7 @@ const AdminUserManagement = () => {
           <p className="text-center text-lg opacity-80 py-10">No users found matching your criteria.</p>
         )}
 
-        {!loading && filteredUsers.length > 0 && (
+        {!loading && users.length > 0 && (
           <Pagination
             currentPage={currentPage}
             totalPages={totalPages}

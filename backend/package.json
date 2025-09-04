@@ -1,23 +1,4 @@
 {
-  "name": "bazzarnet-backend",
-  "version": "1.0.0",
-  "description": "Backend for BazzarNet local e-commerce platform",
-  "main": "server.js",
-  "type": "module",
-  "scripts": {
-    "start": "node server.js",
-    "dev": "nodemon server.js"
-  },
-  "keywords": [
-    "ecommerce",
-    "local",
-    "bazzarnet",
-    "mongodb",
-    "express",
-    "node"
-  ],
-  "author": "Dyad AI",
-  "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",

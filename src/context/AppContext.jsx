@@ -2,16 +2,26 @@ import React, { createContext, useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { mockOrders as allMockOrders, allProducts as initialAllProducts, stores as initialStores, mockUsers as initialMockUsers } from '../data/mockData';
 import * as api from '../services/api'; // Import the API service
+import useAuth from '../hooks/useAuth'; // Import the useAuth hook
 
 export const AppContext = createContext();
 
 export const AppProvider = ({ children }) => {
+  const {
+    isLoggedIn,
+    user,
+    isVendor,
+    isAdmin,
+    loginAsUser,
+    loginAsVendor,
+    loginAsAdmin,
+    logout,
+    registerUser,
+    registerVendor,
+  } = useAuth(); // Use the custom authentication hook
+
   const [theme, setTheme] = useState('dark');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [user, setUser] = useState(null);
-  const [isVendor, setIsVendor] = useState(false);
-  const [isAdmin, setIsAdmin] = useState(false);
   const [cart, setCart] = useState([]);
   const [wishlist, setWishlist] = useState([]);
   const [allAppProducts, setAllAppProducts] = useState(initialAllProducts);
@@ -54,120 +64,6 @@ export const AppProvider = ({ children }) => {
   // Generate a 6-digit OTP
   const generateOtp = () => {
     return Math.floor(100000 + Math.random() * 900000).toString();
-  };
-
-  // Login Functions
-  const loginUserInState = (userData) => {
-    setUser(userData);
-    setIsLoggedIn(true);
-    setIsVendor(userData.role === 'vendor');
-    setIsAdmin(userData.role === 'admin');
-    localStorage.setItem('user', JSON.stringify(userData));
-  };
-
-  const loginAsUser = async (name, email, password) => {
-    try {
-      const response = await api.auth.login({ email, password });
-      if (response) {
-        loginUserInState(response);
-        toast.success(`Welcome back, ${response.name}!`);
-        return true;
-      }
-      return false;
-    } catch (error) {
-      toast.error(error.message || 'Login failed.');
-      return false;
-    }
-  };
-
-  const loginAsVendor = async (name, storeName, email, password) => {
-    try {
-      const response = await api.auth.login({ email, password });
-      if (response) {
-        loginUserInState(response);
-        toast.success(`Welcome, ${response.name}! Manage your store now.`);
-        return true;
-      }
-      return false;
-    } catch (error) {
-      toast.error(error.message || 'Login failed.');
-      return false;
-    }
-  };
-
-  const loginAsAdmin = async (email, password) => {
-    try {
-      const response = await api.auth.login({ email, password });
-      if (response) {
-        loginUserInState(response);
-        toast.success('Welcome, Super Admin!');
-        return true;
-      }
-      return false;
-    } catch (error) {
-      toast.error(error.message || 'Login failed.');
-      return false;
-    }
-  };
-
-  const logout = async () => {
-    try {
-      // In a real app, you might call a backend logout endpoint here
-      // await api.auth.logout(); 
-      localStorage.removeItem('user');
-      setUser(null);
-      setIsLoggedIn(false);
-      setIsVendor(false);
-      setIsAdmin(false);
-      setCart([]); // Clear cart on logout
-      setWishlist([]); // Clear wishlist on logout
-      setVendorProducts([]);
-      toast.success('You have been logged out.');
-    } catch (error) {
-      toast.error(`Logout error: ${error.message}`);
-    }
-  };
-
-  // Registration Functions
-  const registerUser = async (name, email, password) => {
-    try {
-      const response = await api.auth.registerUser({ name, email, password });
-      if (response) {
-        loginUserInState(response); // Auto-login after successful registration
-        toast.success(`Welcome to BazzarNet, ${response.name}!`);
-        return true;
-      }
-      return false;
-    } catch (error) {
-      toast.error(error.message || 'Registration failed.');
-      return false;
-    }
-  };
-
-  const registerVendor = async (formData) => {
-    try {
-      const response = await api.auth.registerVendor({
-        name: formData.fullName,
-        email: formData.email,
-        password: formData.password,
-        storeName: formData.businessName,
-        businessDescription: formData.description,
-        category: formData.category,
-        phone: formData.phone,
-        pan: formData.pan,
-        gst: formData.gst,
-        address: formData.address,
-      });
-      if (response) {
-        loginUserInState(response); // Auto-login after successful registration
-        toast.success(`Welcome, ${response.name}! Your store is now live.`);
-        return true;
-      }
-      return false;
-    } catch (error) {
-      toast.error(error.message || 'Vendor registration failed.');
-      return false;
-    }
   };
 
   // Cart Functions
@@ -550,7 +446,7 @@ export const AppProvider = ({ children }) => {
         return false;
       }
 
-      const order = orders[order[orderIndex].id === orderId ? orderIndex : -1]; // Corrected to use orderIndex
+      const order = orders[orderIndex]; // Corrected to use orderIndex
       if (order.otp === enteredOtp) {
         setOrders(prevOrders =>
           prevOrders.map((o, idx) =>
@@ -594,7 +490,7 @@ export const AppProvider = ({ children }) => {
       // --- Mock Logic (for demo) ---
       setAllAppUsers(prevUsers => prevUsers.filter(u => u.id !== userId));
       
-      const deletedUser = allAppUsers.find(u => u.id === userId);
+      const deletedUser = initialMockUsers.find(u => u.id === userId); // Use initialMockUsers for finding deleted user
       if (deletedUser?.role === 'vendor' && deletedUser.storeId) {
         setAllAppProducts(prevProducts => prevProducts.filter(p => p.storeId !== deletedUser.storeId));
         setAppStores(prevStores => prevStores.filter(s => s.id !== deletedUser.storeId));
@@ -627,31 +523,12 @@ export const AppProvider = ({ children }) => {
       setAllAppUsers(prevUsers =>
         prevUsers.map(u => (u.id === userId ? { ...u, isActive: newStatus } : u))
       );
-      const userToUpdate = allAppUsers.find(u => u.id === userId);
+      const userToUpdate = initialMockUsers.find(u => u.id === userId); // Use initialMockUsers for finding user
       toast.success(`${userToUpdate?.name}'s account is now ${newStatus ? 'active' : 'inactive'}.`);
     } catch (error) {
       toast.error(`Error updating user status: ${error.message}`);
     }
   };
-
-  // Auto-login from localStorage and fetch user profile
-  useEffect(() => {
-    const storedUser = JSON.parse(localStorage.getItem('user'));
-    if (storedUser && storedUser.token) {
-      const fetchUserProfile = async () => {
-        try {
-          const fetchedUser = await api.userProfile.getMe();
-          loginUserInState({ ...fetchedUser, token: storedUser.token }); // Keep the token from local storage
-          toast.success(`Welcome back, ${fetchedUser.name}!`);
-        } catch (error) {
-          console.error('Auto-login failed:', error);
-          toast.error('Your session expired. Please log in again.');
-          logout(); // Log out if token is invalid or expired
-        }
-      };
-      fetchUserProfile();
-    }
-  }, []);
 
   const value = {
     theme,
@@ -692,8 +569,8 @@ export const AppProvider = ({ children }) => {
     updateUserStatus,
     adminEditProduct,
     adminDeleteProduct,
-    registerUser, // Added registerUser to context value
-    registerVendor, // Added registerVendor to context value
+    registerUser,
+    registerVendor,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

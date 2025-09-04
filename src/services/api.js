@@ -75,15 +75,15 @@ const apiRequest = async (endpoint, options = {}) => {
 // --- Authentication Endpoints ---
 export const auth = {
   login: (credentials) => apiRequest('/auth/login', { method: 'POST', body: JSON.stringify(credentials) }),
-  registerUser: (userData) => apiRequest('/auth/register/customer', { method: 'POST', body: JSON.stringify(userData) }), // Corrected endpoint
+  registerUser: (userData) => apiRequest('/auth/register/customer', { method: 'POST', body: JSON.stringify(userData) }),
   registerVendor: (vendorData) => apiRequest('/auth/register/vendor', { method: 'POST', body: JSON.stringify(vendorData) }),
-  logout: () => apiRequest('/auth/logout', { method: 'POST' }), // This endpoint doesn't exist yet in backend
+  logout: () => apiRequest('/auth/logout', { method: 'POST' }), // Updated to backend logout endpoint
 };
 
 // --- User Profile Endpoints ---
 export const userProfile = {
-  getMe: () => apiRequest('/users/me'), // Corrected to use /users/me
-  updateProfile: (userId, profileData) => apiRequest(`/users/${userId}/profile`, { method: 'PUT', body: JSON.stringify(profileData) }), // This endpoint doesn't exist yet in backend
+  getMe: () => apiRequest('/users/me'),
+  updateProfile: (profileData) => apiRequest(`/users/me`, { method: 'PUT', body: JSON.stringify(profileData) }), // Updated to use /users/me and PUT
   uploadProfileImage: (formData) => apiRequest('/upload/profile-image', { method: 'POST', body: formData, headers: {} }), // This endpoint doesn't exist yet in backend
 };
 
@@ -115,7 +115,7 @@ export const vendor = {
 export const customer = {
   getCart: (userId) => apiRequest(`/customers/${userId}/cart`), // This endpoint doesn't exist yet in backend
   addToCart: (userId, productId, quantity = 1) => apiRequest(`/customers/${userId}/cart`, { method: 'POST', body: JSON.stringify({ productId, quantity }) }), // This endpoint doesn't exist yet in backend
-  updateCartItem: (userId, productId, quantity) => apiRequest(`/customers/${userId}/cart/${productId}`, { method: 'PUT', body: JSON.stringify({ quantity }) }), // This endpoint doesn't exist yet in backend
+  updateCartItem: (userId, productId, quantity) => apiRequest(`/customers/${userId}/cart/${productId}`, { method: 'PUT', body: JSON.stringify({ productId, quantity }) }), // This endpoint doesn't exist yet in backend
   removeFromCart: (userId, productId) => apiRequest(`/customers/${userId}/cart/${productId}`, { method: 'DELETE' }), // This endpoint doesn't exist yet in backend
   getWishlist: (userId) => apiRequest(`/customers/${userId}/wishlist`), // This endpoint doesn't exist yet in backend
   addToWishlist: (userId, productId) => apiRequest(`/customers/${userId}/wishlist`, { method: 'POST', body: JSON.stringify({ productId }) }), // This endpoint doesn't exist yet in backend
@@ -128,9 +128,9 @@ export const customer = {
 // --- Admin Specific Endpoints ---
 export const admin = {
   getDashboardStats: (params) => apiRequest(`/admin/dashboard/stats?${new URLSearchParams(params)}`), // This endpoint doesn't exist yet in backend
-  getUsers: (params) => apiRequest(`/admin/users?${new URLSearchParams(params)}`), // This endpoint doesn't exist yet in backend
-  updateUserStatus: (userId, isActive) => apiRequest(`/admin/users/${userId}/status`, { method: 'PUT', body: JSON.stringify({ isActive }) }), // This endpoint doesn't exist yet in backend
-  deleteUser: (userId) => apiRequest(`/admin/users/${userId}`, { method: 'DELETE' }), // This endpoint doesn't exist yet in backend
+  getUsers: (params) => apiRequest(`/admin/users?${new URLSearchParams(params)}`), // Updated to backend endpoint
+  updateUserStatus: (userId, isActive) => apiRequest(`/admin/users/${userId}/status`, { method: 'PUT', body: JSON.stringify({ isActive }) }), // Updated to backend endpoint
+  deleteUser: (userId) => apiRequest(`/admin/users/${userId}`, { method: 'DELETE' }), // Updated to backend endpoint
   getProducts: (params) => apiRequest(`/admin/products?${new URLSearchParams(params)}`), // This endpoint doesn't exist yet in backend
   updateProduct: (productId, productData) => apiRequest(`/admin/products/${productId}`, { method: 'PUT', body: JSON.stringify(productData) }), // This endpoint doesn't exist yet in backend
   deleteProduct: (productId) => apiRequest(`/admin/products/${productId}`, { method: 'DELETE' }), // This endpoint doesn't exist yet in backend

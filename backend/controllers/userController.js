@@ -1,5 +1,7 @@
 import asyncHandler from '../middleware/asyncHandler.js';
 import User from '../models/User.js';
+import Store from '../models/Store.js'; // Import Store model
+import { updateCustomerProfileSchema, updateVendorProfileSchema } from '../validators/userValidator.js'; // Import validators
 
 // @desc    Get current user profile
 // @route   GET /api/users/me
@@ -22,9 +24,10 @@ const getMe = asyncHandler(async (req, res) => {
       profileImage: user.profileImage,
     };
 
-    if (user.role === 'vendor') {
-      responseData.storeId = user.storeId;
-      responseData.store = user.store;
+    if (user.role === 'vendor' && user.storeId) {
+      const store = await Store.findById(user.storeId);
+      responseData.storeId = store?._id;
+      responseData.store = store?.name;
       responseData.pan = user.pan;
       responseData.gst = user.gst;
       responseData.description = user.description;
@@ -41,4 +44,105 @@ const getMe = asyncHandler(async (req, res) => {
   }
 });
 
-export { getMe };
+// @desc    Update user profile
+// @route   PUT /api/users/me
+// @access  Private
+const updateUserProfile = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+
+  if (user) {
+    let validatedData;
+    if (user.role === 'customer') {
+      const { error } = updateCustomerProfileSchema.validate(req.body, { abortEarly: false, allowUnknown: true });
+      if (error) {
+        res.status(400);
+        throw new Error(error.details.map(err => err.message).join(', '));
+      }
+      validatedData = req.body;
+    } else if (user.role === 'vendor') {
+      const { error } = updateVendorProfileSchema.validate(req.body, { abortEarly: false, allowUnknown: true });
+      if (error) {
+        res.status(400);
+        throw new Error(error.details.map(err => err.message).join(', '));
+      }
+      validatedData = req.body;
+    } else {
+      res.status(403);
+      throw new Error('Admin profiles cannot be updated via this endpoint.');
+    }
+
+    // Update user fields
+    user.name = validatedData.name || user.name;
+    user.phone = validatedData.phone || user.phone;
+    user.upiId = validatedData.upiId || user.upiId;
+    user.profileImage = validatedData.profileImage || user.profileImage;
+
+    // Update nested address fields
+    if (validatedData.address) {
+      user.address = { ...user.address, ...validatedData.address };
+    }
+
+    // Update nested cardDetails fields
+    if (validatedData.cardDetails) {
+      user.cardDetails = { ...user.cardDetails, ...validatedData.cardDetails };
+    }
+
+    // Update vendor-specific fields
+    if (user.role === 'vendor') {
+      user.pan = validatedData.pan || user.pan;
+      user.gst = validatedData.gst || user.gst;
+      user.description = validatedData.description || user.description;
+      user.category = validatedData.category || user.category;
+      user.bankAccount = validatedData.bankAccount || user.bankAccount;
+      user.bankName = validatedData.bankName || user.bankName;
+      user.ifsc = validatedData.ifsc || user.ifsc;
+
+      // Also update the associated store if store-related fields are changed
+      const store = await Store.findById(user.storeId);
+      if (store) {
+        store.description = validatedData.description || store.description;
+        store.category = validatedData.category || store.category;
+        store.phone = validatedData.phone || store.phone;
+        if (validatedData.address) {
+          store.address = { ...store.address, ...validatedData.address };
+        }
+        await store.save();
+      }
+    }
+
+    const updatedUser = await user.save();
+
+    let responseData = {
+      _id: updatedUser._id,
+      name: updatedUser.name,
+      email: updatedUser.email,
+      role: updatedUser.role,
+      isActive: updatedUser.isActive,
+      address: updatedUser.address,
+      phone: updatedUser.phone,
+      upiId: updatedUser.upiId,
+      cardDetails: updatedUser.cardDetails,
+      profileImage: updatedUser.profileImage,
+    };
+
+    if (updatedUser.role === 'vendor' && updatedUser.storeId) {
+      const store = await Store.findById(updatedUser.storeId);
+      responseData.storeId = store?._id;
+      responseData.store = store?.name;
+      responseData.pan = updatedUser.pan;
+      responseData.gst = updatedUser.gst;
+      responseData.description = updatedUser.description;
+      responseData.category = updatedUser.category;
+      responseData.bankAccount = updatedUser.bankAccount;
+      responseData.bankName = updatedUser.bankName;
+      responseData.ifsc = updatedUser.ifsc;
+    }
+
+    res.json(responseData);
+  } else {
+    res.status(404);
+    throw new Error('User not found');
+  }
+});
+
+export { getMe, updateUserProfile };
