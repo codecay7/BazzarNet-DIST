@@ -1,7 +1,17 @@
-import React, { createContext, useState, useEffect, useCallback } from 'react';
-import toast from 'react-hot-toast';
-import * as api from '../services/api'; // Import the API service
-import useAuth from '../hooks/useAuth'; // Import the useAuth hook
+import React, { createContext, useEffect, useCallback } from 'react';
+import useAuth from '../hooks/useAuth';
+import useTheme from '../hooks/useTheme';
+import useUtils from '../hooks/useUtils';
+import useProducts from '../hooks/useProducts';
+import useStores from '../hooks/useStores';
+import useCart from '../hooks/useCart';
+import useWishlist from '../hooks/useWishlist';
+import useOrders from '../hooks/useOrders';
+import useUsers from '../hooks/useUsers';
+import useVendorProducts from '../hooks/useVendorProducts';
+import useAdminProducts from '../hooks/useAdminProducts';
+import useAdminStores from '../hooks/useAdminStores';
+import * as api from '../services/api'; // Still needed for direct API calls in some places
 
 export const AppContext = createContext();
 
@@ -15,142 +25,150 @@ export const AppProvider = ({ children }) => {
     loginAsVendor,
     loginAsAdmin,
     logout,
-    setUser: setAuthUser, // Rename setUser from useAuth to avoid conflict
-    loginUserInState, // Use this after successful registration
-  } = useAuth(); // Use the custom authentication hook
+    setUser: setAuthUser,
+    loginUserInState,
+  } = useAuth();
 
-  const [theme, setTheme] = useState('dark');
-  const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [cart, setCart] = useState([]);
-  const [wishlist, setWishlist] = useState([]); 
-  const [allAppProducts, setAllAppProducts] = useState([]);
-  const [allAppProductsMeta, setAllAppProductsMeta] = useState({ page: 1, pages: 1, count: 0 });
-  const [vendorProducts, setVendorProducts] = useState([]);
-  const [vendorProductsMeta, setVendorProductsMeta] = useState({ page: 1, pages: 1, count: 0 });
-  const [orders, setOrders] = useState([]);
-  const [ordersMeta, setOrdersMeta] = useState({ page: 1, pages: 1, count: 0 });
-  const [appStores, setAppStores] = useState([]);
-  const [appStoresMeta, setAppStoresMeta] = useState({ page: 1, pages: 1, count: 0 });
-  const [allAppUsers, setAllAppUsers] = useState([]);
-  const [allAppUsersMeta, setAllAppUsersMeta] = useState({ page: 1, pages: 1, count: 0 });
+  const { theme, toggleTheme } = useTheme();
+  const { simulateLoading, generateOtp } = useUtils();
 
-  // Set initial theme on mount
-  useEffect(() => {
-    document.body.setAttribute('data-theme', 'dark');
-  }, []);
+  // Sidebar state is still local to AppContext as it's a global UI state
+  const [sidebarOpen, setSidebarOpen] = React.useState(false);
+  const toggleSidebar = useCallback(() => setSidebarOpen(prev => !prev), []);
 
-  // --- Data Fetching Effects ---
-  const fetchAllProducts = useCallback(async (params = {}) => {
-    try {
-      const { products, page, pages, count } = await api.products.getAll(params);
-      setAllAppProducts(products);
-      setAllAppProductsMeta({ page, pages, count });
-      // console.log('AppContext: fetchAllProducts - Fetched products:', products); // REMOVED LOG HERE
-    } catch (error) {
-      toast.error(`Failed to load products: ${error.message}`);
-      setAllAppProducts([]);
-      setAllAppProductsMeta({ page: 1, pages: 1, count: 0 });
+  // --- Data Hooks ---
+  const {
+    allAppProducts,
+    allAppProductsMeta,
+    fetchAllProducts,
+    recommendedProducts,
+    recommendedLoading,
+    fetchRecommendedProducts,
+    setAllAppProducts // Expose for admin/vendor product updates
+  } = useProducts();
+
+  const {
+    appStores,
+    appStoresMeta,
+    fetchAppStores,
+    setAppStores // Expose for admin store updates
+  } = useStores();
+
+  const {
+    cart,
+    fetchCart,
+    addToCart,
+    removeFromCart,
+    updateCartQuantity,
+    checkout,
+    setCart
+  } = useCart(isLoggedIn, user, isVendor, isAdmin);
+
+  const {
+    wishlist,
+    fetchWishlist,
+    addToWishlist,
+    removeFromWishlist,
+    moveToCart,
+    moveToWishlist,
+    setWishlist
+  } = useWishlist(isLoggedIn, user, isVendor, isAdmin, addToCart, fetchCart);
+
+  const {
+    orders,
+    ordersMeta,
+    fetchOrders,
+    updateOrderStatus,
+    confirmDeliveryWithOtp,
+    setOrders
+  } = useOrders(isLoggedIn, user, isVendor, isAdmin);
+
+  const {
+    allAppUsers,
+    allAppUsersMeta,
+    fetchAllUsers,
+    deleteUser,
+    updateUserStatus,
+  } = useUsers(isLoggedIn, isAdmin, fetchAllProducts, fetchAppStores);
+
+  const {
+    vendorProducts,
+    vendorProductsMeta,
+    fetchVendorProducts,
+    addVendorProduct,
+    editVendorProduct,
+    deleteVendorProduct,
+  } = useVendorProducts(isLoggedIn, isVendor, user);
+
+  const {
+    adminEditProduct,
+    adminDeleteProduct,
+  } = useAdminProducts(isLoggedIn, isAdmin, fetchAllProducts, allAppProductsMeta);
+
+  const {
+    adminUpdateStore,
+    adminDeleteStore,
+  } = useAdminStores(isLoggedIn, isAdmin, fetchAppStores, appStoresMeta, fetchAllProducts);
+
+  // --- User Profile Update in Context ---
+  const updateUserInContext = useCallback((updatedUserData) => {
+    setAuthUser(prevUser => ({ ...prevUser, ...updatedUserData }));
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    if (storedUser) {
+      localStorage.setItem('user', JSON.stringify({ ...storedUser, ...updatedUserData }));
     }
-  }, []);
+  }, [setAuthUser]);
 
-  const fetchAppStores = useCallback(async (params = {}) => {
+  // --- Signup Functions (Backend Integrated) ---
+  const registerUser = useCallback(async (userData) => {
     try {
-      const { stores, page, pages, count } = await api.stores.getAll(params);
-      setAppStores(stores);
-      setAppStoresMeta({ page, pages, count });
-    } catch (error) {
-      toast.error(`Failed to load stores: ${error.message}`);
-      setAppStores([]);
-      setAppStoresMeta({ page: 1, pages: 1, count: 0 });
-    }
-  }, []);
-
-  const fetchCart = useCallback(async () => {
-    if (!isLoggedIn || !user?._id || isVendor || isAdmin) return; // Only fetch for customers
-    try {
-      const userCart = await api.customer.getCart();
-      setCart(userCart.items); // Assuming API returns { items: [...] }
-    } catch (error) {
-      toast.error(`Failed to load cart: ${error.message}`);
-      setCart([]); // Clear cart on error
-    }
-  }, [isLoggedIn, user?._id, isVendor, isAdmin]);
-
-  const fetchWishlist = useCallback(async () => {
-    if (!isLoggedIn || !user?._id || isVendor || isAdmin) return; // Only fetch for customers
-    try {
-      const userWishlist = await api.customer.getWishlist();
-      setWishlist(userWishlist); // Assuming API returns array of items
-    } catch (error) {
-      toast.error(`Failed to load wishlist: ${error.message}`);
-      setWishlist([]); // Clear wishlist on error
-    }
-  }, [isLoggedIn, user?._id, isVendor, isAdmin]);
-
-  const fetchOrders = useCallback(async (params = {}) => {
-    if (!isLoggedIn || !user?._id) {
-      console.log('AppContext: fetchOrders - Not logged in or user ID missing. Skipping fetch.');
-      return;
-    }
-    console.log('AppContext: fetchOrders - Attempting to fetch orders for user:', user._id, 'with role:', user.role, 'and params:', params);
-    try {
-      let fetchedOrdersData;
-      if (isAdmin) {
-        fetchedOrdersData = await api.admin.getOrders(params);
-        console.log('AppContext: fetchOrders - Admin orders fetched:', fetchedOrdersData);
-      } else if (isVendor) {
-        fetchedOrdersData = await api.vendor.getOrders(user.storeId, params);
-        console.log('AppContext: fetchOrders - Vendor orders fetched:', fetchedOrdersData);
-      } else { // Customer
-        fetchedOrdersData = await api.customer.getOrders(user._id, params);
-        console.log('AppContext: fetchOrders - Customer orders fetched:', fetchedOrdersData);
+      const response = await api.auth.registerUser(userData);
+      if (response) {
+        loginUserInState(response);
+        toast.success(`Welcome to BazzarNet, ${response.name}!`);
+        return true;
       }
-      setOrders(fetchedOrdersData.orders);
-      setOrdersMeta({ page: fetchedOrdersData.page, pages: fetchedOrdersData.pages, count: fetchedOrdersData.count });
-      console.log('AppContext: fetchOrders - Orders state updated. Orders:', fetchedOrdersData.orders, 'Meta:', fetchedOrdersData.pages);
+      return false;
     } catch (error) {
-      console.error('AppContext: fetchOrders - Failed to load orders:', error);
-      toast.error(`Failed to load orders: ${error.message}`);
-      setOrders([]); // Clear orders on error
-      setOrdersMeta({ page: 1, pages: 1, count: 0 });
+      toast.error(error.message || 'Registration failed.');
+      return false;
     }
-  }, [isLoggedIn, user?._id, isAdmin, isVendor, user?.storeId]);
+  }, [loginUserInState]);
 
-  const fetchAllUsers = useCallback(async (params = {}) => {
-    if (!isLoggedIn || !isAdmin) return;
+  const registerVendor = useCallback(async (vendorData) => {
     try {
-      const { users, page, pages, count } = await api.admin.getUsers(params);
-      setAllAppUsers(users);
-      setAllAppUsersMeta({ page, pages, count });
+      const response = await api.auth.registerVendor({
+        name: vendorData.fullName, // Use fullName from form
+        email: vendorData.email,
+        password: vendorData.password,
+        storeName: vendorData.businessName, // Use businessName from form
+        businessDescription: vendorData.description,
+        category: vendorData.category,
+        phone: vendorData.phone,
+        pan: vendorData.pan,
+        gst: vendorData.gst,
+        address: vendorData.address,
+      });
+      if (response) {
+        loginUserInState(response);
+        toast.success(`Welcome, ${response.name}! Your store is now live.`);
+        return true;
+      }
+      return false;
     } catch (error) {
-      toast.error(`Failed to load users: ${error.message}`);
-      setAllAppUsers([]); // Clear users on error
-      setAllAppUsersMeta({ page: 1, pages: 1, count: 0 });
+      toast.error(error.message || 'Vendor registration failed.');
+      return false;
     }
-  }, [isLoggedIn, isAdmin]);
+  }, [loginUserInState]);
 
-  const fetchVendorProducts = useCallback(async (params = {}) => {
-    if (!isLoggedIn || !isVendor || !user?.storeId) return;
-    try {
-      const { products, page, pages, count } = await api.vendor.getProducts({ ...params, store: user.storeId });
-      setVendorProducts(products);
-      setVendorProductsMeta({ page, pages, count });
-    } catch (error) {
-      toast.error(`Failed to load vendor products: ${error.message}`);
-      setVendorProducts([]);
-      setVendorProductsMeta({ page: 1, pages: 1, count: 0 });
-    }
-  }, [isLoggedIn, isVendor, user?.storeId]);
-
-
-  // Initial data load on login/role change
+  // --- Initial Data Load on Login/Role Change ---
   useEffect(() => {
     if (isLoggedIn) {
-      // Initial fetch without specific params, components will trigger more specific fetches
+      // Trigger initial fetches for all relevant data
       fetchAllProducts();
       fetchAppStores();
       fetchCart();
-      fetchWishlist(); 
+      fetchWishlist();
       fetchOrders();
       if (isAdmin) {
         fetchAllUsers();
@@ -173,367 +191,7 @@ export const AppProvider = ({ children }) => {
       setAllAppUsers([]);
       setAllAppUsersMeta({ page: 1, pages: 1, count: 0 });
     }
-  }, [isLoggedIn, user, isAdmin, isVendor, fetchAllProducts, fetchAppStores, fetchCart, fetchWishlist, fetchOrders, fetchAllUsers, fetchVendorProducts]);
-
-  // Theme Toggle
-  const toggleTheme = () => {
-    const newTheme = theme === 'light' ? 'dark' : 'light';
-    setTheme(newTheme);
-    document.body.setAttribute('data-theme', newTheme);
-  };
-
-  // Sidebar Toggle
-  const toggleSidebar = () => {
-    setSidebarOpen(!sidebarOpen);
-  };
-
-  // Simulate Loading (kept for components that might still use it for UI/UX)
-  const simulateLoading = (delay = 1000) => {
-    return new Promise(resolve => setTimeout(resolve, delay));
-  };
-
-  // Generate a 6-digit OTP (kept as it's a utility)
-  const generateOtp = () => {
-    return Math.floor(100000 + Math.random() * 900000).toString();
-  };
-
-  // --- NEW: Function to update user in context after profile update ---
-  const updateUserInContext = useCallback((updatedUserData) => {
-    // Update the user state from useAuth hook
-    setAuthUser(prevUser => ({ ...prevUser, ...updatedUserData }));
-    // Also update localStorage to keep it consistent
-    const storedUser = JSON.parse(localStorage.getItem('user'));
-    if (storedUser) {
-      localStorage.setItem('user', JSON.stringify({ ...storedUser, ...updatedUserData }));
-    }
-  }, [setAuthUser]);
-
-  // --- Cart Functions (Backend Integrated) ---
-  const addToCart = async (product) => {
-    if (!isLoggedIn || !user?._id) {
-      toast.error('Please log in to add items to your cart.');
-      return;
-    }
-    try {
-      const response = await api.customer.addToCart(product._id, 1, product.unit); // Pass unit
-      setCart(response.items); // Assuming backend returns updated cart items
-      toast.success(`${product.name} added to cart!`);
-    } catch (error) {
-      toast.error(`Error adding to cart: ${error.message}`);
-    }
-  };
-
-  const removeFromCart = async (productId) => {
-    if (!isLoggedIn || !user?._id) return;
-    try {
-      const response = await api.customer.removeFromCart(productId);
-      setCart(response.items);
-      toast.error(`Item removed from cart.`);
-    } catch (error) {
-      toast.error(`Error removing from cart: ${error.message}`);
-    }
-  };
-  
-  const updateCartQuantity = async (productId, quantity) => {
-    if (!isLoggedIn || !user?._id) return;
-    if (quantity <= 0) {
-      removeFromCart(productId);
-      return;
-    }
-    try {
-      const response = await api.customer.updateCartItem(productId, quantity);
-      setCart(response.items);
-    } catch (error) {
-      toast.error(`Error updating cart quantity: ${error.message}`);
-    }
-  };
-
-  const checkout = async (orderDetails) => {
-    if (!isLoggedIn || !user?._id) {
-      toast.error('Please log in to place an order.');
-      return null;
-    }
-    try {
-      const newOrder = await api.customer.placeOrder(orderDetails);
-      setOrders(prevOrders => [...prevOrders, newOrder]);
-      setCart([]); // Clear cart after successful order
-      toast.success('Order placed successfully!');
-      return newOrder;
-    } catch (error) {
-      toast.error(`Error placing order: ${error.message}`);
-      return null;
-    }
-  };
-
-  // --- Wishlist Functions (Backend Integrated) ---
-  const addToWishlist = async (product) => {
-    if (!isLoggedIn || !user?._id) {
-      toast.error('Please log in to add items to your wishlist.');
-      return;
-    }
-    try {
-      const response = await api.customer.addToWishlist(product._id, product.unit); // Pass unit
-      setWishlist(response);
-      toast.success(`${product.name} added to wishlist!`);
-    } catch (error) {
-      toast.error(`Error adding to wishlist: ${error.message}`);
-    }
-  };
-
-  const removeFromWishlist = async (productId) => {
-    if (!isLoggedIn || !user?._id) return;
-    try {
-      const response = await api.customer.removeFromWishlist(productId);
-      setWishlist(response);
-      toast.error(`Item removed from wishlist.`);
-    } catch (error) {
-      toast.error(`Error removing from wishlist: ${error.message}`);
-    }
-  };
-
-  const moveToCart = async (product) => {
-    if (!isLoggedIn || !user?._id) return;
-    try {
-      await addToCart(product); // Use the real addToCart API
-      await removeFromWishlist(product._id); // Use the real removeFromWishlist API
-      fetchWishlist(); // Re-fetch wishlist to ensure UI is updated
-    } catch (error) {
-      toast.error(`Error moving to cart: ${error.message}`);
-    }
-  };
-
-  const moveToWishlist = async (product) => {
-    if (!isLoggedIn || !user?._id) return;
-    try {
-      await addToWishlist(product); // Use the real addToWishlist API
-      await removeFromCart(product._id); // Use the real removeFromCart API
-      fetchCart(); // Re-fetch cart to ensure UI is updated
-    } catch (error) {
-      toast.error(`Error moving to wishlist: ${error.message}`);
-    }
-  };
-
-  // --- Vendor Product Management Functions (Backend Integrated) ---
-  const addVendorProduct = async (newProduct) => {
-    if (!isLoggedIn || !isVendor || !user?.storeId) {
-      toast.error('You must be a logged-in vendor to add products.');
-      return;
-    }
-    try {
-      const createdProduct = await api.vendor.addProduct(newProduct);
-      // Re-fetch vendor products to update the list with pagination/filters
-      fetchVendorProducts({ page: vendorProductsMeta.page, limit: 6 });
-      toast.success(`${newProduct.name} added to your store!`);
-    } catch (error) {
-      toast.error(`Error adding product: ${error.message}`);
-    }
-  };
-
-  const editVendorProduct = async (productId, updatedProduct) => {
-    if (!isLoggedIn || !isVendor || !user?.storeId) {
-      toast.error('You must be a logged-in vendor to edit products.');
-      return;
-    }
-    try {
-      const response = await api.vendor.updateProduct(productId, updatedProduct);
-      // Re-fetch vendor products to update the list with pagination/filters
-      fetchVendorProducts({ page: vendorProductsMeta.page, limit: 6 });
-      toast.success('Product updated!');
-    } catch (error) {
-      toast.error(`Error updating product: ${error.message}`);
-    }
-  };
-
-  const deleteVendorProduct = async (productId) => {
-    if (!isLoggedIn || !isVendor || !user?.storeId) {
-      toast.error('You must be a logged-in vendor to delete products.');
-      return;
-    }
-    try {
-      await api.vendor.deleteProduct(productId);
-      // Re-fetch vendor products to update the list with pagination/filters
-      fetchVendorProducts({ page: vendorProductsMeta.page, limit: 6 });
-      toast.error('Product deleted.');
-    } catch (error) {
-      toast.error(`Error deleting product: ${error.message}`);
-    }
-  };
-
-  // --- Admin Product Management Functions (Backend Integrated) ---
-  const adminEditProduct = async (productId, updatedProduct) => {
-    if (!isLoggedIn || !isAdmin) {
-      toast.error('You must be an admin to edit products.');
-      return;
-    }
-    try {
-      const response = await api.admin.updateProduct(productId, updatedProduct);
-      // Re-fetch all products to update the list with pagination/filters
-      fetchAllProducts({ page: allAppProductsMeta.page, limit: 6 });
-      toast.success('Product updated by Admin!');
-    } catch (error) {
-      toast.error(`Error updating product by Admin: ${error.message}`);
-    }
-  };
-
-  const adminDeleteProduct = async (productId) => {
-    if (!isLoggedIn || !isAdmin) {
-      toast.error('You must be an admin to delete products.');
-      return;
-    }
-    try {
-      await api.admin.deleteProduct(productId);
-      // Re-fetch all products to update the list with pagination/filters
-      fetchAllProducts({ page: allAppProductsMeta.page, limit: 6 });
-      toast.error('Product deleted by Admin.');
-    } catch (error) {
-      toast.error(`Error deleting product by Admin: ${error.message}`);
-    }
-  };
-
-  // --- Admin Store Management Functions (Backend Integrated) ---
-  const adminUpdateStore = async (storeId, updatedStoreData) => {
-    if (!isLoggedIn || !isAdmin) {
-      toast.error('You must be an admin to update stores.');
-      return;
-    }
-    try {
-      const response = await api.admin.updateStore(storeId, updatedStoreData);
-      // Re-fetch all stores to update the list with pagination/filters
-      fetchAppStores({ page: appStoresMeta.page, limit: 8 });
-      toast.success('Store updated by Admin!');
-    } catch (error) {
-      toast.error(`Error updating store by Admin: ${error.message}`);
-    }
-  };
-
-  const adminDeleteStore = async (storeId, storeName) => {
-    if (!isLoggedIn || !isAdmin) {
-      toast.error('You must be an admin to delete stores.');
-      return;
-    }
-    if (!window.confirm(`Are you sure you want to delete the store "${storeName}"? This will also delete all associated products.`)) {
-      return;
-    }
-    try {
-      const response = await api.admin.deleteStore(storeId);
-      // Re-fetch all stores to update the list with pagination/filters
-      fetchAppStores({ page: appStoresMeta.page, limit: 8 });
-      // Also re-fetch all products as store deletion cascades to products
-      fetchAllProducts();
-      toast.success(response.message);
-    } catch (error) {
-      toast.error(`Error deleting store by Admin: ${error.message}`);
-    }
-  };
-
-  // --- Order Functions (Backend Integrated) ---
-  const updateOrderStatus = async (orderId, newStatus) => {
-    if (!isLoggedIn || (!isVendor && !isAdmin)) {
-      toast.error('You are not authorized to update order status.');
-      return;
-    }
-    try {
-      const response = await api.admin.updateOrderStatus(orderId, newStatus); // Admin API for now, can be split for vendor
-      // Re-fetch orders to update the list with pagination/filters
-      fetchOrders({ page: ordersMeta.page, limit: 5 });
-      toast.success(`Order ${orderId} status updated to ${newStatus}.`);
-    } catch (error) {
-      toast.error(`Error updating order status: ${error.message}`);
-    }
-  };
-
-  const confirmDeliveryWithOtp = async (orderId, enteredOtp) => {
-    if (!isLoggedIn || !isVendor) {
-      toast.error('You must be a vendor to confirm delivery.');
-      return false;
-    }
-    try {
-      const response = await api.vendor.confirmDelivery(orderId, enteredOtp);
-      // Re-fetch orders to update the list with pagination/filters
-      fetchOrders({ page: ordersMeta.page, limit: 5 });
-      toast.success(response.message); // Assuming backend sends a success message
-      return true;
-    } catch (error) {
-      toast.error(`Error confirming delivery: ${error.message}`);
-      return false;
-    }
-  };
-
-  // --- Admin User Management Functions (Backend Integrated) ---
-  const deleteUser = async (userId) => {
-    if (!isLoggedIn || !isAdmin) {
-      toast.error('You must be an admin to delete users.');
-      return;
-    }
-    try {
-      const response = await api.admin.deleteUser(userId);
-      // Re-fetch all users to update the list with pagination/filters
-      fetchAllUsers({ page: allAppUsersMeta.page, limit: 8 });
-      // Re-fetch products and stores to reflect cascading deletions if a vendor was deleted
-      fetchAllProducts();
-      fetchAppStores();
-      toast.success(response.message);
-    } catch (error) {
-      toast.error(`Error deleting user: ${error.message}`);
-    }
-  };
-
-  const updateUserStatus = async (userId, newStatus) => {
-    if (!isLoggedIn || !isAdmin) {
-      toast.error('You must be an admin to update user status.');
-      return;
-    }
-    try {
-      const response = await api.admin.updateUserStatus(userId, newStatus);
-      // Re-fetch all users to update the list with pagination/filters
-      fetchAllUsers({ page: allAppUsersMeta.page, limit: 8 });
-      toast.success(response.message);
-    } catch (error) {
-      toast.error(`Error updating user status: ${error.message}`);
-    }
-  };
-
-  // --- Signup Functions (Backend Integrated) ---
-  const registerUser = useCallback(async (userData) => {
-    try {
-      const response = await api.auth.registerUser(userData);
-      if (response) {
-        loginUserInState(response); // Use loginUserInState from useAuth
-        toast.success(`Welcome to BazzarNet, ${response.name}!`);
-        return true;
-      }
-      return false;
-    } catch (error) {
-      toast.error(error.message || 'Registration failed.');
-      return false;
-    }
-  }, [loginUserInState]);
-
-  const registerVendor = useCallback(async (vendorData) => { // Changed parameter name to vendorData for clarity
-    try {
-      const response = await api.auth.registerVendor({
-        name: vendorData.name, // Corrected: Use vendorData.name directly
-        email: vendorData.email,
-        password: vendorData.password,
-        storeName: vendorData.storeName,
-        businessDescription: vendorData.businessDescription, // Corrected: Use vendorData.businessDescription directly
-        category: vendorData.category,
-        phone: vendorData.phone,
-        pan: vendorData.pan,
-        gst: vendorData.gst,
-        address: vendorData.address,
-      });
-      if (response) {
-        loginUserInState(response); // Use loginUserInState from useAuth
-        toast.success(`Welcome, ${response.name}! Your store is now live.`);
-        return true;
-      }
-      return false;
-    } catch (error) {
-      toast.error(error.message || 'Vendor registration failed.');
-      return false;
-    }
-  }, [loginUserInState]);
+  }, [isLoggedIn, user, isAdmin, isVendor, fetchAllProducts, fetchAppStores, fetchCart, fetchWishlist, fetchOrders, fetchAllUsers, fetchVendorProducts, setCart, setWishlist, setAllAppProducts, setAppStores, setOrders, setAllAppUsers]);
 
 
   const value = {
@@ -555,42 +213,42 @@ export const AppProvider = ({ children }) => {
     removeFromCart,
     updateCartQuantity,
     checkout,
-    wishlist, 
-    addToWishlist, 
-    removeFromWishlist, 
-    moveToCart, 
-    moveToWishlist, 
+    wishlist,
+    addToWishlist,
+    removeFromWishlist,
+    moveToCart,
+    moveToWishlist,
     allAppProducts,
     allAppProductsMeta,
-    fetchAllProducts, // Expose fetch function
+    fetchAllProducts,
     vendorProducts,
     vendorProductsMeta,
-    fetchVendorProducts, // Expose fetch function
+    fetchVendorProducts,
     addVendorProduct,
     editVendorProduct,
     deleteVendorProduct,
     orders,
     ordersMeta,
-    fetchOrders, // Expose fetch function
+    fetchOrders,
     updateOrderStatus,
     confirmDeliveryWithOtp,
     simulateLoading,
+    generateOtp,
     appStores,
     appStoresMeta,
-    fetchAppStores, // Expose fetch function
+    fetchAppStores,
     allAppUsers,
     allAppUsersMeta,
-    fetchAllUsers, // Expose fetch function
+    fetchAllUsers,
     deleteUser,
     updateUserStatus,
     adminEditProduct,
     adminDeleteProduct,
-    adminUpdateStore, // Expose admin store update
-    adminDeleteStore, // Expose admin store delete
-    registerUser, // Use the local registerUser
-    registerVendor, // Use the local registerVendor
-    fetchWishlist, 
-    updateUserInContext, // NEW: Expose the new function
+    adminUpdateStore,
+    adminDeleteStore,
+    registerUser,
+    registerVendor,
+    updateUserInContext,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
