@@ -1,6 +1,7 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import { ChevronDown } from 'lucide-react';
+import useFormValidation from '../hooks/useFormValidation'; // Import the custom hook
 
 const ProductForm = ({ onSubmit, initialData = null }) => {
   const [product, setProduct] = useState({
@@ -12,12 +13,49 @@ const ProductForm = ({ onSubmit, initialData = null }) => {
     description: '',
     image: '',
   });
-  const [errors, setErrors] = useState({});
 
   const categories = [
     'Groceries', 'Bakery', 'Butcher', 'Cafe', 'Electronics', 
     'Furniture', 'Decor', 'Clothing', 'Other'
   ];
+
+  // Define the validation logic for the product form
+  const productValidationLogic = useCallback((data) => {
+    let newErrors = {};
+    const priceValue = parseFloat(data.price);
+    const originalPriceValue = data.originalPrice ? parseFloat(data.originalPrice) : null;
+    const stockValue = parseInt(data.stock);
+
+    if (!data.name.trim()) {
+      newErrors.name = 'Product Name is required.';
+    }
+    if (!data.category) {
+      newErrors.category = 'Category is required.';
+    }
+    if (isNaN(priceValue) || priceValue <= 0) {
+      newErrors.price = 'Price must be a positive number.';
+    }
+    if (originalPriceValue !== null && (isNaN(originalPriceValue) || originalPriceValue <= 0)) {
+      newErrors.originalPrice = 'Original Price must be a positive number.';
+    }
+    if (originalPriceValue !== null && originalPriceValue <= priceValue) {
+      newErrors.originalPrice = 'Original price must be greater than the current price.';
+    }
+    if (isNaN(stockValue) || stockValue < 0) {
+      newErrors.stock = 'Stock must be a non-negative number.';
+    }
+    if (!data.description.trim()) {
+      newErrors.description = 'Description is required.';
+    }
+    // Image URL validation (optional, can be more robust with regex)
+    if (data.image && !/^https?:\/\/\S+\.(png|jpe?g|gif|svg)$/i.test(data.image)) {
+      newErrors.image = 'Please enter a valid image URL (png, jpg, gif, svg).';
+    }
+    return newErrors;
+  }, []);
+
+  // Use the custom validation hook
+  const { errors, validate, resetErrors } = useFormValidation(product, productValidationLogic);
 
   useEffect(() => {
     if (initialData) {
@@ -37,57 +75,21 @@ const ProductForm = ({ onSubmit, initialData = null }) => {
         category: '', description: '', image: '',
       });
     }
-    setErrors({}); // Clear errors on initialData change
-  }, [initialData]);
+    resetErrors(); // Clear errors on initialData change
+  }, [initialData, resetErrors]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
     setProduct(prev => ({ ...prev, [name]: value }));
   };
 
-  const validateForm = () => {
-    let newErrors = {};
-    const priceValue = parseFloat(product.price);
-    const originalPriceValue = product.originalPrice ? parseFloat(product.originalPrice) : null;
-    const stockValue = parseInt(product.stock);
-
-    if (!product.name.trim()) {
-      newErrors.name = 'Product Name is required.';
-    }
-    if (!product.category) {
-      newErrors.category = 'Category is required.';
-    }
-    if (isNaN(priceValue) || priceValue <= 0) {
-      newErrors.price = 'Price must be a positive number.';
-    }
-    if (originalPriceValue !== null && (isNaN(originalPriceValue) || originalPriceValue <= 0)) {
-      newErrors.originalPrice = 'Original Price must be a positive number.';
-    }
-    if (originalPriceValue !== null && originalPriceValue <= priceValue) {
-      newErrors.originalPrice = 'Original price must be greater than the current price.';
-    }
-    if (isNaN(stockValue) || stockValue < 0) {
-      newErrors.stock = 'Stock must be a non-negative number.';
-    }
-    if (!product.description.trim()) {
-      newErrors.description = 'Description is required.';
-    }
-    // Image URL validation (optional, can be more robust with regex)
-    if (product.image && !/^https?:\/\/\S+\.(png|jpe?g|gif|svg)$/i.test(product.image)) {
-      newErrors.image = 'Please enter a valid image URL (png, jpg, gif, svg).';
-    }
-
-    setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
-  };
-
   const handleSubmit = (e) => {
     e.preventDefault();
     
-    if (validateForm()) {
+    if (validate(product)) { // Use the validate function from the hook
       const submittedProduct = {
         ...product,
-        id: initialData?.id || Date.now(),
+        id: initialData?.id || Date.now(), // For mock data, generate ID
         price: parseFloat(product.price),
         originalPrice: product.originalPrice ? parseFloat(product.originalPrice) : null,
         stock: parseInt(product.stock),
