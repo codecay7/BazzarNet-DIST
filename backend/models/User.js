@@ -68,6 +68,9 @@ const userSchema = new mongoose.Schema({
   bankName: { type: String, trim: true, sparse: true },
   ifsc: { type: String, trim: true, uppercase: true, sparse: true },
   profileImage: { type: String, trim: true }, // URL to profile/store image
+  // Password Reset Fields
+  passwordResetToken: String,
+  passwordResetExpires: Date,
 }, {
   timestamps: true, // Adds createdAt and updatedAt fields
 });

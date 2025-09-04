@@ -12,6 +12,7 @@ import paymentRoutes from './routes/paymentRoutes.js';
 import vendorRoutes from './routes/vendorRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js'; // Import upload routes
+import passwordResetRoutes from './routes/passwordResetRoutes.js'; // Import password reset routes
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import path from 'path'; // Import path module
 
@@ -41,6 +42,8 @@ app.use('/api/payments', paymentRoutes);
 app.use('/api/vendors', vendorRoutes);
 app.use('/api/orders', orderRoutes);
 app.use('/api/upload', uploadRoutes); // Mount upload routes
+app.use('/api/password-reset', passwordResetRoutes); // Mount password reset routes
+
 
 // Serve static files from the 'uploads' directory
 const __dirname = path.resolve(); // Get current directory name
