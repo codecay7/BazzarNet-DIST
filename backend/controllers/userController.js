@@ -75,7 +75,8 @@ const updateUserProfile = asyncHandler(async (req, res) => {
     user.name = validatedData.name || user.name;
     user.phone = validatedData.phone || user.phone;
     user.upiId = validatedData.upiId || user.upiId;
-    user.profileImage = validatedData.profileImage || user.profileImage;
+    // profileImage is handled by a separate endpoint, so don't update it here
+    // user.profileImage = validatedData.profileImage || user.profileImage;
 
     // Update nested address fields
     if (validatedData.address) {
@@ -145,4 +146,43 @@ const updateUserProfile = asyncHandler(async (req, res) => {
   }
 });
 
-export { getMe, updateUserProfile };
+// @desc    Update user profile image
+// @route   PUT /api/users/me/profile-image
+// @access  Private
+const updateUserProfileImage = asyncHandler(async (req, res) => {
+  const user = await User.findById(req.user._id);
+
+  if (!user) {
+    res.status(404);
+    throw new Error('User not found');
+  }
+
+  if (req.file) {
+    const filePath = `/uploads/${req.file.filename}`;
+    user.profileImage = filePath;
+    await user.save();
+
+    // If the user is a vendor, also update their store's logo with the same image
+    if (user.role === 'vendor' && user.storeId) {
+      const store = await Store.findById(user.storeId);
+      if (store) {
+        store.logo = filePath;
+        await store.save();
+      }
+    }
+
+    res.json({
+      _id: user._id,
+      name: user.name,
+      email: user.email,
+      role: user.role,
+      profileImage: user.profileImage,
+      message: 'Profile image updated successfully',
+    });
+  } else {
+    res.status(400);
+    throw new Error('No image file provided');
+  }
+});
+
+export { getMe, updateUserProfile, updateUserProfileImage };

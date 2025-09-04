@@ -88,7 +88,7 @@ export const auth = {
 export const userProfile = {
   getMe: () => apiRequest('/users/me'),
   updateProfile: (profileData) => apiRequest(`/users/me`, { method: 'PUT', body: JSON.stringify(profileData) }), // Updated to use /users/me and PUT
-  uploadProfileImage: (formData) => apiRequest('/upload/profile-image', { method: 'POST', body: formData, headers: {} }), // This endpoint doesn't exist yet in backend
+  uploadProfileImage: (formData) => apiRequest('/users/me/profile-image', { method: 'PUT', body: formData, headers: {} }), // Updated to new backend endpoint
 };
 
 // --- Product Endpoints ---
