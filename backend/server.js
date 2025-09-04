@@ -1,7 +1,9 @@
 import express from 'express';
 import cors from 'cors';
-import env from './config/env.js'; // Import environment variables
-import connectDB from './config/db.js'; // Import database connection function
+import env from './config/env.js';
+import connectDB from './config/db.js';
+import authRoutes from './routes/authRoutes.js'; // Import auth routes
+import { notFound, errorHandler } from './middleware/errorMiddleware.js'; // Import error middleware
 
 // Initialize Express app
 const app = express();
@@ -18,8 +20,12 @@ app.get('/', (req, res) => {
   res.send('BazzarNet Backend API is running...');
 });
 
-// TODO: Mount API routes here (e.g., app.use('/api/auth', authRoutes);)
-// TODO: Implement and mount error handling middleware here
+// Mount API routes
+app.use('/api/auth', authRoutes); // Mount authentication routes
+
+// Error handling middleware (must be last)
+app.use(notFound);
+app.use(errorHandler);
 
 // Start the server
 const PORT = env.PORT;
