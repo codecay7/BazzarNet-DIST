@@ -14,6 +14,12 @@ const errorHandler = (err, req, res, next) => {
     message = 'Resource not found';
   }
 
+  // If Joi validation error, use 400 and extract details
+  if (err.errors && Array.isArray(err.errors) && err.errors[0].message) { // Check for Joi validation errors structure
+    statusCode = 400;
+    message = 'Validation failed';
+  }
+
   res.status(statusCode).json({
     message: message,
     stack: process.env.NODE_ENV === 'production' ? null : err.stack,
