@@ -5,6 +5,7 @@ import Product from '../models/Product.js';
 // @route   GET /api/products
 // @access  Public
 const getAllProducts = asyncHandler(async (req, res) => {
+  console.log('Backend: Received request for all products.'); // Added log
   const pageSize = Number(req.query.limit) || 10; // Default limit 10
   const page = Number(req.query.page) || 1; // Default page 1
 
