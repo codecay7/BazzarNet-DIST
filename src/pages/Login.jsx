@@ -221,7 +221,8 @@ const Login = () => {
                 <FontAwesomeIcon icon={faSignInAlt} aria-hidden="true" /> Sign in as User
               </button>
             </motion.form>
-          ) : activeTab === 'vendor' ? (
+          )}
+          {activeTab === 'vendor' && (
             <motion.form
               key="vendor"
               variants={tabVariants}
@@ -293,7 +294,8 @@ const Login = () => {
                 <FontAwesomeIcon icon={faSignInAlt} aria-hidden="true" /> Sign in as Vendor
               </button>
             </motion.form>
-          ) : (
+          )}
+          {activeTab === 'admin' && (
             <motion.form
               key="admin"
               variants={tabVariants}
