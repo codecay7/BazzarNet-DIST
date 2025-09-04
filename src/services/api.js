@@ -165,3 +165,9 @@ export const general = {
   getFAQ: () => apiRequest('/faq'), // This endpoint doesn't exist yet in backend
   getAboutContent: () => apiRequest('/about'), // This endpoint doesn't exist yet in backend
 };
+
+// --- Password Reset Endpoints ---
+export const passwordReset = {
+  forgotPassword: (email) => apiRequest('/password-reset/forgot', { method: 'POST', body: JSON.stringify({ email }) }),
+  resetPassword: (token, password) => apiRequest(`/password-reset/reset/${token}`, { method: 'POST', body: JSON.stringify({ password }) }),
+};

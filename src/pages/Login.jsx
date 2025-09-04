@@ -349,6 +349,9 @@ const Login = () => {
         <p className="text-center text-sm mt-6">
           Don't have an account? <Link to="/register" className="text-[var(--accent)] font-semibold">Sign up here.</Link>
         </p>
+        <p className="text-center text-sm mt-2">
+          <Link to="/forgot-password" className="text-[var(--accent)] font-semibold">Forgot Password?</Link>
+        </p>
       </div>
     </div>
   );

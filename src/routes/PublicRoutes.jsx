@@ -9,6 +9,8 @@ const Dashboard = lazy(() => import('../pages/Dashboard')); // LandingPage is re
 const FAQ = lazy(() => import('../pages/FAQ'));
 const About = lazy(() => import('../pages/About'));
 const Help = lazy(() => import('../pages/Help'));
+const ForgotPassword = lazy(() => import('../pages/ForgotPassword')); // Import new page
+const ResetPassword = lazy(() => import('../pages/ResetPassword')); // Import new page
 
 const PublicRoutes = () => {
   return (
@@ -20,6 +22,8 @@ const PublicRoutes = () => {
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
+        <Route path="/forgot-password" element={<ForgotPassword />} /> {/* New route */}
+        <Route path="/reset-password/:token" element={<ResetPassword />} /> {/* New route */}
         <Route element={<PublicLayout />}>
           <Route path="/" element={<Dashboard />} /> {/* Landing page */}
           <Route path="/faq" element={<FAQ />} />
