@@ -26,7 +26,8 @@ const useStores = () => {
     appStores,
     appStoresMeta,
     fetchAppStores,
-    setAppStores // Expose for admin store updates
+    setAppStores, // Expose for admin store updates
+    setAppStoresMeta, // Explicitly return the setter for meta data
   };
 };
 

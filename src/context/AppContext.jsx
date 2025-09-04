@@ -52,7 +52,8 @@ export const AppProvider = ({ children }) => {
     appStores,
     appStoresMeta,
     fetchAppStores,
-    setAppStores // Expose for admin store updates
+    setAppStores, // Expose for admin store updates
+    setAppStoresMeta, // Destructure setAppStoresMeta here
   } = useStores();
 
   const {
@@ -196,7 +197,7 @@ export const AppProvider = ({ children }) => {
       setAllAppUsers([]); // This line should now work correctly
       setAllAppUsersMeta({ page: 1, pages: 1, count: 0 });
     }
-  }, [isLoggedIn, user, isAdmin, isVendor, fetchAllProducts, fetchAppStores, fetchCart, fetchWishlist, fetchOrders, fetchAllUsers, fetchVendorProducts, setCart, setWishlist, setAllAppProducts, setAllAppProductsMeta, setAppStores, setOrders, setAllAppUsers, setVendorProducts, setVendorProductsMeta, setOrdersMeta]);
+  }, [isLoggedIn, user, isAdmin, isVendor, fetchAllProducts, fetchAppStores, fetchCart, fetchWishlist, fetchOrders, fetchAllUsers, fetchVendorProducts, setCart, setWishlist, setAllAppProducts, setAllAppProductsMeta, setAppStores, setAppStoresMeta, setOrders, setAllAppUsers, setVendorProducts, setVendorProductsMeta, setOrdersMeta]);
 
 
   const value = {
