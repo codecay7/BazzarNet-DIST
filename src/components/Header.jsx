@@ -9,7 +9,7 @@ import { NavLink, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const Header = () => {
-  const { sidebarOpen, toggleSidebar, cart, theme, toggleTheme, isVendor, logout } = useContext(AppContext);
+  const { sidebarOpen, toggleSidebar, cart, theme, toggleTheme, isVendor, isAdmin, logout } = useContext(AppContext);
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef(null);
   const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
@@ -31,6 +31,11 @@ const Header = () => {
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, []);
 
+  const adminLinks = [
+    { name: 'Dashboard', path: '/admin-dashboard' },
+    // Add other admin specific links here if needed for desktop nav
+  ];
+
   const vendorLinks = [
     { name: 'Dashboard', path: '/dashboard' },
     { name: 'Manage Store', path: '/manage-products' },
@@ -42,7 +47,7 @@ const Header = () => {
     { name: 'Stores', path: '/stores' },
   ];
 
-  const links = isVendor ? vendorLinks : userLinks;
+  const links = isAdmin ? adminLinks : (isVendor ? vendorLinks : userLinks);
 
   const navLinkClasses = "relative text-[var(--text)] font-medium px-3 py-2 rounded-md text-sm transition-colors duration-300 hover:text-[var(--accent)]";
   const activeLinkClasses = "text-[var(--accent)]";
@@ -75,7 +80,7 @@ const Header = () => {
         </div>
 
         <div className="flex items-center gap-4">
-          {!isVendor && (
+          {!isVendor && !isAdmin && ( // Hide cart/wishlist for vendors and admins
             <div className="hidden md:flex items-center gap-4 border border-white/20 rounded-full px-4 py-2">
               <NavLink to="/cart" className="relative text-[var(--text)] hover:text-[var(--accent)] transition-colors duration-200" aria-label={`Shopping Cart with ${cartItemCount} items`}>
                 <FontAwesomeIcon icon={faShoppingCart} className="text-xl" />
@@ -111,12 +116,16 @@ const Header = () => {
                   className="absolute top-14 right-0 w-48 bg-[var(--card-bg)] border border-white/10 rounded-lg shadow-lg flex flex-col py-1"
                   role="menu"
                 >
-                  <NavLink to="/profile" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm hover:bg-white/10" role="menuitem">
-                    <FontAwesomeIcon icon={faIdCard} aria-hidden="true" /> Profile
-                  </NavLink>
-                  <NavLink to="/orders" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm hover:bg-white/10" role="menuitem">
-                    <FontAwesomeIcon icon={faBox} aria-hidden="true" /> Orders
-                  </NavLink>
+                  {!isAdmin && ( // Profile and Orders are not for admin in this context
+                    <>
+                      <NavLink to="/profile" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm hover:bg-white/10" role="menuitem">
+                        <FontAwesomeIcon icon={faIdCard} aria-hidden="true" /> Profile
+                      </NavLink>
+                      <NavLink to="/orders" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm hover:bg-white/10" role="menuitem">
+                        <FontAwesomeIcon icon={faBox} aria-hidden="true" /> Orders
+                      </NavLink>
+                    </>
+                  )}
                   {isVendor && (
                     <NavLink to="/payments" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm hover:bg-white/10" role="menuitem">
                       <FontAwesomeIcon icon={faCreditCard} aria-hidden="true" /> Payments

@@ -98,3 +98,26 @@ export const topProductsData = [
   { name: 'Sourdough', sales: 98 },
   { name: 'Milk', sales: 120 },
 ];
+
+// New mock data for Admin Dashboard
+export const adminDashboardData = {
+  totalRevenue: 3050000, // ₹30,50,000
+  activeUsers: 908,
+  vendorStatus: [
+    { name: 'Active', value: 85, color: '#4CAF50' }, // Green
+    { name: 'Inactive', value: 24, color: '#FFC107' }, // Yellow
+    { name: 'Offline', value: 30, color: '#F44336' }, // Red
+  ],
+  userStatus: [
+    { name: 'Active', value: 850, color: '#2196F3' }, // Blue
+    { name: 'Inactive', value: 58, color: '#607D8B' }, // Grey
+  ],
+  orderCompletion: [
+    { name: 'Pending', value: 150, color: '#FFC107' }, // Yellow
+    { name: 'Completed', value: 850, color: '#4CAF50' }, // Green
+  ],
+  salesTrend: [
+    { name: 'Monthly', sales: 450000, color: '#00BCD4' }, // Cyan
+    { name: 'Yearly', sales: 2850000, color: '#2196F3' }, // Blue
+  ],
+};

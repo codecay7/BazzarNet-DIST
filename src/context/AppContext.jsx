@@ -10,6 +10,7 @@ export const AppProvider = ({ children }) => {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [user, setUser] = useState(null);
   const [isVendor, setIsVendor] = useState(false);
+  const [isAdmin, setIsAdmin] = useState(false); // New state for admin role
   const [cart, setCart] = useState([]);
   const [wishlist, setWishlist] = useState([]);
   const [allAppProducts, setAllAppProducts] = useState(initialAllProducts); // Central source of truth for all products
@@ -76,6 +77,7 @@ export const AppProvider = ({ children }) => {
     setUser(userData);
     setIsLoggedIn(true);
     setIsVendor(false);
+    setIsAdmin(false); // Ensure admin is false
     localStorage.setItem('user', JSON.stringify(userData));
     toast.success(`Welcome to BazzarNet, ${name}!`);
     return true;
@@ -112,9 +114,31 @@ export const AppProvider = ({ children }) => {
     setUser(userData);
     setIsLoggedIn(true);
     setIsVendor(true);
+    setIsAdmin(false); // Ensure admin is false
     localStorage.setItem('user', JSON.stringify(userData));
     toast.success(`Welcome, ${name}! Manage your store now.`);
     return true;
+  };
+
+  const loginAsAdmin = (username, password) => {
+    // Mock admin credentials
+    if (username === 'admin' && password === 'admin123') {
+      const adminData = {
+        name: 'Super Admin',
+        email: 'admin@bazzarnet.com',
+        role: 'admin',
+      };
+      setUser(adminData);
+      setIsLoggedIn(true);
+      setIsVendor(false);
+      setIsAdmin(true);
+      localStorage.setItem('user', JSON.stringify(adminData));
+      toast.success('Welcome, Super Admin!');
+      return true;
+    } else {
+      toast.error('Invalid admin credentials.');
+      return false;
+    }
   };
 
   const logout = () => {
@@ -122,6 +146,7 @@ export const AppProvider = ({ children }) => {
     setUser(null);
     setIsLoggedIn(false);
     setIsVendor(false);
+    setIsAdmin(false); // Reset admin state on logout
     setVendorProducts([]); // Clear vendor-specific products on logout
     toast.success('You have been logged out.');
   };
@@ -267,6 +292,7 @@ export const AppProvider = ({ children }) => {
       setUser(storedUser);
       setIsLoggedIn(true);
       setIsVendor(storedUser.role === 'vendor');
+      setIsAdmin(storedUser.role === 'admin'); // Set admin state on auto-login
     }
   }, []);
 
@@ -279,8 +305,10 @@ export const AppProvider = ({ children }) => {
     isLoggedIn,
     user,
     isVendor,
+    isAdmin, // Expose new admin state
     loginAsUser,
     loginAsVendor,
+    loginAsAdmin, // Expose new admin login function
     logout,
     cart,
     addToCart,

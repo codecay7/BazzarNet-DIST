@@ -7,6 +7,7 @@ import PublicLayout from './components/PublicLayout';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
+import AdminDashboard from './pages/AdminDashboard'; // Import new AdminDashboard
 import Products from './pages/Products';
 import Stores from './pages/Stores';
 import StorePage from './pages/StorePage';
@@ -25,7 +26,7 @@ import About from './pages/About';
 import Profile from './pages/Profile';
 
 const App = () => {
-  const { theme, isLoggedIn, isVendor } = useContext(AppContext);
+  const { theme, isLoggedIn, isVendor, isAdmin } = useContext(AppContext); // Get isAdmin from context
 
   return (
     <div className={`font-poppins min-h-screen flex flex-col transition-all duration-300 ${theme === 'dark' ? 'bg-[#07080a] text-[#E0E0E0]' : 'bg-[#E0E0E0] text-[#333]'}`}>
@@ -33,51 +34,60 @@ const App = () => {
         {isLoggedIn ? (
           // --- Logged In Routes ---
           <Route element={<Layout />}>
-            <Route path="/dashboard" element={<Dashboard />} />
-            <Route path="/orders" element={<Orders />} />
-            <Route path="/profile" element={<Profile />} />
-
-            {isVendor ? (
+            {isAdmin ? (
               <>
-                <Route path="/manage-products" element={<ManageProducts />} />
-                <Route path="/orders/:orderId" element={<OrderDetails />} />
-                <Route path="/payments" element={<Payments />} />
-                {/* Redirect customer routes for vendors */}
-                <Route path="/products" element={<Navigate to="/dashboard" />} />
-                <Route path="/products/:id" element={<Navigate to="/dashboard" />} />
-                <Route path="/stores" element={<Navigate to="/dashboard" />} />
-                <Route path="/stores/:storeId" element={<Navigate to="/dashboard" />} />
-                <Route path="/cart" element={<Navigate to="/dashboard" />} />
-                <Route path="/checkout" element={<Navigate to="/dashboard" />} />
-                <Route path="/confirmation" element={<Navigate to="/dashboard" />} />
-                <Route path="/wishlist" element={<Navigate to="/dashboard" />} />
-                <Route path="/faq" element={<Navigate to="/dashboard" />} />
-                <Route path="/about" element={<Navigate to="/dashboard" />} />
-                <Route path="/my-orders/:orderId" element={<Navigate to="/dashboard" />} />
-                <Route path="/settings" element={<Navigate to="/dashboard" />} />
+                <Route path="/admin-dashboard" element={<AdminDashboard />} />
+                <Route path="*" element={<Navigate to="/admin-dashboard" />} />
               </>
             ) : (
               <>
-                <Route path="/products" element={<Products />} />
-                <Route path="/products/:id" element={<ProductDetail />} />
-                <Route path="/stores" element={<Stores />} />
-                <Route path="/stores/:storeId" element={<StorePage />} />
-                <Route path="/cart" element={<Cart />} />
-                <Route path="/checkout" element={<Checkout />} />
-                <Route path="/confirmation" element={<OrderConfirmation />} />
-                <Route path="/wishlist" element={<Wishlist />} />
-                <Route path="/faq" element={<FAQ />} />
-                <Route path="/about" element={<About />} />
-                <Route path="/my-orders/:orderId" element={<CustomerOrderDetails />} />
-                {/* Redirect vendor routes for customers */}
-                <Route path="/manage-products" element={<Navigate to="/dashboard" />} />
-                <Route path="/orders/:orderId" element={<Navigate to="/dashboard" />} />
-                <Route path="/payments" element={<Navigate to="/dashboard" />} />
-                <Route path="/settings" element={<Navigate to="/dashboard" />} />
+                <Route path="/dashboard" element={<Dashboard />} />
+                <Route path="/orders" element={<Orders />} />
+                <Route path="/profile" element={<Profile />} />
+
+                {isVendor ? (
+                  <>
+                    <Route path="/manage-products" element={<ManageProducts />} />
+                    <Route path="/orders/:orderId" element={<OrderDetails />} />
+                    <Route path="/payments" element={<Payments />} />
+                    {/* Redirect customer routes for vendors */}
+                    <Route path="/products" element={<Navigate to="/dashboard" />} />
+                    <Route path="/products/:id" element={<Navigate to="/dashboard" />} />
+                    <Route path="/stores" element={<Navigate to="/dashboard" />} />
+                    <Route path="/stores/:storeId" element={<Navigate to="/dashboard" />} />
+                    <Route path="/cart" element={<Navigate to="/dashboard" />} />
+                    <Route path="/checkout" element={<Navigate to="/dashboard" />} />
+                    <Route path="/confirmation" element={<Navigate to="/dashboard" />} />
+                    <Route path="/wishlist" element={<Navigate to="/dashboard" />} />
+                    <Route path="/faq" element={<Navigate to="/dashboard" />} />
+                    <Route path="/about" element={<Navigate to="/dashboard" />} />
+                    <Route path="/my-orders/:orderId" element={<Navigate to="/dashboard" />} />
+                    <Route path="/settings" element={<Navigate to="/dashboard" />} />
+                  </>
+                ) : (
+                  <>
+                    <Route path="/products" element={<Products />} />
+                    <Route path="/products/:id" element={<ProductDetail />} />
+                    <Route path="/stores" element={<Stores />} />
+                    <Route path="/stores/:storeId" element={<StorePage />} />
+                    <Route path="/cart" element={<Cart />} />
+                    <Route path="/checkout" element={<Checkout />} />
+                    <Route path="/confirmation" element={<OrderConfirmation />} />
+                    <Route path="/wishlist" element={<Wishlist />} />
+                    <Route path="/faq" element={<FAQ />} />
+                    <Route path="/about" element={<About />} />
+                    <Route path="/my-orders/:orderId" element={<CustomerOrderDetails />} />
+                    {/* Redirect vendor routes for customers */}
+                    <Route path="/manage-products" element={<Navigate to="/dashboard" />} />
+                    <Route path="/orders/:orderId" element={<Navigate to="/dashboard" />} />
+                    <Route path="/payments" element={<Navigate to="/dashboard" />} />
+                    <Route path="/settings" element={<Navigate to="/dashboard" />} />
+                  </>
+                )}
+                
+                <Route path="*" element={<Navigate to="/dashboard" />} />
               </>
             )}
-            
-            <Route path="*" element={<Navigate to="/dashboard" />} />
           </Route>
         ) : (
           // --- Logged Out Routes ---

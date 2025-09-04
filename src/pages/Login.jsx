@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
 
 const Login = () => {
-  const { loginAsUser, loginAsVendor } = useContext(AppContext);
+  const { loginAsUser, loginAsVendor, loginAsAdmin } = useContext(AppContext);
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('user');
 
@@ -23,6 +23,11 @@ const Login = () => {
   const [vendorEmail, setVendorEmail] = useState('');
   const [vendorPassword, setVendorPassword] = useState('');
   const [vendorErrors, setVendorErrors] = useState({});
+
+  // Admin Login State
+  const [adminUsername, setAdminUsername] = useState('');
+  const [adminPassword, setAdminPassword] = useState('');
+  const [adminErrors, setAdminErrors] = useState({});
 
   const validateUserLogin = () => {
     let newErrors = {};
@@ -65,6 +70,18 @@ const Login = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  const validateAdminLogin = () => {
+    let newErrors = {};
+    if (!adminUsername.trim()) {
+      newErrors.username = 'Username is required.';
+    }
+    if (!adminPassword) {
+      newErrors.password = 'Password is required.';
+    }
+    setAdminErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
+  };
+
   const handleUserLogin = (e) => {
     e.preventDefault();
     if (validateUserLogin()) {
@@ -87,6 +104,17 @@ const Login = () => {
     }
   };
 
+  const handleAdminLogin = (e) => {
+    e.preventDefault();
+    if (validateAdminLogin()) {
+      if (loginAsAdmin(adminUsername, adminPassword)) {
+        navigate('/admin-dashboard'); // Navigate to admin-specific dashboard
+      }
+    } else {
+      toast.error('Please fill in all required fields.');
+    }
+  };
+
   const tabVariants = {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.3 } },
@@ -103,7 +131,7 @@ const Login = () => {
         <div className="flex justify-center bg-black/10 rounded-lg p-1 mb-6" role="tablist">
           <button
             onClick={() => setActiveTab('user')}
-            className={`w-1/2 py-2 rounded-md font-semibold transition-colors duration-300 ${activeTab === 'user' ? 'bg-[var(--accent)] text-white' : 'text-[var(--text)]'}`}
+            className={`w-1/3 py-2 rounded-md font-semibold transition-colors duration-300 ${activeTab === 'user' ? 'bg-[var(--accent)] text-white' : 'text-[var(--text)]'}`}
             role="tab"
             aria-selected={activeTab === 'user'}
             aria-controls="user-login-panel"
@@ -113,7 +141,7 @@ const Login = () => {
           </button>
           <button
             onClick={() => setActiveTab('vendor')}
-            className={`w-1/2 py-2 rounded-md font-semibold transition-colors duration-300 ${activeTab === 'vendor' ? 'bg-[var(--accent)] text-white' : 'text-[var(--text)]'}`}
+            className={`w-1/3 py-2 rounded-md font-semibold transition-colors duration-300 ${activeTab === 'vendor' ? 'bg-[var(--accent)] text-white' : 'text-[var(--text)]'}`}
             role="tab"
             aria-selected={activeTab === 'vendor'}
             aria-controls="vendor-login-panel"
@@ -121,10 +149,20 @@ const Login = () => {
           >
             Vendor
           </button>
+          <button
+            onClick={() => setActiveTab('admin')}
+            className={`w-1/3 py-2 rounded-md font-semibold transition-colors duration-300 ${activeTab === 'admin' ? 'bg-[var(--accent)] text-white' : 'text-[var(--text)]'}`}
+            role="tab"
+            aria-selected={activeTab === 'admin'}
+            aria-controls="admin-login-panel"
+            id="admin-login-tab"
+          >
+            Admin
+          </button>
         </div>
 
         <AnimatePresence mode="wait">
-          {activeTab === 'user' ? (
+          {activeTab === 'user' && (
             <motion.form
               key="user"
               variants={tabVariants}
@@ -183,7 +221,7 @@ const Login = () => {
                 <FontAwesomeIcon icon={faSignInAlt} aria-hidden="true" /> Sign in as User
               </button>
             </motion.form>
-          ) : (
+          ) : activeTab === 'vendor' ? (
             <motion.form
               key="vendor"
               variants={tabVariants}
@@ -253,6 +291,52 @@ const Login = () => {
                 className="bg-[var(--accent)] text-white border-none py-3 px-6 rounded-lg flex items-center justify-center w-full gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300 mt-4"
               >
                 <FontAwesomeIcon icon={faSignInAlt} aria-hidden="true" /> Sign in as Vendor
+              </button>
+            </motion.form>
+          ) : (
+            <motion.form
+              key="admin"
+              variants={tabVariants}
+              initial="hidden"
+              animate="visible"
+              exit="exit"
+              onSubmit={handleAdminLogin}
+              className="flex flex-col"
+              role="tabpanel"
+              id="admin-login-panel"
+              aria-labelledby="admin-login-tab"
+            >
+              <label htmlFor="adminUsername" className="sr-only">Admin Username</label>
+              <input
+                type="text"
+                id="adminUsername"
+                value={adminUsername}
+                onChange={(e) => setAdminUsername(e.target.value)}
+                placeholder="Username"
+                className={inputClasses}
+                aria-invalid={!!adminErrors.username}
+                aria-describedby={adminErrors.username ? "adminUsername-error" : undefined}
+              />
+              {adminErrors.username && <p id="adminUsername-error" className="text-red-400 text-xs text-left -mt-1 mb-2">{adminErrors.username}</p>}
+
+              <label htmlFor="adminPassword" className="sr-only">Admin Password</label>
+              <input
+                type="password"
+                id="adminPassword"
+                value={adminPassword}
+                onChange={(e) => setAdminPassword(e.target.value)}
+                placeholder="Password"
+                className={inputClasses}
+                aria-invalid={!!adminErrors.password}
+                aria-describedby={adminErrors.password ? "adminPassword-error" : undefined}
+              />
+              {adminErrors.password && <p id="adminPassword-error" className="text-red-400 text-xs text-left -mt-1 mb-2">{adminErrors.password}</p>}
+
+              <button
+                type="submit"
+                className="bg-[var(--accent)] text-white border-none py-3 px-6 rounded-lg flex items-center justify-center w-full gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300 mt-4"
+              >
+                <FontAwesomeIcon icon={faSignInAlt} aria-hidden="true" /> Sign in as Admin
               </button>
             </motion.form>
           )}

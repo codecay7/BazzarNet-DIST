@@ -2,14 +2,14 @@ import React, { useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {
   faHome, faShoppingBag, faStore, faTruck, faUser, faSignOutAlt,
-  faHeart, faShoppingCart
+  faHeart, faShoppingCart, faUsers, faBoxes, faChartLine, faBullhorn, faCog
 } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 
 const MobileNav = () => {
-  const { sidebarOpen, toggleSidebar, isVendor, logout } = useContext(AppContext);
+  const { sidebarOpen, toggleSidebar, isVendor, isAdmin, logout } = useContext(AppContext);
   const navigate = useNavigate();
 
   const handleLogout = () => {
@@ -17,6 +17,16 @@ const MobileNav = () => {
     toggleSidebar();
     navigate('/');
   };
+
+  const adminLinks = [
+    { name: 'Dashboard', path: '/admin-dashboard', icon: faHome },
+    { name: 'Vendors', path: '/admin-vendors', icon: faStore }, // Placeholder for admin vendor management
+    { name: 'Customers', path: '/admin-customers', icon: faUsers }, // Placeholder for admin customer management
+    { name: 'Orders', path: '/admin-orders', icon: faBoxes }, // Placeholder for admin order management
+    { name: 'Sales', path: '/admin-sales', icon: faChartLine }, // Placeholder for admin sales reports
+    { name: 'Broadcasts', path: '/admin-broadcasts', icon: faBullhorn }, // Placeholder for admin broadcasts
+    { name: 'Settings', path: '/admin-settings', icon: faCog }, // Placeholder for admin settings
+  ];
 
   const vendorLinks = [
     { name: 'Dashboard', path: '/dashboard', icon: faHome },
@@ -35,7 +45,7 @@ const MobileNav = () => {
     { name: 'Profile', path: '/profile', icon: faUser },
   ];
 
-  const links = isVendor ? vendorLinks : userLinks;
+  const links = isAdmin ? adminLinks : (isVendor ? vendorLinks : userLinks);
 
   const menuVariants = {
     hidden: { opacity: 0, y: -50 },
