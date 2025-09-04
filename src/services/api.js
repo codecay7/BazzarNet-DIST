@@ -98,7 +98,13 @@ export const userProfile = {
 
 // --- Product Endpoints ---
 export const products = {
-  getAll: (params) => apiRequest(`/products?${new URLSearchParams(params)}`),
+  getAll: (params) => {
+    // Filter out undefined values from params before creating URLSearchParams
+    const filteredParams = Object.fromEntries(
+      Object.entries(params).filter(([, value]) => value !== undefined)
+    );
+    return apiRequest(`/products?${new URLSearchParams(filteredParams)}`);
+  },
   getById: (productId) => apiRequest(`/products/${productId}`),
   getStoreProducts: (storeId, params) => apiRequest(`/stores/${storeId}/products?${new URLSearchParams(params)}`),
   getRecommended: (params) => {
