@@ -1,6 +1,6 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faQuestionCircle, faEnvelope, faPhone, faComments } from '@fortawesome/free-solid-svg-icons';
+import { faQuestionCircle, faEnvelope } from '@fortawesome/free-solid-svg-icons';
 import toast from 'react-hot-toast';
 
 const Help = () => {
@@ -14,7 +14,7 @@ const Help = () => {
       <div className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-8 mx-4">
         <h2 className="text-3xl font-bold mb-6 md:text-4xl text-center">How Can We Help You?</h2>
         
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div className="bg-black/10 p-6 rounded-xl flex flex-col items-center text-center shadow-lg hover:-translate-y-1 transition-transform duration-300">
             <FontAwesomeIcon icon={faQuestionCircle} className="text-5xl text-[var(--accent)] mb-4" aria-hidden="true" />
             <h3 className="text-xl font-semibold mb-2">Visit our FAQ</h3>
@@ -32,23 +32,6 @@ const Help = () => {
               Send Email
             </a>
           </div>
-
-          <div className="bg-black/10 p-6 rounded-xl flex flex-col items-center text-center shadow-lg hover:-translate-y-1 transition-transform duration-300">
-            <FontAwesomeIcon icon={faPhone} className="text-5xl text-[var(--accent)] mb-4" aria-hidden="true" />
-            <h3 className="text-xl font-semibold mb-2">Call Us</h3>
-            <p className="text-base opacity-80 mb-4">Speak directly with our support team.</p>
-            <a href="tel:+911234567890" onClick={(e) => handleContactClick(e, 'phone')} className="bg-[var(--accent)] text-white py-2 px-6 rounded-lg font-medium hover:bg-[var(--accent-dark)] transition-colors" aria-label="Call support">
-              Call Now
-            </a>
-          </div>
-        </div>
-
-        <div className="mt-10 text-center">
-          <h3 className="text-2xl font-bold mb-4">Need immediate assistance?</h3>
-          <p className="text-lg opacity-80 mb-6">Our live chat is available during business hours.</p>
-          <button onClick={(e) => handleContactClick(e, 'chat')} className="bg-[var(--accent)] text-white py-3 px-8 rounded-lg font-medium text-lg hover:bg-[var(--accent-dark)] transition-colors flex items-center justify-center mx-auto gap-2" aria-label="Start live chat">
-            <FontAwesomeIcon icon={faComments} aria-hidden="true" /> Start Live Chat
-          </button>
         </div>
       </div>
     </section>
