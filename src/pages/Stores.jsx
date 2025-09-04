@@ -17,7 +17,7 @@ const Stores = () => {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      await simulateLoading(800); // Simulate network delay
+      // Removed await simulateLoading(800); // Removed this line
       
       const params = {
         page: currentPage,
@@ -28,7 +28,7 @@ const Stores = () => {
       setLoading(false);
     };
     loadData();
-  }, [searchTerm, currentPage, fetchAppStores, simulateLoading]);
+  }, [searchTerm, currentPage, fetchAppStores]); // Removed simulateLoading from dependencies
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);

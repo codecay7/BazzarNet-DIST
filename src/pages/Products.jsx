@@ -19,7 +19,7 @@ const Products = () => {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      await simulateLoading(800); // Simulate network delay
+      // Removed await simulateLoading(800); // Removed this line
       
       const params = {
         page: currentPage,
@@ -33,7 +33,7 @@ const Products = () => {
       setLoading(false);
     };
     loadData();
-  }, [searchTerm, selectedStore, currentPage, fetchAllProducts, simulateLoading]);
+  }, [searchTerm, selectedStore, currentPage, fetchAllProducts]); // Removed simulateLoading from dependencies
 
   const calculateDiscount = (price, originalPrice) => {
     if (!originalPrice || originalPrice <= price) return 0;
@@ -138,7 +138,7 @@ const Products = () => {
             {sortedProducts.map((product) => {
               const discount = calculateDiscount(product.price, product.originalPrice);
               return (
-                <div key={product._id} className="bg-black/10 border border-white/10 rounded-2xl overflow-hidden shadow-lg flex flex-col" role="listitem">
+                <div key={product._id} className="bg-black/10 border border-white/10 rounded-2xl overflow-hidden shadow-lg flex flex-col" role="listitem" aria-label={`Product: ${product.name}`}>
                   <Link to={`/products/${product._id}`} className="flex-grow" aria-label={`View details for ${product.name}`}>
                     <div className="relative">
                       <img
