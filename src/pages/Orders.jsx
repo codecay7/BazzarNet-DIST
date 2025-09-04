@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import Pagination from '../components/Pagination';
 
 const Orders = () => {
-  const { isVendor, orders, simulateLoading, user } = useContext(AppContext);
+  const { isVendor, orders, ordersMeta, fetchOrders, simulateLoading, user } = useContext(AppContext);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -16,11 +16,21 @@ const Orders = () => {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      await simulateLoading(800);
+      await simulateLoading(800); // Simulate network delay
+      
+      const params = {
+        page: currentPage,
+        limit: itemsPerPage,
+        search: searchTerm,
+        // status: filterStatus, // Add status filter if needed
+      };
+      await fetchOrders(params);
       setLoading(false);
     };
-    loadData();
-  }, [searchTerm, simulateLoading, orders.length]); // Re-run loading when orders change
+    if (user?._id && (isVendor ? user.storeId : true)) { // Only fetch if user is logged in and has relevant IDs
+      loadData();
+    }
+  }, [searchTerm, currentPage, fetchOrders, simulateLoading, user, isVendor]);
 
   const getStatusInfo = (status) => {
     switch (status) {
@@ -40,17 +50,6 @@ const Orders = () => {
       navigate(`/my-orders/${orderId}`);
     }
   };
-
-  const filteredOrders = orders.filter(order =>
-    order._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-    order.items.some(item => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
-  );
-
-  // Calculate pagination values
-  const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentOrders = filteredOrders.slice(indexOfFirstItem, indexOfLastItem);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -97,9 +96,9 @@ const Orders = () => {
               </div>
             ))}
           </div>
-        ) : currentOrders.length > 0 ? (
+        ) : orders.length > 0 ? (
           <div className="space-y-6" role="list">
-            {currentOrders.map(order => {
+            {orders.map(order => {
               const statusInfo = getStatusInfo(order.orderStatus); // Use orderStatus
               return (
                 <div key={order._id} className="bg-black/10 rounded-2xl p-6 transition-all duration-300" role="listitem" aria-label={`Order ${order._id}, total ₹${order.totalPrice.toFixed(2)}, status ${order.orderStatus}`}>
@@ -130,10 +129,10 @@ const Orders = () => {
           <p className="text-center text-lg opacity-80">No orders found matching your search.</p>
         )}
 
-        {!loading && filteredOrders.length > 0 && (
+        {!loading && orders.length > 0 && (
           <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
+            currentPage={ordersMeta.page}
+            totalPages={ordersMeta.pages}
             onPageChange={handlePageChange}
           />
         )}

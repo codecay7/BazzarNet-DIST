@@ -6,8 +6,25 @@ import Product from '../models/Product.js';
 // @route   GET /api/stores
 // @access  Public
 const getAllStores = asyncHandler(async (req, res) => {
-  const stores = await Store.find({ isActive: true }).populate('owner', 'name');
-  res.json(stores);
+  const pageSize = Number(req.query.limit) || 10;
+  const page = Number(req.query.page) || 1;
+
+  const keyword = req.query.search
+    ? {
+        name: {
+          $regex: req.query.search,
+          $options: 'i',
+        },
+      }
+    : {};
+
+  const count = await Store.countDocuments({ ...keyword, isActive: true });
+  const stores = await Store.find({ ...keyword, isActive: true })
+    .populate('owner', 'name')
+    .limit(pageSize)
+    .skip(pageSize * (page - 1));
+
+  res.json({ stores, page, pages: Math.ceil(count / pageSize) });
 });
 
 // @desc    Fetch a single store by ID with its products (public)
@@ -17,8 +34,9 @@ const getStoreById = asyncHandler(async (req, res) => {
   const store = await Store.findById(req.params.id);
 
   if (store && store.isActive) {
-    const products = await Product.find({ store: store._id, isActive: true });
-    res.json({ store, products });
+    // Products for a specific store are fetched via the productRoutes with a store filter
+    // This endpoint will just return the store details.
+    res.json(store);
   } else {
     res.status(404);
     throw new Error('Store not found or is inactive');

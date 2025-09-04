@@ -9,7 +9,7 @@ import Pagination from '../components/Pagination';
 import { Search, Store, Tag, ChevronDown } from 'lucide-react';
 
 const AdminProductManagement = () => {
-  const { allAppProducts, adminEditProduct, adminDeleteProduct, simulateLoading, appStores } = useContext(AppContext);
+  const { allAppProducts, allAppProductsMeta, fetchAllProducts, adminEditProduct, adminDeleteProduct, simulateLoading, appStores } = useContext(AppContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -27,11 +27,20 @@ const AdminProductManagement = () => {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      await simulateLoading(800);
+      await simulateLoading(800); // Simulate network delay
+      
+      const params = {
+        page: currentPage,
+        limit: itemsPerPage,
+        search: searchTerm,
+        store: filterStore === 'all' ? undefined : filterStore,
+        category: filterCategory === 'all' ? undefined : filterCategory,
+      };
+      await fetchAllProducts(params);
       setLoading(false);
     };
     loadData();
-  }, [searchTerm, filterStore, filterCategory, allAppProducts.length, simulateLoading]);
+  }, [searchTerm, filterStore, filterCategory, currentPage, fetchAllProducts, simulateLoading]);
 
   const handleOpenModal = (product = null) => {
     setEditingProduct(product);
@@ -60,31 +69,6 @@ const AdminProductManagement = () => {
     if (!originalPrice || originalPrice <= price) return 0;
     return Math.round(((originalPrice - price) / originalPrice) * 100);
   };
-
-  const filteredProducts = useMemo(() => {
-    let products = allAppProducts;
-
-    if (searchTerm) {
-      products = products.filter(product =>
-        product.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
-
-    if (filterStore !== 'all') {
-      products = products.filter(product => product.store._id === filterStore); // Filter by populated store._id
-    }
-
-    if (filterCategory !== 'all') {
-      products = products.filter(product => product.category === filterCategory);
-    }
-
-    return products;
-  }, [allAppProducts, searchTerm, filterStore, filterCategory]);
-
-  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentProducts = filteredProducts.slice(indexOfFirstItem, indexOfLastItem);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -151,9 +135,9 @@ const AdminProductManagement = () => {
                 <SkeletonCard key={index} />
               ))}
             </div>
-          ) : currentProducts.length > 0 ? (
+          ) : allAppProducts.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" role="list">
-              {currentProducts.map((product) => {
+              {allAppProducts.map((product) => {
                 const discount = calculateDiscount(product.price, product.originalPrice);
                 const storeName = appStores.find(s => s._id === product.store._id)?.name || 'N/A'; // Use product.store._id
                 return (
@@ -196,10 +180,10 @@ const AdminProductManagement = () => {
             </div>
           )}
 
-          {!loading && filteredProducts.length > 0 && (
+          {!loading && allAppProducts.length > 0 && (
             <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
+              currentPage={allAppProductsMeta.page}
+              totalPages={allAppProductsMeta.pages}
               onPageChange={handlePageChange}
             />
           )}

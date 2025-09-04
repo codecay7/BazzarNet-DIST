@@ -8,7 +8,8 @@ import {
   adminDeleteProduct,
   adminUpdateStore,
   adminDeleteStore,
-  getAdminDashboardStats, // Import new function
+  getAdminOrders, // Import new function
+  getAdminDashboardStats,
 } from '../controllers/adminController.js';
 import { validate } from '../middleware/validationMiddleware.js';
 import { updateProductSchema } from '../validators/productValidator.js';
@@ -39,5 +40,9 @@ router.delete('/products/:id', adminDeleteProduct);
 // Store management routes (Admin)
 router.put('/stores/:id', validate(updateStoreSchema), adminUpdateStore);
 router.delete('/stores/:id', adminDeleteStore);
+
+// Admin Order Management routes
+router.get('/orders', getAdminOrders); // Admin can get all orders
+// Note: updateOrderStatus is handled in orderRoutes.js and allows admin role.
 
 export default router;

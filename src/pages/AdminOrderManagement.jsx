@@ -14,7 +14,7 @@ const formatTimestamp = (isoString) => {
 };
 
 const AdminOrderManagement = () => {
-  const { orders, updateOrderStatus, simulateLoading } = useContext(AppContext);
+  const { orders, ordersMeta, fetchOrders, updateOrderStatus, simulateLoading } = useContext(AppContext);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all'); // 'all', 'Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'
   const [loading, setLoading] = useState(true);
@@ -24,35 +24,19 @@ const AdminOrderManagement = () => {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      await simulateLoading(800);
+      await simulateLoading(800); // Simulate network delay
+      
+      const params = {
+        page: currentPage,
+        limit: itemsPerPage,
+        search: searchTerm,
+        status: filterStatus === 'all' ? undefined : filterStatus,
+      };
+      await fetchOrders(params);
       setLoading(false);
     };
     loadData();
-  }, [searchTerm, filterStatus, orders.length, simulateLoading]);
-
-  const filteredOrders = useMemo(() => {
-    let currentOrders = orders;
-
-    if (searchTerm) {
-      currentOrders = currentOrders.filter(order =>
-        order._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.customerEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.items.some(item => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
-      );
-    }
-
-    if (filterStatus !== 'all') {
-      currentOrders = currentOrders.filter(order => order.orderStatus === filterStatus);
-    }
-
-    return currentOrders;
-  }, [orders, searchTerm, filterStatus]);
-
-  const totalPages = Math.ceil(filteredOrders.length / itemsPerPage);
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentOrders = filteredOrders.slice(indexOfFirstItem, indexOfLastItem);
+  }, [searchTerm, filterStatus, currentPage, fetchOrders, simulateLoading]);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -130,7 +114,7 @@ const AdminOrderManagement = () => {
               </div>
             ))}
           </div>
-        ) : filteredOrders.length > 0 ? (
+        ) : orders.length > 0 ? (
           <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
             <table className="min-w-full divide-y divide-white/10">
               <thead>
@@ -144,7 +128,7 @@ const AdminOrderManagement = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                {currentOrders.map((order) => (
+                {orders.map((order) => (
                   <tr key={order._id} className="hover:bg-black/5 transition-colors duration-200">
                     <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">{order._id.substring(0, 6)}...</td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm">
@@ -191,10 +175,10 @@ const AdminOrderManagement = () => {
           <p className="text-center text-lg opacity-80 py-10">No orders found matching your criteria.</p>
         )}
 
-        {!loading && filteredOrders.length > 0 && (
+        {!loading && orders.length > 0 && (
           <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
+            currentPage={ordersMeta.page}
+            totalPages={ordersMeta.pages}
             onPageChange={handlePageChange}
           />
         )}

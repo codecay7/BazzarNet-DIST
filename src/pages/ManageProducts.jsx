@@ -8,7 +8,7 @@ import SkeletonCard from '../components/SkeletonCard';
 import Pagination from '../components/Pagination';
 
 const ManageProducts = () => {
-  const { vendorProducts, addVendorProduct, editVendorProduct, deleteVendorProduct, simulateLoading, user } = useContext(AppContext);
+  const { vendorProducts, vendorProductsMeta, fetchVendorProducts, addVendorProduct, editVendorProduct, deleteVendorProduct, simulateLoading, user } = useContext(AppContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -19,11 +19,21 @@ const ManageProducts = () => {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      await simulateLoading(800);
+      await simulateLoading(800); // Simulate network delay
+      
+      const params = {
+        page: currentPage,
+        limit: itemsPerPage,
+        search: searchTerm,
+        store: user?.storeId, // Ensure products are filtered by the vendor's store
+      };
+      await fetchVendorProducts(params);
       setLoading(false);
     };
-    loadData();
-  }, [searchTerm, vendorProducts.length, simulateLoading]);
+    if (user?.storeId) { // Only fetch if user is a vendor and has a storeId
+      loadData();
+    }
+  }, [searchTerm, currentPage, fetchVendorProducts, simulateLoading, user?.storeId]);
 
   const handleOpenModal = (product = null) => {
     setEditingProduct(product);
@@ -48,21 +58,6 @@ const ManageProducts = () => {
     if (!originalPrice || originalPrice <= price) return 0;
     return Math.round(((originalPrice - price) / originalPrice) * 100);
   };
-
-  const filteredProducts = useMemo(() => {
-    if (!searchTerm) {
-      return vendorProducts;
-    }
-    return vendorProducts.filter(product =>
-      product.name.toLowerCase().includes(searchTerm.toLowerCase())
-    );
-  }, [vendorProducts, searchTerm]);
-
-  // Calculate pagination values
-  const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentProducts = filteredProducts.slice(indexOfFirstItem, indexOfLastItem);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -103,9 +98,9 @@ const ManageProducts = () => {
                 <SkeletonCard key={index} />
               ))}
             </div>
-          ) : currentProducts.length > 0 ? (
+          ) : vendorProducts.length > 0 ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" role="list">
-              {currentProducts.map((product) => {
+              {vendorProducts.map((product) => {
                 const discount = calculateDiscount(product.price, product.originalPrice);
                 return (
                   <div key={product._id} className="bg-black/10 border border-white/10 rounded-2xl overflow-hidden shadow-lg flex flex-col" role="listitem" aria-label={`Product: ${product.name}`}>
@@ -146,10 +141,10 @@ const ManageProducts = () => {
             </div>
           )}
 
-          {!loading && filteredProducts.length > 0 && (
+          {!loading && vendorProducts.length > 0 && (
             <Pagination
-              currentPage={currentPage}
-              totalPages={totalPages}
+              currentPage={vendorProductsMeta.page}
+              totalPages={vendorProductsMeta.pages}
               onPageChange={handlePageChange}
             />
           )}

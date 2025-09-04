@@ -10,24 +10,31 @@ import Order from '../models/Order.js';
 // @route   GET /api/admin/users
 // @access  Private/Admin
 const getAllUsers = asyncHandler(async (req, res) => {
-  const { role, status, search } = req.query;
-  let query = {};
+  const pageSize = Number(req.query.limit) || 10;
+  const page = Number(req.query.page) || 1;
 
-  if (role && role !== 'all') {
-    query.role = role;
+  let query = { role: { $ne: 'admin' } }; // Exclude admins from this list
+
+  if (req.query.role && req.query.role !== 'all') {
+    query.role = req.query.role;
   }
-  if (status && status !== 'all') {
-    query.isActive = status === 'active';
+  if (req.query.status && req.query.status !== 'all') {
+    query.isActive = req.query.status === 'active';
   }
-  if (search) {
+  if (req.query.search) {
     query.$or = [
-      { name: { $regex: search, $options: 'i' } },
-      { email: { $regex: search, $options: 'i' } },
+      { name: { $regex: req.query.search, $options: 'i' } },
+      { email: { $regex: req.query.search, $options: 'i' } },
     ];
   }
 
-  const users = await User.find(query).select('-password');
-  res.json(users);
+  const count = await User.countDocuments(query);
+  const users = await User.find(query)
+    .select('-password')
+    .limit(pageSize)
+    .skip(pageSize * (page - 1));
+
+  res.json({ users, page, pages: Math.ceil(count / pageSize) });
 });
 
 // @desc    Update user status (activate/deactivate)
@@ -168,6 +175,41 @@ const adminDeleteStore = asyncHandler(async (req, res) => {
   }
 });
 
+// --- Admin Order Management ---
+
+// @desc    Get all orders (Admin)
+// @route   GET /api/admin/orders
+// @access  Private/Admin
+const getAdminOrders = asyncHandler(async (req, res) => {
+  const pageSize = Number(req.query.limit) || 10;
+  const page = Number(req.query.page) || 1;
+
+  let query = {};
+
+  if (req.query.status && req.query.status !== 'all') {
+    query.orderStatus = req.query.status;
+  }
+  if (req.query.search) {
+    query.$or = [
+      { _id: { $regex: req.query.search, $options: 'i' } },
+      { customerName: { $regex: req.query.search, $options: 'i' } },
+      { customerEmail: { $regex: req.query.search, $options: 'i' } },
+      { 'items.name': { $regex: req.query.search, $options: 'i' } }, // Search within item names
+    ];
+  }
+
+  const count = await Order.countDocuments(query);
+  const orders = await Order.find(query)
+    .populate('user', 'name email') // Populate customer info
+    .populate('store', 'name') // Populate store info
+    .sort({ createdAt: -1 })
+    .limit(pageSize)
+    .skip(pageSize * (page - 1));
+
+  res.json({ orders, page, pages: Math.ceil(count / pageSize) });
+});
+
+
 // --- Admin Dashboard Stats ---
 
 // @desc    Get admin dashboard statistics
@@ -253,5 +295,6 @@ export {
   adminDeleteProduct,
   adminUpdateStore,
   adminDeleteStore,
+  getAdminOrders, // Export new function
   getAdminDashboardStats,
 };

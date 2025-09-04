@@ -24,10 +24,15 @@ export const AppProvider = ({ children }) => {
   const [cart, setCart] = useState([]);
   const [wishlist, setWishlist] = useState([]); 
   const [allAppProducts, setAllAppProducts] = useState([]);
+  const [allAppProductsMeta, setAllAppProductsMeta] = useState({ page: 1, pages: 1, count: 0 });
   const [vendorProducts, setVendorProducts] = useState([]);
+  const [vendorProductsMeta, setVendorProductsMeta] = useState({ page: 1, pages: 1, count: 0 });
   const [orders, setOrders] = useState([]);
+  const [ordersMeta, setOrdersMeta] = useState({ page: 1, pages: 1, count: 0 });
   const [appStores, setAppStores] = useState([]);
+  const [appStoresMeta, setAppStoresMeta] = useState({ page: 1, pages: 1, count: 0 });
   const [allAppUsers, setAllAppUsers] = useState([]);
+  const [allAppUsersMeta, setAllAppUsersMeta] = useState({ page: 1, pages: 1, count: 0 });
 
   // Set initial theme on mount
   useEffect(() => {
@@ -35,21 +40,27 @@ export const AppProvider = ({ children }) => {
   }, []);
 
   // --- Data Fetching Effects ---
-  const fetchAllProducts = useCallback(async () => {
+  const fetchAllProducts = useCallback(async (params = {}) => {
     try {
-      const products = await api.products.getAll();
+      const { products, page, pages, count } = await api.products.getAll(params);
       setAllAppProducts(products);
+      setAllAppProductsMeta({ page, pages, count });
     } catch (error) {
       toast.error(`Failed to load products: ${error.message}`);
+      setAllAppProducts([]);
+      setAllAppProductsMeta({ page: 1, pages: 1, count: 0 });
     }
   }, []);
 
-  const fetchAppStores = useCallback(async () => {
+  const fetchAppStores = useCallback(async (params = {}) => {
     try {
-      const stores = await api.stores.getAll();
+      const { stores, page, pages, count } = await api.stores.getAll(params);
       setAppStores(stores);
+      setAppStoresMeta({ page, pages, count });
     } catch (error) {
       toast.error(`Failed to load stores: ${error.message}`);
+      setAppStores([]);
+      setAppStoresMeta({ page: 1, pages: 1, count: 0 });
     }
   }, []);
 
@@ -64,77 +75,84 @@ export const AppProvider = ({ children }) => {
     }
   }, [isLoggedIn, user?._id]);
 
-  const fetchWishlist = useCallback(async () => {
+  const fetchOrders = useCallback(async (params = {}) => {
     if (!isLoggedIn || !user?._id) return;
     try {
-      const userWishlist = await api.customer.getWishlist();
-      setWishlist(userWishlist); // Assuming API returns array of items
-    } catch (error) {
-      toast.error(`Failed to load wishlist: ${error.message}`);
-      setWishlist([]); // Clear wishlist on error
-    }
-  }, [isLoggedIn, user?._id]);
-
-  const fetchOrders = useCallback(async () => {
-    if (!isLoggedIn || !user?._id) return;
-    try {
-      let fetchedOrders;
+      let fetchedOrdersData;
       if (isAdmin) {
-        fetchedOrders = await api.admin.getOrders();
+        fetchedOrdersData = await api.admin.getOrders(params);
       } else if (isVendor) {
-        fetchedOrders = await api.vendor.getOrders(user.storeId);
+        fetchedOrdersData = await api.vendor.getOrders(user.storeId, params);
       } else { // Customer
-        fetchedOrders = await api.customer.getOrders(user._id);
+        fetchedOrdersData = await api.customer.getOrders(user._id, params);
       }
-      setOrders(fetchedOrders);
+      setOrders(fetchedOrdersData.orders);
+      setOrdersMeta({ page: fetchedOrdersData.page, pages: fetchedOrdersData.pages, count: fetchedOrdersData.count });
     } catch (error) {
       toast.error(`Failed to load orders: ${error.message}`);
       setOrders([]); // Clear orders on error
+      setOrdersMeta({ page: 1, pages: 1, count: 0 });
     }
   }, [isLoggedIn, user?._id, isAdmin, isVendor, user?.storeId]);
 
-  const fetchAllUsers = useCallback(async () => {
+  const fetchAllUsers = useCallback(async (params = {}) => {
     if (!isLoggedIn || !isAdmin) return;
     try {
-      const users = await api.admin.getUsers();
+      const { users, page, pages, count } = await api.admin.getUsers(params);
       setAllAppUsers(users);
+      setAllAppUsersMeta({ page, pages, count });
     } catch (error) {
       toast.error(`Failed to load users: ${error.message}`);
       setAllAppUsers([]); // Clear users on error
+      setAllAppUsersMeta({ page: 1, pages: 1, count: 0 });
     }
   }, [isLoggedIn, isAdmin]);
+
+  const fetchVendorProducts = useCallback(async (params = {}) => {
+    if (!isLoggedIn || !isVendor || !user?.storeId) return;
+    try {
+      const { products, page, pages, count } = await api.vendor.getProducts({ ...params, store: user.storeId });
+      setVendorProducts(products);
+      setVendorProductsMeta({ page, pages, count });
+    } catch (error) {
+      toast.error(`Failed to load vendor products: ${error.message}`);
+      setVendorProducts([]);
+      setVendorProductsMeta({ page: 1, pages: 1, count: 0 });
+    }
+  }, [isLoggedIn, isVendor, user?.storeId]);
+
 
   // Initial data load on login/role change
   useEffect(() => {
     if (isLoggedIn) {
+      // Initial fetch without specific params, components will trigger more specific fetches
       fetchAllProducts();
       fetchAppStores();
       fetchCart();
-      fetchWishlist(); // Fetch wishlist on login
+      fetchWishlist(); 
       fetchOrders();
       if (isAdmin) {
         fetchAllUsers();
+      }
+      if (isVendor) {
+        fetchVendorProducts();
       }
     } else {
       // Clear all data if logged out
       setCart([]);
       setWishlist([]);
       setAllAppProducts([]);
+      setAllAppProductsMeta({ page: 1, pages: 1, count: 0 });
       setVendorProducts([]);
+      setVendorProductsMeta({ page: 1, pages: 1, count: 0 });
       setOrders([]);
+      setOrdersMeta({ page: 1, pages: 1, count: 0 });
       setAppStores([]);
+      setAppStoresMeta({ page: 1, pages: 1, count: 0 });
       setAllAppUsers([]);
+      setAllAppUsersMeta({ page: 1, pages: 1, count: 0 });
     }
-  }, [isLoggedIn, user, isAdmin, fetchAllProducts, fetchAppStores, fetchCart, fetchWishlist, fetchOrders, fetchAllUsers]);
-
-  // Effect to update vendorProducts when allAppProducts or user changes
-  useEffect(() => {
-    if (isLoggedIn && isVendor && user?.storeId) {
-      setVendorProducts(allAppProducts.filter(p => p.store._id === user.storeId)); // Assuming product.store is populated with store object
-    } else {
-      setVendorProducts([]);
-    }
-  }, [isLoggedIn, isVendor, user, allAppProducts]);
+  }, [isLoggedIn, user, isAdmin, isVendor, fetchAllProducts, fetchAppStores, fetchCart, fetchWishlist, fetchOrders, fetchAllUsers, fetchVendorProducts]);
 
   // Theme Toggle
   const toggleTheme = () => {
@@ -271,7 +289,8 @@ export const AppProvider = ({ children }) => {
     }
     try {
       const createdProduct = await api.vendor.addProduct(newProduct);
-      setAllAppProducts(prevProducts => [...prevProducts, createdProduct]);
+      // Re-fetch vendor products to update the list with pagination/filters
+      fetchVendorProducts({ page: vendorProductsMeta.page, limit: 6 });
       toast.success(`${newProduct.name} added to your store!`);
     } catch (error) {
       toast.error(`Error adding product: ${error.message}`);
@@ -285,9 +304,8 @@ export const AppProvider = ({ children }) => {
     }
     try {
       const response = await api.vendor.updateProduct(productId, updatedProduct);
-      setAllAppProducts(prevProducts =>
-        prevProducts.map(p => (p._id === productId ? { ...p, ...response } : p))
-      );
+      // Re-fetch vendor products to update the list with pagination/filters
+      fetchVendorProducts({ page: vendorProductsMeta.page, limit: 6 });
       toast.success('Product updated!');
     } catch (error) {
       toast.error(`Error updating product: ${error.message}`);
@@ -301,7 +319,8 @@ export const AppProvider = ({ children }) => {
     }
     try {
       await api.vendor.deleteProduct(productId);
-      setAllAppProducts(prevProducts => prevProducts.filter(p => p._id !== productId));
+      // Re-fetch vendor products to update the list with pagination/filters
+      fetchVendorProducts({ page: vendorProductsMeta.page, limit: 6 });
       toast.error('Product deleted.');
     } catch (error) {
       toast.error(`Error deleting product: ${error.message}`);
@@ -316,9 +335,8 @@ export const AppProvider = ({ children }) => {
     }
     try {
       const response = await api.admin.updateProduct(productId, updatedProduct);
-      setAllAppProducts(prevProducts =>
-        prevProducts.map(p => (p._id === productId ? { ...p, ...response } : p))
-      );
+      // Re-fetch all products to update the list with pagination/filters
+      fetchAllProducts({ page: allAppProductsMeta.page, limit: 6 });
       toast.success('Product updated by Admin!');
     } catch (error) {
       toast.error(`Error updating product by Admin: ${error.message}`);
@@ -332,7 +350,8 @@ export const AppProvider = ({ children }) => {
     }
     try {
       await api.admin.deleteProduct(productId);
-      setAllAppProducts(prevProducts => prevProducts.filter(p => p._id !== productId));
+      // Re-fetch all products to update the list with pagination/filters
+      fetchAllProducts({ page: allAppProductsMeta.page, limit: 6 });
       toast.error('Product deleted by Admin.');
     } catch (error) {
       toast.error(`Error deleting product by Admin: ${error.message}`);
@@ -347,11 +366,8 @@ export const AppProvider = ({ children }) => {
     }
     try {
       const response = await api.admin.updateOrderStatus(orderId, newStatus); // Admin API for now, can be split for vendor
-      setOrders(prevOrders =>
-        prevOrders.map(order =>
-          order._id === orderId ? { ...order, orderStatus: newStatus } : order
-        )
-      );
+      // Re-fetch orders to update the list with pagination/filters
+      fetchOrders({ page: ordersMeta.page, limit: 5 });
       toast.success(`Order ${orderId} status updated to ${newStatus}.`);
     } catch (error) {
       toast.error(`Error updating order status: ${error.message}`);
@@ -365,9 +381,8 @@ export const AppProvider = ({ children }) => {
     }
     try {
       const response = await api.vendor.confirmDelivery(orderId, enteredOtp);
-      setOrders(prevOrders =>
-        prevOrders.map(o => (o._id === orderId ? { ...o, orderStatus: 'Delivered' } : o))
-      );
+      // Re-fetch orders to update the list with pagination/filters
+      fetchOrders({ page: ordersMeta.page, limit: 5 });
       toast.success(response.message); // Assuming backend sends a success message
       return true;
     } catch (error) {
@@ -384,7 +399,8 @@ export const AppProvider = ({ children }) => {
     }
     try {
       const response = await api.admin.deleteUser(userId);
-      setAllAppUsers(prevUsers => prevUsers.filter(u => u._id !== userId));
+      // Re-fetch all users to update the list with pagination/filters
+      fetchAllUsers({ page: allAppUsersMeta.page, limit: 8 });
       // Re-fetch products and stores to reflect cascading deletions if a vendor was deleted
       fetchAllProducts();
       fetchAppStores();
@@ -401,9 +417,8 @@ export const AppProvider = ({ children }) => {
     }
     try {
       const response = await api.admin.updateUserStatus(userId, newStatus);
-      setAllAppUsers(prevUsers =>
-        prevUsers.map(u => (u._id === userId ? { ...u, isActive: newStatus } : u))
-      );
+      // Re-fetch all users to update the list with pagination/filters
+      fetchAllUsers({ page: allAppUsersMeta.page, limit: 8 });
       toast.success(response.message);
     } catch (error) {
       toast.error(`Error updating user status: ${error.message}`);
@@ -435,16 +450,26 @@ export const AppProvider = ({ children }) => {
     moveToCart, 
     moveToWishlist, 
     allAppProducts,
+    allAppProductsMeta,
+    fetchAllProducts, // Expose fetch function
     vendorProducts,
+    vendorProductsMeta,
+    fetchVendorProducts, // Expose fetch function
     addVendorProduct,
     editVendorProduct,
     deleteVendorProduct,
     orders,
+    ordersMeta,
+    fetchOrders, // Expose fetch function
     updateOrderStatus,
     confirmDeliveryWithOtp,
     simulateLoading,
     appStores,
+    appStoresMeta,
+    fetchAppStores, // Expose fetch function
     allAppUsers,
+    allAppUsersMeta,
+    fetchAllUsers, // Expose fetch function
     deleteUser,
     updateUserStatus,
     adminEditProduct,

@@ -9,7 +9,8 @@ import productRoutes from './routes/productRoutes.js';
 import storeRoutes from './routes/storeRoutes.js';
 import wishlistRoutes from './routes/wishlistRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
-import vendorRoutes from './routes/vendorRoutes.js'; // Import vendor routes
+import vendorRoutes from './routes/vendorRoutes.js';
+import orderRoutes from './routes/orderRoutes.js'; // Import new order routes
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 
 // Initialize Express app
@@ -35,7 +36,8 @@ app.use('/api/products', productRoutes);
 app.use('/api/stores', storeRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/payments', paymentRoutes);
-app.use('/api/vendors', vendorRoutes); // Mount vendor routes
+app.use('/api/vendors', vendorRoutes);
+app.use('/api/orders', orderRoutes); // Mount new order routes
 
 // Error handling middleware (must be last)
 app.use(notFound);

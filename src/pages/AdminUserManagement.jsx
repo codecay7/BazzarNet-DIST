@@ -7,8 +7,7 @@ import toast from 'react-hot-toast';
 import * as api from '../services/api'; // Import API service
 
 const AdminUserManagement = () => {
-  const { simulateLoading } = useContext(AppContext);
-  const [users, setUsers] = useState([]); // Manage users locally
+  const { simulateLoading, allAppUsers, allAppUsersMeta, fetchAllUsers, deleteUser, updateUserStatus } = useContext(AppContext);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState('all'); // 'all', 'customer', 'vendor'
   const [filterStatus, setFilterStatus] = useState('all'); // 'all', 'active', 'inactive'
@@ -16,55 +15,23 @@ const AdminUserManagement = () => {
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
 
-  const fetchUsers = async () => {
-    setLoading(true);
-    try {
-      const params = {
-        search: searchTerm,
-        role: filterRole,
-        status: filterStatus,
-      };
-      const fetchedUsers = await api.admin.getUsers(params);
-      setUsers(fetchedUsers);
-    } catch (error) {
-      toast.error(`Failed to load users: ${error.message}`);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   useEffect(() => {
-    fetchUsers();
-  }, [searchTerm, filterRole, filterStatus]); // Re-fetch when filters change
-
-  const handleUpdateUserStatus = async (userId, newStatus) => {
-    try {
-      const response = await api.admin.updateUserStatus(userId, newStatus);
-      setUsers(prevUsers =>
-        prevUsers.map(u => (u._id === userId ? { ...u, isActive: newStatus } : u))
-      );
-      toast.success(response.message);
-    } catch (error) {
-      toast.error(`Failed to update user status: ${error.message}`);
-    }
-  };
-
-  const handleDeleteUser = async (userId, userName) => {
-    if (window.confirm(`Are you sure you want to delete ${userName}? This action cannot be undone.`)) {
-      try {
-        const response = await api.admin.deleteUser(userId);
-        setUsers(prevUsers => prevUsers.filter(u => u._id !== userId));
-        toast.success(response.message);
-      } catch (error) {
-        toast.error(`Failed to delete user: ${error.message}`);
-      }
-    }
-  };
-
-  const totalPages = Math.ceil(users.length / itemsPerPage);
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentUsers = users.slice(indexOfFirstItem, indexOfLastItem);
+    const loadData = async () => {
+      setLoading(true);
+      await simulateLoading(800); // Simulate network delay
+      
+      const params = {
+        page: currentPage,
+        limit: itemsPerPage,
+        search: searchTerm,
+        role: filterRole === 'all' ? undefined : filterRole,
+        status: filterStatus === 'all' ? undefined : filterStatus,
+      };
+      await fetchAllUsers(params);
+      setLoading(false);
+    };
+    loadData();
+  }, [searchTerm, filterRole, filterStatus, currentPage, fetchAllUsers, simulateLoading]);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -137,7 +104,7 @@ const AdminUserManagement = () => {
               </div>
             ))}
           </div>
-        ) : users.length > 0 ? (
+        ) : allAppUsers.length > 0 ? (
           <div className="overflow-x-auto scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
             <table className="min-w-full divide-y divide-white/10">
               <thead>
@@ -151,7 +118,7 @@ const AdminUserManagement = () => {
                 </tr>
               </thead>
               <tbody className="divide-y divide-white/5">
-                {currentUsers.map((user) => (
+                {allAppUsers.map((user) => (
                   <tr key={user._id} className="hover:bg-black/5 transition-colors duration-200">
                     <td className="px-4 py-4 whitespace-nowrap text-sm">{user._id.substring(0, 6)}...</td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">{user.name}</td>
@@ -173,7 +140,7 @@ const AdminUserManagement = () => {
                     <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex justify-end gap-2">
                         <button
-                          onClick={() => handleUpdateUserStatus(user._id, !user.isActive)}
+                          onClick={() => updateUserStatus(user._id, !user.isActive)}
                           className={`p-2 rounded-full transition-colors duration-200 ${
                             user.isActive ? 'bg-red-500/20 hover:bg-red-500/40 text-red-400' : 'bg-green-500/20 hover:bg-green-500/40 text-green-400'
                           }`}
@@ -183,7 +150,7 @@ const AdminUserManagement = () => {
                           {user.isActive ? <ToggleRight size={20} /> : <ToggleLeft size={20} />}
                         </button>
                         <button
-                          onClick={() => handleDeleteUser(user._id, user.name)}
+                          onClick={() => deleteUser(user._id, user.name)}
                           className="p-2 rounded-full bg-red-500/20 hover:bg-red-500/40 text-red-400 transition-colors duration-200"
                           title="Delete User"
                           aria-label={`Delete ${user.name}`}
@@ -201,10 +168,10 @@ const AdminUserManagement = () => {
           <p className="text-center text-lg opacity-80 py-10">No users found matching your criteria.</p>
         )}
 
-        {!loading && users.length > 0 && (
+        {!loading && allAppUsers.length > 0 && (
           <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
+            currentPage={allAppUsersMeta.page}
+            totalPages={allAppUsersMeta.pages}
             onPageChange={handlePageChange}
           />
         )}

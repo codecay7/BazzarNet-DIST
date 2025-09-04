@@ -5,21 +5,33 @@ import Product from '../models/Product.js';
 // @route   GET /api/products
 // @access  Public
 const getAllProducts = asyncHandler(async (req, res) => {
-  const { search, category, store } = req.query;
-  const query = {};
+  const pageSize = Number(req.query.limit) || 10; // Default limit 10
+  const page = Number(req.query.page) || 1; // Default page 1
 
-  if (search) {
-    query.name = { $regex: search, $options: 'i' };
-  }
-  if (category) {
-    query.category = category;
-  }
-  if (store) {
-    query.store = store;
-  }
+  const keyword = req.query.search
+    ? {
+        name: {
+          $regex: req.query.search,
+          $options: 'i',
+        },
+      }
+    : {};
 
-  const products = await Product.find(query).populate('store', 'name');
-  res.json(products);
+  const categoryFilter = req.query.category && req.query.category !== 'all'
+    ? { category: req.query.category }
+    : {};
+
+  const storeFilter = req.query.store && req.query.store !== 'all'
+    ? { store: req.query.store }
+    : {};
+
+  const count = await Product.countDocuments({ ...keyword, ...categoryFilter, ...storeFilter });
+  const products = await Product.find({ ...keyword, ...categoryFilter, ...storeFilter })
+    .populate('store', 'name') // Populate store name
+    .limit(pageSize)
+    .skip(pageSize * (page - 1));
+
+  res.json({ products, page, pages: Math.ceil(count / pageSize) });
 });
 
 // @desc    Fetch a single product by ID (public)

@@ -8,7 +8,7 @@ import SkeletonCard from '../components/SkeletonCard';
 import Pagination from '../components/Pagination';
 
 const Products = () => {
-  const { addToCart, addToWishlist, simulateLoading, allAppProducts, appStores } = useContext(AppContext);
+  const { addToCart, addToWishlist, simulateLoading, allAppProducts, allAppProductsMeta, fetchAllProducts, appStores } = useContext(AppContext);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStore, setSelectedStore] = useState('all');
   const [sortBy, setSortBy] = useState('name-asc');
@@ -19,30 +19,29 @@ const Products = () => {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      await simulateLoading(800);
+      await simulateLoading(800); // Simulate network delay
+      
+      const params = {
+        page: currentPage,
+        limit: itemsPerPage,
+        search: searchTerm,
+        category: 'all', // Add category filter if needed
+        store: selectedStore === 'all' ? undefined : selectedStore,
+        // sortBy is handled client-side after fetching, or could be passed to backend
+      };
+      await fetchAllProducts(params);
       setLoading(false);
     };
     loadData();
-  }, [searchTerm, selectedStore, sortBy, simulateLoading, allAppProducts]); // Re-run loading when allAppProducts changes
+  }, [searchTerm, selectedStore, currentPage, fetchAllProducts, simulateLoading]);
 
   const calculateDiscount = (price, originalPrice) => {
     if (!originalPrice || originalPrice <= price) return 0;
     return ((originalPrice - price) / originalPrice) * 100;
   };
 
-  const filteredAndSortedProducts = useMemo(() => {
-    let products = allAppProducts;
-
-    if (selectedStore !== 'all') {
-      const storeId = selectedStore; // storeId is already a string (ObjectId)
-      products = products.filter(p => p.store._id === storeId); // Filter by populated store._id
-    }
-
-    if (searchTerm) {
-      products = products.filter(p =>
-        p.name.toLowerCase().includes(searchTerm.toLowerCase())
-      );
-    }
+  const sortedProducts = useMemo(() => {
+    let products = [...allAppProducts]; // Use a copy to sort
 
     products.sort((a, b) => {
       switch (sortBy) {
@@ -62,26 +61,18 @@ const Products = () => {
           return 0;
       }
     });
-
     return products;
-  }, [searchTerm, selectedStore, sortBy, allAppProducts]);
-
-  // Calculate pagination values
-  const totalPages = Math.ceil(filteredAndSortedProducts.length / itemsPerPage);
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentProducts = filteredAndSortedProducts.slice(indexOfFirstItem, indexOfLastItem);
+  }, [allAppProducts, sortBy]); // Sort only when allAppProducts or sortBy changes
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
-    // Scroll to top of the product list when page changes
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   // Reset page to 1 when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, selectedStore, sortBy]);
+  }, [searchTerm, selectedStore]);
 
   return (
     <section className="w-full max-w-[1200px] my-10">
@@ -142,9 +133,9 @@ const Products = () => {
               <SkeletonCard key={index} />
             ))}
           </div>
-        ) : currentProducts.length > 0 ? (
+        ) : sortedProducts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8" role="list">
-            {currentProducts.map((product) => {
+            {sortedProducts.map((product) => {
               const discount = calculateDiscount(product.price, product.originalPrice);
               return (
                 <div key={product._id} className="bg-black/10 border border-white/10 rounded-2xl overflow-hidden shadow-lg flex flex-col" role="listitem">
@@ -193,10 +184,10 @@ const Products = () => {
           <p className="text-center text-lg opacity-80 py-10">No products found matching your criteria.</p>
         )}
 
-        {!loading && filteredAndSortedProducts.length > 0 && (
+        {!loading && sortedProducts.length > 0 && (
           <Pagination
-            currentPage={currentPage}
-            totalPages={totalPages}
+            currentPage={allAppProductsMeta.page}
+            totalPages={allAppProductsMeta.pages}
             onPageChange={handlePageChange}
           />
         )}
