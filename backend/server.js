@@ -10,8 +10,10 @@ import storeRoutes from './routes/storeRoutes.js';
 import wishlistRoutes from './routes/wishlistRoutes.js';
 import paymentRoutes from './routes/paymentRoutes.js';
 import vendorRoutes from './routes/vendorRoutes.js';
-import orderRoutes from './routes/orderRoutes.js'; // Import new order routes
+import orderRoutes from './routes/orderRoutes.js';
+import uploadRoutes from './routes/uploadRoutes.js'; // Import upload routes
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
+import path from 'path'; // Import path module
 
 // Initialize Express app
 const app = express();
@@ -37,7 +39,13 @@ app.use('/api/stores', storeRoutes);
 app.use('/api/wishlist', wishlistRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/vendors', vendorRoutes);
-app.use('/api/orders', orderRoutes); // Mount new order routes
+app.use('/api/orders', orderRoutes);
+app.use('/api/upload', uploadRoutes); // Mount upload routes
+
+// Serve static files from the 'uploads' directory
+const __dirname = path.resolve(); // Get current directory name
+app.use('/uploads', express.static(path.join(__dirname, 'backend', 'uploads')));
+
 
 // Error handling middleware (must be last)
 app.use(notFound);
