@@ -24,12 +24,16 @@ const Orders = () => {
         search: searchTerm,
         // status: filterStatus, // Add status filter if needed
       };
-      await fetchOrders(params);
+      console.log('Orders Page: Fetching orders with params:', params); // ADDED LOG
+      console.log('Orders Page: Current user for fetching orders:', user); // ADDED LOG
+      if (user?._id && (isVendor ? user.storeId : true)) { // Only fetch if user is logged in and has relevant IDs
+        await fetchOrders(params);
+      } else {
+        console.log('Orders Page: Not fetching orders because user is not logged in or missing storeId for vendor.'); // ADDED LOG
+      }
       setLoading(false);
     };
-    if (user?._id && (isVendor ? user.storeId : true)) { // Only fetch if user is logged in and has relevant IDs
-      loadData();
-    }
+    loadData();
   }, [searchTerm, currentPage, fetchOrders, simulateLoading, user, isVendor]);
 
   const getStatusInfo = (status) => {
@@ -60,6 +64,10 @@ const Orders = () => {
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm]);
+
+  console.log('Orders Page: Current loading state:', loading); // ADDED LOG
+  console.log('Orders Page: Current orders array:', orders); // ADDED LOG
+  console.log('Orders Page: Current ordersMeta:', ordersMeta); // ADDED LOG
 
   return (
     <section className="w-full max-w-[1200px] my-10">
