@@ -175,7 +175,12 @@ const Products = () => {
                         <div className="flex">{renderStars(product.rating)}</div>
                         <span className="opacity-80">({product.reviews})</span>
                       </div>
-                      <p className="text-sm opacity-80">Stock: {product.stock}</p>
+                      {/* Stock information */}
+                      {product.stock > 0 ? (
+                        <p className="text-sm opacity-80 text-green-400">In Stock: {product.stock}</p>
+                      ) : (
+                        <p className="text-sm opacity-80 text-red-400">Out of Stock</p>
+                      )}
                     </div>
                   </Link>
                   <div className="flex gap-2 mt-4 p-4 pt-0">
@@ -183,6 +188,7 @@ const Products = () => {
                       className="flex-1 bg-[var(--accent)] text-white border-none py-2 px-4 rounded-lg flex items-center justify-center gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300"
                       onClick={() => addToCart(product)}
                       aria-label={`Add ${product.name} to cart`}
+                      disabled={product.stock === 0} // Disable button if out of stock
                     >
                       <FontAwesomeIcon icon={faCartPlus} aria-hidden="true" /> Cart
                     </button>
