@@ -369,6 +369,42 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  // --- Admin Store Management Functions (Backend Integrated) ---
+  const adminUpdateStore = async (storeId, updatedStoreData) => {
+    if (!isLoggedIn || !isAdmin) {
+      toast.error('You must be an admin to update stores.');
+      return;
+    }
+    try {
+      const response = await api.admin.updateStore(storeId, updatedStoreData);
+      // Re-fetch all stores to update the list with pagination/filters
+      fetchAppStores({ page: appStoresMeta.page, limit: 8 });
+      toast.success('Store updated by Admin!');
+    } catch (error) {
+      toast.error(`Error updating store by Admin: ${error.message}`);
+    }
+  };
+
+  const adminDeleteStore = async (storeId, storeName) => {
+    if (!isLoggedIn || !isAdmin) {
+      toast.error('You must be an admin to delete stores.');
+      return;
+    }
+    if (!window.confirm(`Are you sure you want to delete the store "${storeName}"? This will also delete all associated products.`)) {
+      return;
+    }
+    try {
+      const response = await api.admin.deleteStore(storeId);
+      // Re-fetch all stores to update the list with pagination/filters
+      fetchAppStores({ page: appStoresMeta.page, limit: 8 });
+      // Also re-fetch all products as store deletion cascades to products
+      fetchAllProducts();
+      toast.success(response.message);
+    } catch (error) {
+      toast.error(`Error deleting store by Admin: ${error.message}`);
+    }
+  };
+
   // --- Order Functions (Backend Integrated) ---
   const updateOrderStatus = async (orderId, newStatus) => {
     if (!isLoggedIn || (!isVendor && !isAdmin)) {
@@ -485,6 +521,8 @@ export const AppProvider = ({ children }) => {
     updateUserStatus,
     adminEditProduct,
     adminDeleteProduct,
+    adminUpdateStore, // Expose admin store update
+    adminDeleteStore, // Expose admin store delete
     registerUser,
     registerVendor,
     fetchWishlist, 

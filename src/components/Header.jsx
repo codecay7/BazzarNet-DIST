@@ -7,7 +7,7 @@ import { AppContext } from '../context/AppContext';
 import MobileNav from './MobileNav';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, Package, Receipt } from 'lucide-react'; // Import Lucide icons for admin
+import { Users, Package, Receipt, Store } from 'lucide-react'; // Import Store icon for admin
 
 const Header = () => {
   const { sidebarOpen, toggleSidebar, cart, theme, toggleTheme, isVendor, isAdmin, logout } = useContext(AppContext);
@@ -37,6 +37,7 @@ const Header = () => {
     { name: 'Users', path: '/admin-users' },
     { name: 'Products', path: '/admin-products' },
     { name: 'Orders', path: '/admin-orders' },
+    { name: 'Stores', path: '/admin-stores' }, // New admin link
   ];
 
   const vendorLinks = [
@@ -144,6 +145,9 @@ const Header = () => {
                       </NavLink>
                       <NavLink to="/admin-orders" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm hover:bg-white/10" role="menuitem">
                         <Receipt size={16} aria-hidden="true" /> Orders
+                      </NavLink>
+                      <NavLink to="/admin-stores" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm hover:bg-white/10" role="menuitem">
+                        <Store size={16} aria-hidden="true" /> Stores
                       </NavLink>
                     </>
                   )}

@@ -7,7 +7,7 @@ import {
 import { AppContext } from '../context/AppContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Users, Package, Receipt } from 'lucide-react'; // Import Lucide icons for admin
+import { Users, Package, Receipt, Store } from 'lucide-react'; // Import Lucide icons for admin, including Store
 
 const MobileNav = () => {
   const { sidebarOpen, toggleSidebar, isVendor, isAdmin, logout } = useContext(AppContext);
@@ -24,6 +24,7 @@ const MobileNav = () => {
     { name: 'Users', path: '/admin-users', icon: Users },
     { name: 'Products', path: '/admin-products', icon: Package },
     { name: 'Orders', path: '/admin-orders', icon: Receipt },
+    { name: 'Stores', path: '/admin-stores', icon: Store }, // New admin link
   ];
 
   const vendorLinks = [
