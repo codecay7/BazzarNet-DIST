@@ -158,7 +158,7 @@ const Checkout = () => {
     }
   };
 
-  const handlePlaceOrder = () => {
+  const handlePlaceOrder = async () => { // Made async
     if (validatePaymentForm()) {
       const orderDetails = {
           total,
@@ -167,8 +167,10 @@ const Checkout = () => {
           paymentMethod: paymentMethod === 'card' ? 'Credit Card' : 'UPI',
       };
       
-      const newOrder = checkout(orderDetails); // Call checkout from context, which now returns the new order
-      navigate('/confirmation', { state: { orderDetails: newOrder } }); // Pass the full new order with OTP
+      const newOrder = await checkout(orderDetails); // Await the checkout function
+      if (newOrder) { // Only navigate if newOrder is successfully returned
+        navigate('/confirmation', { state: { orderDetails: newOrder } }); // Pass the full new order with OTP
+      }
     } else {
       toast.error('Please correct the errors in the payment form.');
     }
