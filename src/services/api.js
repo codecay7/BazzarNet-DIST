@@ -89,10 +89,17 @@ export const userProfile = {
 
 // --- Product Endpoints ---
 export const products = {
-  getAll: (params) => apiRequest(`/products?${new URLSearchParams(params)}`), // This endpoint doesn't exist yet in backend
-  getById: (productId) => apiRequest(`/products/${productId}`), // This endpoint doesn't exist yet in backend
-  getStoreProducts: (storeId, params) => apiRequest(`/stores/${storeId}/products?${new URLSearchParams(params)}`), // This endpoint doesn't exist yet in backend
+  getAll: (params) => apiRequest(`/products?${new URLSearchParams(params)}`),
+  getById: (productId) => apiRequest(`/products/${productId}`),
+  getStoreProducts: (storeId, params) => apiRequest(`/stores/${storeId}/products?${new URLSearchParams(params)}`),
   getRecommended: (params) => apiRequest(`/products/recommended?${new URLSearchParams(params)}`), // This endpoint doesn't exist yet in backend
+};
+
+// --- Store Endpoints ---
+export const stores = {
+  getAll: (params) => apiRequest(`/stores?${new URLSearchParams(params)}`),
+  getById: (storeId) => apiRequest(`/stores/${storeId}`),
+  updateStore: (storeId, storeData) => apiRequest(`/stores/${storeId}`, { method: 'PUT', body: JSON.stringify(storeData) }),
 };
 
 // --- Vendor Specific Endpoints ---
@@ -100,49 +107,51 @@ export const vendor = {
   getDashboardStats: (vendorId, params) => apiRequest(`/vendors/${vendorId}/dashboard/stats?${new URLSearchParams(params)}`), // This endpoint doesn't exist yet in backend
   getSalesTrend: (vendorId, params) => apiRequest(`/vendors/${vendorId}/dashboard/sales-trend?${new URLSearchParams(params)}`), // This endpoint doesn't exist yet in backend
   getFastSellingItems: (vendorId, params) => apiRequest(`/vendors/${vendorId}/dashboard/fast-selling-items?${new URLSearchParams(params)}`), // This endpoint doesn't exist yet in backend
-  getProducts: (vendorId, params) => apiRequest(`/vendors/${vendorId}/products?${new URLSearchParams(params)}`), // This endpoint doesn't exist yet in backend
-  addProduct: (vendorId, productData) => apiRequest(`/vendors/${vendorId}/products`, { method: 'POST', body: JSON.stringify(productData) }), // This endpoint doesn't exist yet in backend
-  updateProduct: (vendorId, productId, productData) => apiRequest(`/vendors/${vendorId}/products/${productId}`, { method: 'PUT', body: JSON.stringify(productData) }), // This endpoint doesn't exist yet in backend
-  deleteProduct: (vendorId, productId) => apiRequest(`/vendors/${vendorId}/products/${productId}`, { method: 'DELETE' }), // This endpoint doesn't exist yet in backend
-  getOrders: (vendorId, params) => apiRequest(`/vendors/${vendorId}/orders?${new URLSearchParams(params)}`), // This endpoint doesn't exist yet in backend
-  updateOrderStatus: (vendorId, orderId, status) => apiRequest(`/vendors/${vendorId}/orders/${orderId}/status`, { method: 'PUT', body: JSON.stringify({ status }) }), // This endpoint doesn't exist yet in backend
-  confirmDelivery: (vendorId, orderId, otp) => apiRequest(`/vendors/${vendorId}/orders/${orderId}/confirm-delivery`, { method: 'POST', body: JSON.stringify({ otp }) }), // This endpoint doesn't exist yet in backend
+  getProducts: (vendorId, params) => apiRequest(`/products?store=${vendorId}&${new URLSearchParams(params)}`), // Using general products endpoint with store filter
+  addProduct: (productData) => apiRequest(`/products`, { method: 'POST', body: JSON.stringify(productData) }), // Vendor adds product to their store
+  updateProduct: (productId, productData) => apiRequest(`/products/${productId}`, { method: 'PUT', body: JSON.stringify(productData) }), // Vendor updates their product
+  deleteProduct: (productId) => apiRequest(`/products/${productId}`, { method: 'DELETE' }), // Vendor deletes their product
+  getOrders: (storeId, params) => apiRequest(`/orders/store/${storeId}?${new URLSearchParams(params)}`), // Vendor orders
+  updateOrderStatus: (orderId, status) => apiRequest(`/orders/${orderId}/status`, { method: 'PUT', body: JSON.stringify({ status }) }), // Vendor updates order status
+  confirmDelivery: (orderId, otp) => apiRequest(`/orders/${orderId}/confirm-delivery`, { method: 'POST', body: JSON.stringify({ otp }) }), // Vendor confirms delivery
   getPayments: (vendorId, params) => apiRequest(`/vendors/${vendorId}/payments?${new URLSearchParams(params)}`), // This endpoint doesn't exist yet in backend
   reportPaymentIssue: (vendorId, paymentId) => apiRequest(`/vendors/${vendorId}/payments/${paymentId}/report-issue`, { method: 'POST' }), // This endpoint doesn't exist yet in backend
 };
 
 // --- Customer Specific Endpoints ---
 export const customer = {
-  getCart: (userId) => apiRequest(`/customers/${userId}/cart`), // This endpoint doesn't exist yet in backend
-  addToCart: (userId, productId, quantity = 1) => apiRequest(`/customers/${userId}/cart`, { method: 'POST', body: JSON.stringify({ productId, quantity }) }), // This endpoint doesn't exist yet in backend
-  updateCartItem: (userId, productId, quantity) => apiRequest(`/customers/${userId}/cart/${productId}`, { method: 'PUT', body: JSON.stringify({ productId, quantity }) }), // This endpoint doesn't exist yet in backend
-  removeFromCart: (userId, productId) => apiRequest(`/customers/${userId}/cart/${productId}`, { method: 'DELETE' }), // This endpoint doesn't exist yet in backend
+  getCart: () => apiRequest(`/cart`), // Fetch current user's cart
+  addToCart: (productId, quantity = 1) => apiRequest(`/cart`, { method: 'POST', body: JSON.stringify({ productId, quantity }) }),
+  updateCartItem: (itemId, quantity) => apiRequest(`/cart/${itemId}`, { method: 'PUT', body: JSON.stringify({ quantity }) }),
+  removeFromCart: (itemId) => apiRequest(`/cart/${itemId}`, { method: 'DELETE' }),
   getWishlist: (userId) => apiRequest(`/customers/${userId}/wishlist`), // This endpoint doesn't exist yet in backend
   addToWishlist: (userId, productId) => apiRequest(`/customers/${userId}/wishlist`, { method: 'POST', body: JSON.stringify({ productId }) }), // This endpoint doesn't exist yet in backend
   removeFromWishlist: (userId, productId) => apiRequest(`/customers/${userId}/wishlist/${productId}`, { method: 'DELETE' }), // This endpoint doesn't exist yet in backend
-  placeOrder: (userId, orderDetails) => apiRequest(`/customers/${userId}/orders`, { method: 'POST', body: JSON.stringify(orderDetails) }), // This endpoint doesn't exist yet in backend
-  getOrders: (userId, params) => apiRequest(`/customers/${userId}/orders?${new URLSearchParams(params)}`), // This endpoint doesn't exist yet in backend
-  getOrderById: (userId, orderId) => apiRequest(`/customers/${userId}/orders/${orderId}`), // This endpoint doesn't exist yet in backend
+  placeOrder: (orderData) => apiRequest(`/orders`, { method: 'POST', body: JSON.stringify(orderData) }), // Place order
+  getOrders: (userId, params) => apiRequest(`/orders/user/${userId}?${new URLSearchParams(params)}`), // Customer orders
+  getOrderById: (orderId) => apiRequest(`/orders/${orderId}`), // This endpoint doesn't exist yet in backend
 };
 
 // --- Admin Specific Endpoints ---
 export const admin = {
   getDashboardStats: (params) => apiRequest(`/admin/dashboard/stats?${new URLSearchParams(params)}`), // This endpoint doesn't exist yet in backend
-  getUsers: (params) => apiRequest(`/admin/users?${new URLSearchParams(params)}`), // Updated to backend endpoint
-  updateUserStatus: (userId, isActive) => apiRequest(`/admin/users/${userId}/status`, { method: 'PUT', body: JSON.stringify({ isActive }) }), // Updated to backend endpoint
-  deleteUser: (userId) => apiRequest(`/admin/users/${userId}`, { method: 'DELETE' }), // Updated to backend endpoint
-  getProducts: (params) => apiRequest(`/admin/products?${new URLSearchParams(params)}`), // This endpoint doesn't exist yet in backend
-  updateProduct: (productId, productData) => apiRequest(`/admin/products/${productId}`, { method: 'PUT', body: JSON.stringify(productData) }), // This endpoint doesn't exist yet in backend
-  deleteProduct: (productId) => apiRequest(`/admin/products/${productId}`, { method: 'DELETE' }), // This endpoint doesn't exist yet in backend
-  getOrders: (params) => apiRequest(`/admin/orders?${new URLSearchParams(params)}`), // This endpoint doesn't exist yet in backend
-  updateOrderStatus: (orderId, status) => apiRequest(`/admin/orders/${orderId}/status`, { method: 'PUT', body: JSON.stringify({ status }) }), // This endpoint doesn't exist yet in backend
+  getUsers: (params) => apiRequest(`/admin/users?${new URLSearchParams(params)}`),
+  updateUserStatus: (userId, isActive) => apiRequest(`/admin/users/${userId}/status`, { method: 'PUT', body: JSON.stringify({ isActive }) }),
+  deleteUser: (userId) => apiRequest(`/admin/users/${userId}`, { method: 'DELETE' }),
+  getProducts: (params) => apiRequest(`/products?${new URLSearchParams(params)}`), // Admin gets all products
+  updateProduct: (productId, productData) => apiRequest(`/admin/products/${productId}`, { method: 'PUT', body: JSON.stringify(productData) }),
+  deleteProduct: (productId) => apiRequest(`/admin/products/${productId}`, { method: 'DELETE' }),
+  getOrders: (params) => apiRequest(`/orders?${new URLSearchParams(params)}`), // Admin gets all orders
+  updateOrderStatus: (orderId, status) => apiRequest(`/orders/${orderId}/status`, { method: 'PUT', body: JSON.stringify({ status }) }),
   initiateRefund: (orderId) => apiRequest(`/admin/orders/${orderId}/refund`, { method: 'POST' }), // This endpoint doesn't exist yet in backend
+  updateStore: (storeId, storeData) => apiRequest(`/admin/stores/${storeId}`, { method: 'PUT', body: JSON.stringify(storeData) }),
+  deleteStore: (storeId) => apiRequest(`/admin/stores/${storeId}`, { method: 'DELETE' }),
 };
 
 // --- General Endpoints ---
 export const general = {
-  getStores: (params) => apiRequest(`/stores?${new URLSearchParams(params)}`), // This endpoint doesn't exist yet in backend
-  getStoreById: (storeId) => apiRequest(`/stores/${storeId}`), // This endpoint doesn't exist yet in backend
+  getStores: (params) => apiRequest(`/stores?${new URLSearchParams(params)}`),
+  getStoreById: (storeId) => apiRequest(`/stores/${storeId}`),
   getCategories: () => apiRequest('/categories'), // This endpoint doesn't exist yet in backend
   getFAQ: () => apiRequest('/faq'), // This endpoint doesn't exist yet in backend
   getAboutContent: () => apiRequest('/about'), // This endpoint doesn't exist yet in backend
