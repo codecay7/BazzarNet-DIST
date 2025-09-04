@@ -11,6 +11,12 @@ This document outlines the rules and conventions for AI-driven development of th
 - **State Management:** React Hooks (`useState`, `useEffect`, `useContext`) for managing component and application state.
 - **Language:** JavaScript (ES6+).
 
+### Backend Tech Stack
+- **Backend Framework:** Node.js with Express
+- **Backend Database:** MongoDB (using Mongoose ODM)
+- **Backend Authentication:** JWT (JSON Web Tokens)
+- **Backend Language:** JavaScript (ES6+ Modules)
+
 ## Development Rules
 
 - **Styling:**
@@ -23,11 +29,23 @@ This document outlines the rules and conventions for AI-driven development of th
 - **Animations:**
   - **ALWAYS** use the `framer-motion` library for any UI animations.
 
-- **Component Structure:**
+- **Component Structure (Frontend):**
   - **DO NOT** add more logic to the main `App.jsx` file. It is already very large and should be refactored.
   - **ALWAYS** create new components in a `src/components/` directory.
   - **ALWAYS** create new pages/views in a `src/pages/` directory.
   - Keep components small, focused, and reusable. Each component should have a single responsibility.
+
+- **Component Structure (Backend):**
+  - **ALWAYS** adhere to the established backend file structure:
+    - `backend/config/`: Environment variables, database connection.
+    - `backend/controllers/`: Business logic for API endpoints.
+    - `backend/middleware/`: Reusable Express middleware (e.g., authentication, error handling).
+    - `backend/models/`: Mongoose schemas for database collections.
+    - `backend/routes/`: Defines API endpoints and maps to controllers.
+    - `backend/services/`: External integrations or complex reusable logic (e.g., email, payment).
+    - `backend/utils/`: Small, pure utility functions (e.g., JWT generation).
+    - `backend/validators/`: Input validation for request data (using Joi).
+  - Ensure a clear separation of concerns for maintainability and scalability.
 
 - **State Management:**
   - For local component state, use `useState` and `useReducer`.
