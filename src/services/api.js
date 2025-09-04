@@ -108,7 +108,7 @@ export const products = {
   getById: (productId) => apiRequest(`/products/${productId}`),
   getStoreProducts: (storeId, params) => apiRequest(`/stores/${storeId}/products?${new URLSearchParams(params)}`),
   getRecommended: (params) => {
-    console.log('Frontend: Fetching recommended products from /products/recommended'); // Added log
+    // console.log('Frontend: Fetching recommended products from /products/recommended'); // Removed log
     return apiRequest(`/products/recommended?${new URLSearchParams(params)}`);
   },
 };

@@ -8,27 +8,27 @@ const useOrders = (isLoggedIn, user, isVendor, isAdmin) => {
 
   const fetchOrders = useCallback(async (params = {}) => {
     if (!isLoggedIn || !user?._id) {
-      console.log('useOrders: Not logged in or user ID missing. Skipping fetch.');
+      // console.log('useOrders: Not logged in or user ID missing. Skipping fetch.'); // Removed log
       setOrders([]);
       setOrdersMeta({ page: 1, pages: 1, count: 0 });
       return;
     }
-    console.log('useOrders: Attempting to fetch orders for user:', user._id, 'with role:', user.role, 'and params:', params);
+    // console.log('useOrders: Attempting to fetch orders for user:', user._id, 'with role:', user.role, 'and params:', params); // Removed log
     try {
       let fetchedOrdersData;
       if (isAdmin) {
         fetchedOrdersData = await api.admin.getOrders(params);
-        console.log('useOrders: Admin orders fetched:', fetchedOrdersData);
+        // console.log('useOrders: Admin orders fetched:', fetchedOrdersData); // Removed log
       } else if (isVendor) {
         fetchedOrdersData = await api.vendor.getOrders(user.storeId, params);
-        console.log('useOrders: Vendor orders fetched:', fetchedOrdersData);
+        // console.log('useOrders: Vendor orders fetched:', fetchedOrdersData); // Removed log
       } else { // Customer
         fetchedOrdersData = await api.customer.getOrders(user._id, params);
-        console.log('useOrders: Customer orders fetched:', fetchedOrdersData);
+        // console.log('useOrders: Customer orders fetched:', fetchedOrdersData); // Removed log
       }
       setOrders(fetchedOrdersData.orders);
       setOrdersMeta({ page: fetchedOrdersData.page, pages: fetchedOrdersData.pages, count: fetchedOrdersData.count });
-      console.log('useOrders: Orders state updated. Orders:', fetchedOrdersData.orders, 'Meta:', fetchedOrdersData.pages);
+      // console.log('useOrders: Orders state updated. Orders:', fetchedOrdersData.orders, 'Meta:', fetchedOrdersData.pages); // Removed log
     } catch (error) {
       console.error('useOrders: Failed to load orders:', error);
       toast.error(`Failed to load orders: ${error.message}`);
