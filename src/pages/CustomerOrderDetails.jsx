@@ -29,7 +29,8 @@ const CustomerOrderDetails = () => {
   }
 
   const steps = useMemo(() => {
-    const currentStatus = order?.status || ''; // Defensive check for order.status
+    // Ensure currentStatus is always a string for array includes check (added for robustness)
+    const currentStatus = order?.status || ''; 
     return [
       { name: 'Ordered', completed: true, icon: faBox },
       { name: 'Shipped', completed: ['Shipped', 'Delivered'].includes(currentStatus), icon: faTruck },
