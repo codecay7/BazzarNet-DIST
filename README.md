@@ -2,26 +2,30 @@
 
 ## Project Overview
 
-BazzarNet is a modern, responsive e-commerce platform designed to connect local stores with customers for fast and reliable delivery. It supports both customer and vendor roles, offering a seamless shopping experience for users and powerful product management tools for businesses. The application emphasizes a clean UI, smooth animations, and a robust architecture built with React.
+BazzarNet is a modern, responsive e-commerce platform designed to connect local stores with customers for fast and reliable delivery. It supports both customer and vendor roles, offering a seamless shopping experience for users and powerful product management tools for businesses. The application emphasizes a clean UI, smooth animations, and a robust architecture built with React and a Node.js/Express backend with MongoDB.
 
 ## Tech Stack
 
-*   **Framework:** React (with Vite for a fast development experience)
-*   **Styling:** Tailwind CSS (utility-first for rapid UI development)
-*   **Icons:** Font Awesome (`@fortawesome/react-fontawesome`) and Lucide React (`lucide-react`)
-*   **Animations:** Framer Motion
-*   **State Management:** React Context API (`useContext`), `useState`, `useEffect`, `useMemo`
-*   **Routing:** React Router DOM
-*   **Notifications:** React Hot Toast
-*   **Charting:** Recharts (for vendor analytics)
-*   **Language:** JavaScript (ES6+)
+*   **Frontend Framework:** React (with Vite for a fast development experience)
+*   **Frontend Styling:** Tailwind CSS (utility-first for rapid UI development)
+*   **Frontend Icons:** Font Awesome (`@fortawesome/react-fontawesome`) and Lucide React (`lucide-react`)
+*   **Frontend Animations:** Framer Motion
+*   **Frontend State Management:** React Context API (`useContext`), `useState`, `useEffect`, `useMemo`
+*   **Frontend Routing:** React Router DOM
+*   **Frontend Notifications:** React Hot Toast
+*   **Frontend Charting:** Recharts (for vendor analytics)
+*   **Frontend Language:** JavaScript (ES6+)
+*   **Backend Framework:** Node.js with Express
+*   **Backend Database:** MongoDB (using Mongoose ODM)
+*   **Backend Authentication:** JWT (JSON Web Tokens)
+*   **Backend Language:** JavaScript (ES6+ Modules)
 
 ## Key Features
 
 ### General
 *   **Responsive Design:** Optimized for various screen sizes (mobile, tablet, desktop).
 *   **Theming:** Toggle between light and dark modes.
-*   **Authentication:** Separate login/registration flows for customers and vendors.
+*   **Authentication:** Separate login/registration flows for customers, vendors, and admins.
 
 ### Customer Features
 *   **Product Browsing:** View all products or filter by store/category.
@@ -42,60 +46,109 @@ BazzarNet is a modern, responsive e-commerce platform designed to connect local 
 *   **Payments Overview:** Track payment statuses for their sales.
 *   **Profile Management:** View and edit business details, legal information, and payment information.
 
+### Admin Features
+*   **Admin Dashboard:** Centralized overview of platform metrics (total revenue, active users, vendor/user status, order completion, sales trends).
+*   **User Management:** View, activate/deactivate, and delete customer and vendor accounts.
+*   **Product Management:** View, edit, and delete all products across all stores.
+*   **Order Management:** View all orders, update their status, and initiate refunds.
+
 ## Project Structure
 
-The project follows a clear and modular structure:
+The project follows a clear and modular structure for both frontend and backend:
 
-*   `public/`: Static assets.
-*   `src/`: Main application source code.
-    *   `assets/`: Images and other media.
-    *   `components/`: Reusable UI components (e.g., `Header`, `Footer`, `Modal`, `StatCard`, `ProductForm`, `Pagination`, `SkeletonCard`, `MobileNav`).
-    *   `context/`: Global state management using `AppContext.jsx`.
-    *   `data/`: Mock data (`mockData.js`) for products, stores, orders, etc.
-    *   `pages/`: Top-level views/pages of the application (e.g., `Dashboard`, `Products`, `Login`, `Register`, `Profile`, `Orders`).
-    *   `App.jsx`: Main application component, handles routing.
-    *   `main.jsx`: Entry point for the React application.
-    *   `index.css`: Global Tailwind CSS imports and custom CSS variables for theming.
+### Frontend (`./src/`)
+*   `assets/`: Images and other media.
+*   `components/`: Reusable UI components (e.g., `Header`, `Footer`, `Modal`, `StatCard`, `ProductForm`, `Pagination`, `SkeletonCard`, `MobileNav`).
+*   `context/`: Global state management using `AppContext.jsx`.
+*   `data/`: Mock data (`mockData.js`) for products, stores, orders, etc. (will be replaced by backend API).
+*   `hooks/`: Custom React hooks (e.g., `useFormValidation`).
+*   `pages/`: Top-level views/pages of the application (e.g., `Dashboard`, `Products`, `Login`, `Register`, `Profile`, `Orders`).
+*   `services/`: API service layer (`api.js`) for frontend-backend communication.
+*   `App.jsx`: Main application component, handles routing and lazy loading.
+*   `main.jsx`: Entry point for the React application.
+*   `index.css`: Global Tailwind CSS imports and custom CSS variables for theming.
+
+### Backend (`./backend/`)
+*   `config/`:
+    *   `db.js`: Database connection setup (MongoDB).
+    *   `env.js`: Environment variable loading and validation.
+*   `controllers/`: Contains the core business logic for API operations.
+    *   `authController.js`: User authentication logic.
+    *   `userController.js`: User-related business logic.
+    *   `productController.js`: Product-related business logic.
+    *   `storeController.js`: Store-related business logic.
+    *   `orderController.js`: Order-related business logic.
+    *   `adminController.js`: Admin-specific business logic.
+*   `middleware/`: Reusable Express middleware.
+    *   `authMiddleware.js`: Authentication and authorization checks (JWT).
+    *   `errorMiddleware.js`: Centralized error handling.
+*   `models/`: Mongoose schemas defining database collections.
+    *   `User.js`: Mongoose schema for User.
+    *   `Product.js`: Mongoose schema for Product.
+    *   `Store.js`: Mongoose schema for Store.
+    *   `Order.js`: Mongoose schema for Order.
+    *   `Cart.js`: Mongoose schema for Cart (optional, or embedded in User).
+*   `routes/`: Defines API endpoints and maps them to controller functions.
+    *   `authRoutes.js`: Authentication API endpoints.
+    *   `userRoutes.js`: User profile and customer-specific endpoints.
+    *   `productRoutes.js`: Public product browsing endpoints.
+    *   `storeRoutes.js`: Public store browsing endpoints.
+    *   `orderRoutes.js`: Customer/Vendor order endpoints.
+    *   `vendorRoutes.js`: Vendor-specific product/order management.
+    *   `adminRoutes.js`: Admin-specific management endpoints.
+*   `services/`: Encapsulates logic for external integrations or complex reusable logic.
+    *   `emailService.js`: Email sending (e.g., order confirmation).
+    *   `paymentService.js`: Payment gateway integration.
+    *   `otpService.js`: OTP generation and verification.
+*   `utils/`: Small, pure utility functions.
+    *   `jwt.js`: JWT token generation/verification utilities.
+    *   `helpers.js`: General utility functions.
+*   `validators/`: Input validation for request data.
+    *   `authValidator.js`: Validation for login/registration inputs.
+    *   `productValidator.js`: Validation for product creation/update.
+    *   `orderValidator.js`: Validation for order placement.
+*   `.env`: Environment variables (e.g., `DB_URI`, `JWT_SECRET`).
+*   `.gitignore`: Files/folders to ignore in Git.
+*   `package.json`: Project metadata and dependencies.
+*   `server.js`: Main application entry point.
 
 ## How It Works
 
-### State Management
+### Frontend
 The application uses React's Context API (`AppContext.jsx`) for global state management. This context provides:
-*   User authentication status (`isLoggedIn`, `user`, `isVendor`).
+*   User authentication status (`isLoggedIn`, `user`, `isVendor`, `isAdmin`).
 *   Theme settings (`theme`, `toggleTheme`).
 *   Shopping cart and wishlist data (`cart`, `wishlist`, `addToCart`, `removeFromCart`, etc.).
 *   Centralized product and store data (`allAppProducts`, `appStores`).
 *   Order data (`orders`, `updateOrderStatus`, `checkout`).
 *   Utility functions like `simulateLoading` and `generateOtp`.
 
-Components consume this context using the `useContext` hook to access and modify shared state.
+Components consume this context using the `useContext` hook to access and modify shared state. `react-router-dom` is used for navigation, with routes lazy-loaded using `React.lazy` and `Suspense` for performance. All styling is done using **Tailwind CSS**.
 
-### Routing
-`react-router-dom` is used for navigation. The `App.jsx` file defines routes, separating them based on the user's login status and role (customer/vendor) to ensure appropriate access control. `Layout.jsx` and `PublicLayout.jsx` provide consistent headers and footers for logged-in and public routes, respectively.
+### Backend
+The backend is built with Node.js and Express, connecting to a MongoDB database via Mongoose. It follows a modular architecture with dedicated directories for configuration, models, controllers, routes, middleware, services, utilities, and validators. This structure ensures a clear separation of concerns, making the API robust, scalable, and easy to maintain. Authentication is handled using JWTs, and input validation is enforced for all API requests.
 
-### Styling
-All styling is done using **Tailwind CSS**. Custom colors and variables are defined in `tailwind.config.js` and `src/index.css` to maintain a consistent brand identity and enable easy theme switching. CSS variables (`--bg`, `--card-bg`, `--accent`, etc.) are used to implement the light/dark theme toggle.
+### Data Handling (Currently Mocked, Transitioning to Backend)
+Currently, much of the application data (products, stores, orders, user information) is managed using in-memory mock data defined in `src/data/mockData.js` and `AppContext.jsx`. This allows for full frontend functionality.
 
-### Data Handling (Mocked)
-Currently, all application data (products, stores, orders, user information) is managed using in-memory mock data defined in `src/data/mockData.js`. This allows for full frontend functionality without a backend. When a user logs in or registers, their details are stored in `localStorage` to persist the session.
-
-### Animations
-`framer-motion` is integrated for smooth UI transitions and animations, enhancing the user experience, particularly in modals, mobile navigation, and form transitions.
+The `src/services/api.js` file has been introduced to abstract API interactions. The `AppContext.jsx` has been refactored to conceptually integrate with this API layer, showing where actual backend calls will replace the mock logic. The backend setup is now in place to handle persistent data storage and user authentication.
 
 ## Running the Project Locally
 
 To get the BazzarNet application up and running on your local machine, follow these steps:
 
-1.  **Install Dependencies:**
-    ```bash
-    npm install
-    ```
+1.  **Frontend Setup:**
+    *   Navigate to the project root directory (where `package.json` for the frontend is).
+    *   Install dependencies: `npm install`
+    *   Start the development server: `npm run dev`
+    *   This will start the Vite development server, usually at `http://localhost:5173`.
 
-2.  **Start the Development Server:**
-    ```bash
-    npm run dev
-    ```
-    This will start the Vite development server, and you can access the application in your browser, usually at `http://localhost:5173`.
+2.  **Backend Setup:**
+    *   Navigate to the `backend/` directory.
+    *   Create a `.env` file and populate it with your MongoDB URI, JWT secret, and email service credentials (see `backend/.env` example). **Remember to replace placeholders with your actual credentials.**
+    *   Install dependencies: `npm install`
+    *   Start the development server: `npm run dev`
+    *   This will start the Node.js/Express server, usually at `http://localhost:5000`.
 
 ## Development Guidelines
 
@@ -104,10 +157,11 @@ To get the BazzarNet application up and running on your local machine, follow th
 *   **Pages:** New views should be created in `src/pages/`.
 *   **State:** Prefer React Context for global state.
 *   **Dependencies:** Avoid adding new libraries unless there's a clear and strong justification.
+*   **Backend Modularity:** Adhere to the established backend file structure (models, controllers, routes, middleware, services, utils, validators).
 
 ## Future Enhancements
 
-*   Integration with a real backend (e.g., Supabase, Firebase, custom API) for persistent data storage and user authentication.
+*   Full integration with the backend for persistent data storage and real user authentication.
 *   Advanced search and filtering options for products and stores.
 *   Real-time order tracking with map integration.
 *   User reviews and ratings system for products and stores.
