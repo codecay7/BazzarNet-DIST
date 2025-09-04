@@ -15,8 +15,8 @@ export const AppProvider = ({ children }) => {
     loginAsVendor,
     loginAsAdmin,
     logout,
-    registerUser,
-    registerVendor,
+    registerUser: authRegisterUser, // Rename to avoid conflict with local registerUser
+    registerVendor: authRegisterVendor, // Rename to avoid conflict with local registerVendor
     setUser: setAuthUser, // Rename setUser from useAuth to avoid conflict
   } = useAuth(); // Use the custom authentication hook
 
@@ -484,6 +484,49 @@ export const AppProvider = ({ children }) => {
     }
   };
 
+  // --- Signup Functions (Backend Integrated) ---
+  const registerUser = useCallback(async (userData) => {
+    try {
+      const response = await api.auth.registerUser(userData);
+      if (response) {
+        authRegisterUser(response); // Use the auth hook's registerUser to set user state
+        toast.success(`Welcome to BazzarNet, ${response.name}!`);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      toast.error(error.message || 'Registration failed.');
+      return false;
+    }
+  }, [authRegisterUser]);
+
+  const registerVendor = useCallback(async (formData) => {
+    try {
+      const response = await api.auth.registerVendor({
+        name: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+        storeName: formData.businessName,
+        businessDescription: formData.description,
+        category: formData.category,
+        phone: formData.phone,
+        pan: formData.pan,
+        gst: formData.gst,
+        address: formData.address,
+      });
+      if (response) {
+        authRegisterVendor(response); // Use the auth hook's registerVendor to set user state
+        toast.success(`Welcome, ${response.name}! Your store is now live.`);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      toast.error(error.message || 'Vendor registration failed.');
+      return false;
+    }
+  }, [authRegisterVendor]);
+
+
   const value = {
     theme,
     toggleTheme,
@@ -535,8 +578,8 @@ export const AppProvider = ({ children }) => {
     adminDeleteProduct,
     adminUpdateStore, // Expose admin store update
     adminDeleteStore, // Expose admin store delete
-    registerUser,
-    registerVendor,
+    registerUser, // Use the local registerUser
+    registerVendor, // Use the local registerVendor
     fetchWishlist, 
     updateUserInContext, // NEW: Expose the new function
   };

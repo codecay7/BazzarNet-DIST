@@ -5,8 +5,17 @@ import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { ChevronDown } from 'lucide-react';
 
+const indianStates = [
+  "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
+  "Goa", "Gujarat", "Haryana", "Himachal Pradesh", "Jharkhand",
+  "Karnataka", "Kerala", "Madhya Pradesh", "Maharashtra", "Manipur",
+  "Meghalaya", "Mizoram", "Nagaland", "Odisha", "Punjab",
+  "Rajasthan", "Sikkim", "Tamil Nadu", "Telangana", "Tripura",
+  "Uttar Pradesh", "Uttarakhand", "West Bengal"
+];
+
 const VendorRegistrationForm = () => {
-  const { registerVendor } = useContext(AppContext); // Use registerVendor
+  const { registerVendor } = useContext(AppContext);
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     fullName: '',
@@ -53,9 +62,17 @@ const VendorRegistrationForm = () => {
     let newErrors = {};
     if (!formData.fullName.trim()) {
       newErrors.fullName = 'Full Name is required.';
+    } else if (formData.fullName.trim().length < 3) {
+      newErrors.fullName = 'Full Name must be at least 3 characters long.';
+    } else if (formData.fullName.trim().length > 50) {
+      newErrors.fullName = 'Full Name cannot exceed 50 characters.';
     }
     if (!formData.businessName.trim()) {
       newErrors.businessName = 'Business Name is required.';
+    } else if (formData.businessName.trim().length < 3) {
+      newErrors.businessName = 'Business Name must be at least 3 characters long.';
+    } else if (formData.businessName.trim().length > 100) {
+      newErrors.businessName = 'Business Name cannot exceed 100 characters.';
     }
     if (!formData.email.trim()) {
       newErrors.email = 'Email is required.';
@@ -72,22 +89,33 @@ const VendorRegistrationForm = () => {
     } else if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(formData.pan)) {
       newErrors.pan = 'Invalid PAN format.';
     }
+    
+    // Address validation
+    let addressErrors = {};
     if (!formData.address.houseNo.trim()) {
-      newErrors.address = { ...newErrors.address, houseNo: 'House No. is required.' };
+      addressErrors.houseNo = 'House No. is required.';
     }
     if (!formData.address.city.trim()) {
-      newErrors.address = { ...newErrors.address, city: 'City is required.' };
+      addressErrors.city = 'City is required.';
     }
     if (!formData.address.state.trim()) {
-      newErrors.address = { ...newErrors.address, state: 'State is required.' };
+      addressErrors.state = 'State is required.';
     }
     if (!formData.address.pinCode.trim()) {
-      newErrors.address = { ...newErrors.address, pinCode: 'Pin Code is required.' };
+      addressErrors.pinCode = 'Pin Code is required.';
     } else if (!/^\d{6}$/.test(formData.address.pinCode)) {
-      newErrors.address = { ...newErrors.address, pinCode: 'Pin Code must be 6 digits.' };
+      addressErrors.pinCode = 'Pin Code must be 6 digits.';
     }
+    if (Object.keys(addressErrors).length > 0) {
+      newErrors.address = addressErrors;
+    }
+
     if (!formData.description.trim()) {
       newErrors.description = 'Business Description is required.';
+    } else if (formData.description.trim().length < 10) {
+      newErrors.description = 'Business Description must be at least 10 characters long.';
+    } else if (formData.description.trim().length > 500) {
+      newErrors.description = 'Business Description cannot exceed 500 characters.';
     }
     if (!formData.category) {
       newErrors.category = 'Category is required.';
@@ -98,13 +126,26 @@ const VendorRegistrationForm = () => {
       newErrors.password = 'Password must be at least 6 characters long.';
     }
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0 && Object.keys(newErrors.address || {}).length === 0;
+    return Object.keys(newErrors).length === 0;
   };
 
-  const handleRegistration = async (e) => { // Made async
+  const handleRegistration = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-      if (await registerVendor(formData)) { // Call registerVendor
+      // Ensure GST is sent, even if empty, to match backend schema
+      const vendorData = {
+        name: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+        storeName: formData.businessName,
+        businessDescription: formData.description,
+        category: formData.category,
+        phone: formData.phone,
+        pan: formData.pan,
+        gst: formData.gst || '', // Ensure GST is an empty string if not provided
+        address: formData.address,
+      };
+      if (await registerVendor(vendorData)) {
         navigate('/dashboard');
       }
     } else {

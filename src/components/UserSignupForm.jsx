@@ -7,7 +7,7 @@ import { faUserPlus } from '@fortawesome/free-solid-svg-icons';
 import toast from 'react-hot-toast';
 
 const UserSignupForm = () => {
-  const { registerUser } = useContext(AppContext); // Use registerUser
+  const { registerUser } = useContext(AppContext);
   const navigate = useNavigate();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -18,6 +18,10 @@ const UserSignupForm = () => {
     let newErrors = {};
     if (!name.trim()) {
       newErrors.name = 'Full Name is required.';
+    } else if (name.trim().length < 3) {
+      newErrors.name = 'Full Name must be at least 3 characters long.';
+    } else if (name.trim().length > 50) {
+      newErrors.name = 'Full Name cannot exceed 50 characters.';
     }
     if (!email.trim()) {
       newErrors.email = 'Email is required.';
@@ -33,10 +37,24 @@ const UserSignupForm = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSignup = async (e) => { // Made async
+  const handleSignup = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-      if (await registerUser(name, email, password)) { // Call registerUser
+      // Include optional fields with default empty values to match backend schema
+      const userData = {
+        name,
+        email,
+        password,
+        phone: '', // Default empty phone
+        address: { // Default empty address object
+          houseNo: '',
+          landmark: '',
+          city: '',
+          state: '',
+          pinCode: '',
+        },
+      };
+      if (await registerUser(userData)) {
         navigate('/dashboard');
       }
     } else {
