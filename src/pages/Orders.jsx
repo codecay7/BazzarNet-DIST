@@ -16,7 +16,7 @@ const Orders = () => {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      await simulateLoading(800); // Simulate network delay
+      // Removed await simulateLoading(800); // Removed this line
       
       const params = {
         page: currentPage,
@@ -34,7 +34,7 @@ const Orders = () => {
       setLoading(false);
     };
     loadData();
-  }, [searchTerm, currentPage, fetchOrders, simulateLoading, user, isVendor]);
+  }, [searchTerm, currentPage, fetchOrders, user, isVendor]); // Removed simulateLoading from dependencies
 
   const getStatusInfo = (status) => {
     switch (status) {

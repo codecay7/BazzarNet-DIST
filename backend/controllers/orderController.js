@@ -36,6 +36,28 @@ const placeOrder = asyncHandler(async (req, res) => {
     throw new Error('Store not found for the order.');
   }
 
+  // --- Stock Validation and Decrement ---
+  const productsToUpdate = [];
+  for (const item of items) {
+    const product = await Product.findById(item.product);
+    if (!product) {
+      res.status(404);
+      throw new Error(`Product with ID ${item.product} not found.`);
+    }
+    if (product.stock < item.quantity) {
+      res.status(400);
+      throw new Error(`Not enough stock for "${product.name}". Available: ${product.stock}, requested: ${item.quantity}.`);
+    }
+    productsToUpdate.push({ product, quantity: item.quantity });
+  }
+
+  // Decrement stock for all products
+  for (const { product, quantity } of productsToUpdate) {
+    product.stock -= quantity;
+    await product.save();
+  }
+  // --- End Stock Validation and Decrement ---
+
   const orderItems = items.map(item => ({
     product: item.product,
     name: item.name,

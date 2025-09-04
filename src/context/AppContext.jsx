@@ -45,7 +45,7 @@ export const AppProvider = ({ children }) => {
       const { products, page, pages, count } = await api.products.getAll(params);
       setAllAppProducts(products);
       setAllAppProductsMeta({ page, pages, count });
-      console.log('AppContext: fetchAllProducts - Fetched products:', products); // ADDED LOG HERE
+      // console.log('AppContext: fetchAllProducts - Fetched products:', products); // REMOVED LOG HERE
     } catch (error) {
       toast.error(`Failed to load products: ${error.message}`);
       setAllAppProducts([]);
@@ -88,19 +88,28 @@ export const AppProvider = ({ children }) => {
   }, [isLoggedIn, user?._id, isVendor, isAdmin]);
 
   const fetchOrders = useCallback(async (params = {}) => {
-    if (!isLoggedIn || !user?._id) return;
+    if (!isLoggedIn || !user?._id) {
+      console.log('AppContext: fetchOrders - Not logged in or user ID missing. Skipping fetch.');
+      return;
+    }
+    console.log('AppContext: fetchOrders - Attempting to fetch orders for user:', user._id, 'with role:', user.role, 'and params:', params);
     try {
       let fetchedOrdersData;
       if (isAdmin) {
         fetchedOrdersData = await api.admin.getOrders(params);
+        console.log('AppContext: fetchOrders - Admin orders fetched:', fetchedOrdersData);
       } else if (isVendor) {
         fetchedOrdersData = await api.vendor.getOrders(user.storeId, params);
+        console.log('AppContext: fetchOrders - Vendor orders fetched:', fetchedOrdersData);
       } else { // Customer
         fetchedOrdersData = await api.customer.getOrders(user._id, params);
+        console.log('AppContext: fetchOrders - Customer orders fetched:', fetchedOrdersData);
       }
       setOrders(fetchedOrdersData.orders);
       setOrdersMeta({ page: fetchedOrdersData.page, pages: fetchedOrdersData.pages, count: fetchedOrdersData.count });
+      console.log('AppContext: fetchOrders - Orders state updated. Orders:', fetchedOrdersData.orders, 'Meta:', fetchedOrdersData.pages);
     } catch (error) {
+      console.error('AppContext: fetchOrders - Failed to load orders:', error);
       toast.error(`Failed to load orders: ${error.message}`);
       setOrders([]); // Clear orders on error
       setOrdersMeta({ page: 1, pages: 1, count: 0 });
