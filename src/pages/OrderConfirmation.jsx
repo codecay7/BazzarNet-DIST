@@ -3,7 +3,7 @@ import { Link, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
-import QRCode from 'react-qr-code';
+import QRCode from 'react-qr-code'; // Ensure this import is correct
 
 // Helper function to format ISO timestamp
 const formatTimestamp = (isoString) => {
@@ -31,7 +31,7 @@ const OrderConfirmation = () => {
     );
   }
 
-  const { id: orderId, total, cart, otp, timestamp, paymentMethod, transactionId } = orderDetails; // Destructure new fields
+  const { id: orderId, total, cart, otp, timestamp, paymentMethod, transactionId } = orderDetails;
 
   // Data to encode in QR code (e.g., order ID and OTP)
   const qrCodeValue = JSON.stringify({ orderId, otp });
@@ -46,9 +46,9 @@ const OrderConfirmation = () => {
         <div className="text-left max-w-md mx-auto bg-black/10 p-6 rounded-lg" aria-labelledby="order-summary-heading">
             <h3 id="order-summary-heading" className="text-xl font-semibold mb-4 border-b border-white/20 pb-2">Order Summary</h3>
             <p className="mb-2"><strong>Order ID:</strong> {orderId}</p>
-            <p className="mb-2"><strong>Order Date:</strong> {formatTimestamp(timestamp)}</p> {/* Display formatted timestamp */}
-            <p className="mb-2"><strong>Payment Method:</strong> {paymentMethod}</p> {/* Display payment method */}
-            <p className="mb-4"><strong>Transaction ID:</strong> {transactionId}</p> {/* Display transaction ID */}
+            <p className="mb-2"><strong>Order Date:</strong> {formatTimestamp(timestamp)}</p>
+            <p className="mb-2"><strong>Payment Method:</strong> {paymentMethod}</p>
+            <p className="mb-4"><strong>Transaction ID:</strong> {transactionId}</p>
             <p className="mb-4"><strong>Total:</strong> ₹{total.toFixed(2)}</p>
             <div className="mb-4">
                 <h4 className="font-semibold">Items:</h4>
