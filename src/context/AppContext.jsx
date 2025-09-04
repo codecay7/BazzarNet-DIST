@@ -1,6 +1,5 @@
-import React, { createContext, useState, useEffect } from 'react';
+import React, { createContext, useState, useEffect, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import { mockOrders as allMockOrders, allProducts as initialAllProducts, stores as initialStores, mockUsers as initialMockUsers } from '../data/mockData';
 import * as api from '../services/api'; // Import the API service
 import useAuth from '../hooks/useAuth'; // Import the useAuth hook
 
@@ -23,22 +22,103 @@ export const AppProvider = ({ children }) => {
   const [theme, setTheme] = useState('dark');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [cart, setCart] = useState([]);
-  const [wishlist, setWishlist] = useState([]);
-  const [allAppProducts, setAllAppProducts] = useState(initialAllProducts);
+  const [wishlist, setWishlist] = useState([]); // Wishlist still uses mock logic for now
+  const [allAppProducts, setAllAppProducts] = useState([]);
   const [vendorProducts, setVendorProducts] = useState([]);
-  const [orders, setOrders] = useState(allMockOrders);
-  const [appStores, setAppStores] = useState(initialStores);
-  const [allAppUsers, setAllAppUsers] = useState(initialMockUsers); // This will eventually be managed by backend
+  const [orders, setOrders] = useState([]);
+  const [appStores, setAppStores] = useState([]);
+  const [allAppUsers, setAllAppUsers] = useState([]);
 
   // Set initial theme on mount
   useEffect(() => {
     document.body.setAttribute('data-theme', 'dark');
   }, []);
 
+  // --- Data Fetching Effects ---
+  const fetchAllProducts = useCallback(async () => {
+    try {
+      const products = await api.products.getAll();
+      setAllAppProducts(products);
+    } catch (error) {
+      toast.error(`Failed to load products: ${error.message}`);
+    }
+  }, []);
+
+  const fetchAppStores = useCallback(async () => {
+    try {
+      const stores = await api.stores.getAll();
+      setAppStores(stores);
+    } catch (error) {
+      toast.error(`Failed to load stores: ${error.message}`);
+    }
+  }, []);
+
+  const fetchCart = useCallback(async () => {
+    if (!isLoggedIn || !user?._id) return;
+    try {
+      const userCart = await api.customer.getCart();
+      setCart(userCart.items); // Assuming API returns { items: [...] }
+    } catch (error) {
+      toast.error(`Failed to load cart: ${error.message}`);
+      setCart([]); // Clear cart on error
+    }
+  }, [isLoggedIn, user?._id]);
+
+  const fetchOrders = useCallback(async () => {
+    if (!isLoggedIn || !user?._id) return;
+    try {
+      let fetchedOrders;
+      if (isAdmin) {
+        fetchedOrders = await api.admin.getOrders();
+      } else if (isVendor) {
+        fetchedOrders = await api.vendor.getOrders(user.storeId);
+      } else { // Customer
+        fetchedOrders = await api.customer.getOrders(user._id);
+      }
+      setOrders(fetchedOrders);
+    } catch (error) {
+      toast.error(`Failed to load orders: ${error.message}`);
+      setOrders([]); // Clear orders on error
+    }
+  }, [isLoggedIn, user?._id, isAdmin, isVendor, user?.storeId]);
+
+  const fetchAllUsers = useCallback(async () => {
+    if (!isLoggedIn || !isAdmin) return;
+    try {
+      const users = await api.admin.getUsers();
+      setAllAppUsers(users);
+    } catch (error) {
+      toast.error(`Failed to load users: ${error.message}`);
+      setAllAppUsers([]); // Clear users on error
+    }
+  }, [isLoggedIn, isAdmin]);
+
+  // Initial data load on login/role change
+  useEffect(() => {
+    if (isLoggedIn) {
+      fetchAllProducts();
+      fetchAppStores();
+      fetchCart();
+      fetchOrders();
+      if (isAdmin) {
+        fetchAllUsers();
+      }
+    } else {
+      // Clear all data if logged out
+      setCart([]);
+      setWishlist([]);
+      setAllAppProducts([]);
+      setVendorProducts([]);
+      setOrders([]);
+      setAppStores([]);
+      setAllAppUsers([]);
+    }
+  }, [isLoggedIn, user, isAdmin, fetchAllProducts, fetchAppStores, fetchCart, fetchOrders, fetchAllUsers]);
+
   // Effect to update vendorProducts when allAppProducts or user changes
   useEffect(() => {
     if (isLoggedIn && isVendor && user?.storeId) {
-      setVendorProducts(allAppProducts.filter(p => p.storeId === user.storeId));
+      setVendorProducts(allAppProducts.filter(p => p.store._id === user.storeId)); // Assuming product.store is populated with store object
     } else {
       setVendorProducts([]);
     }
@@ -56,40 +136,25 @@ export const AppProvider = ({ children }) => {
     setSidebarOpen(!sidebarOpen);
   };
 
-  // Simulate Loading
+  // Simulate Loading (kept for components that might still use it for UI/UX)
   const simulateLoading = (delay = 1000) => {
     return new Promise(resolve => setTimeout(resolve, delay));
   };
 
-  // Generate a 6-digit OTP
+  // Generate a 6-digit OTP (kept as it's a utility)
   const generateOtp = () => {
     return Math.floor(100000 + Math.random() * 900000).toString();
   };
 
-  // Cart Functions
+  // --- Cart Functions (Backend Integrated) ---
   const addToCart = async (product) => {
-    // --- Backend Integration Point: Add to Cart ---
-    // In a real app, this would call `api.customer.addToCart(user.id, product.id, 1)`
-    // and update local cart state based on backend response.
+    if (!isLoggedIn || !user?._id) {
+      toast.error('Please log in to add items to your cart.');
+      return;
+    }
     try {
-      // const response = await api.customer.addToCart(user.id, product.id, 1);
-      // if (response.success) {
-      //   setCart(response.cart); // Assume backend returns updated cart
-      //   toast.success(`${product.name} added to cart!`);
-      // } else {
-      //   toast.error(response.message || 'Failed to add to cart.');
-      // }
-
-      // --- Mock Logic (for demo) ---
-      setCart((prevCart) => {
-        const existingProduct = prevCart.find((item) => item.id === product.id);
-        if (existingProduct) {
-          return prevCart.map((item) =>
-            item.id === product.id ? { ...item, quantity: item.quantity + 1 } : item
-          );
-        }
-        return [...prevCart, { ...product, quantity: 1 }];
-      });
+      const response = await api.customer.addToCart(product._id, 1); // Assuming quantity is 1 for initial add
+      setCart(response.items); // Assuming backend returns updated cart items
       toast.success(`${product.name} added to cart!`);
     } catch (error) {
       toast.error(`Error adding to cart: ${error.message}`);
@@ -97,20 +162,10 @@ export const AppProvider = ({ children }) => {
   };
 
   const removeFromCart = async (productId) => {
-    // --- Backend Integration Point: Remove from Cart ---
-    // In a real app, this would call `api.customer.removeFromCart(user.id, productId)`
-    // and update local cart state based on backend response.
+    if (!isLoggedIn || !user?._id) return;
     try {
-      // const response = await api.customer.removeFromCart(user.id, productId);
-      // if (response.success) {
-      //   setCart(response.cart);
-      //   toast.error(`Item removed from cart.`);
-      // } else {
-      //   toast.error(response.message || 'Failed to remove from cart.');
-      // }
-
-      // --- Mock Logic (for demo) ---
-      setCart((prevCart) => prevCart.filter((item) => item.id !== productId));
+      const response = await api.customer.removeFromCart(productId);
+      setCart(response.items);
       toast.error(`Item removed from cart.`);
     } catch (error) {
       toast.error(`Error removing from cart: ${error.message}`);
@@ -118,68 +173,28 @@ export const AppProvider = ({ children }) => {
   };
   
   const updateCartQuantity = async (productId, quantity) => {
+    if (!isLoggedIn || !user?._id) return;
     if (quantity <= 0) {
       removeFromCart(productId);
       return;
     }
-    // --- Backend Integration Point: Update Cart Quantity ---
-    // In a real app, this would call `api.customer.updateCartItem(user.id, productId, quantity)`
-    // and update local cart state based on backend response.
     try {
-      // const response = await api.customer.updateCartItem(user.id, productId, quantity);
-      // if (response.success) {
-      //   setCart(response.cart);
-      // } else {
-      //   toast.error(response.message || 'Failed to update cart quantity.');
-      // }
-
-      // --- Mock Logic (for demo) ---
-      setCart((prevCart) =>
-        prevCart.map((item) =>
-          item.id === productId ? { ...item, quantity } : item
-        )
-      );
+      const response = await api.customer.updateCartItem(productId, quantity);
+      setCart(response.items);
     } catch (error) {
       toast.error(`Error updating cart quantity: ${error.message}`);
     }
   };
 
   const checkout = async (orderDetails) => {
-    // --- Backend Integration Point: Checkout / Place Order ---
-    // This is a critical backend interaction.
-    // It would call `api.customer.placeOrder(user.id, orderDetails)`
-    // The backend would: validate the order, process payment, update inventory,
-    // create the order record, generate an OTP, and send confirmation emails.
-    // The response would include the final order details, including the generated
-    // orderId, otp, and transactionId.
+    if (!isLoggedIn || !user?._id) {
+      toast.error('Please log in to place an order.');
+      return null;
+    }
     try {
-      // const response = await api.customer.placeOrder(user.id, orderDetails);
-      // if (response.success) {
-      //   setOrders(prevOrders => [...prevOrders, response.order]); // Add new order from backend
-      //   setCart([]); // Clear cart after successful order
-      //   toast.success('Order placed successfully!');
-      //   return response.order; // Return the full order object from backend
-      // } else {
-      //   toast.error(response.message || 'Order placement failed.');
-      //   return null;
-      // }
-
-      // --- Mock Logic (for demo) ---
-      const otp = generateOtp();
-      const newOrder = {
-        ...orderDetails,
-        id: `#BN${Math.floor(10000 + Math.random() * 90000)}`,
-        customer: { name: user.name, email: user.email },
-        customerEmail: user.email,
-        timestamp: new Date().toISOString(),
-        transactionId: `TXN${Math.floor(1000000000 + Math.random() * 9000000000)}`,
-        status: 'Pending',
-        otp: otp,
-        shipping: { trackingNumber: 'N/A', carrier: 'BazzarNet Delivery' },
-      };
-
+      const newOrder = await api.customer.placeOrder(orderDetails);
       setOrders(prevOrders => [...prevOrders, newOrder]);
-      setCart([]);
+      setCart([]); // Clear cart after successful order
       toast.success('Order placed successfully!');
       return newOrder;
     } catch (error) {
@@ -188,110 +203,53 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  // Wishlist Functions
+  // --- Wishlist Functions (Mock Logic - Backend Endpoints Not Yet Implemented) ---
   const addToWishlist = async (product) => {
-    // --- Backend Integration Point: Add to Wishlist ---
-    // In a real app, this would call `api.customer.addToWishlist(user.id, product.id)`
-    // and update local wishlist state based on backend response.
-    try {
-      // const response = await api.customer.addToWishlist(user.id, product.id);
-      // if (response.success) {
-      //   setWishlist(response.wishlist);
-      //   toast.success(`${product.name} added to wishlist!`);
-      // } else {
-      //   toast.error(response.message || 'Failed to add to wishlist.');
-      // }
-
-      // --- Mock Logic (for demo) ---
-      setWishlist((prevWishlist) => {
-          if (prevWishlist.find(item => item.id === product.id)) {
-              toast.error(`${product.name} is already in your wishlist.`);
-              return prevWishlist;
-          }
-          toast.success(`${product.name} added to wishlist!`);
-          return [...prevWishlist, product];
-      });
-    } catch (error) {
-      toast.error(`Error adding to wishlist: ${error.message}`);
+    if (!isLoggedIn || !user?._id) {
+      toast.error('Please log in to add items to your wishlist.');
+      return;
     }
+    // Mock Logic for demo
+    setWishlist((prevWishlist) => {
+        if (prevWishlist.find(item => item._id === product._id)) { // Use _id for backend consistency
+            toast.error(`${product.name} is already in your wishlist.`);
+            return prevWishlist;
+        }
+        toast.success(`${product.name} added to wishlist!`);
+        return [...prevWishlist, product];
+    });
   };
 
   const removeFromWishlist = async (productId) => {
-    // --- Backend Integration Point: Remove from Wishlist ---
-    // In a real app, this would call `api.customer.removeFromWishlist(user.id, productId)`
-    // and update local wishlist state based on backend response.
-    try {
-      // const response = await api.customer.removeFromWishlist(user.id, productId);
-      // if (response.success) {
-      //   setWishlist(response.wishlist);
-      //   toast.error(`Item removed from wishlist.`);
-      // } else {
-      //   toast.error(response.message || 'Failed to remove from wishlist.');
-      // }
-
-      // --- Mock Logic (for demo) ---
-      setWishlist((prevWishlist) => prevWishlist.filter((item) => item.id !== productId));
-      toast.error(`Item removed from wishlist.`);
-    } catch (error) {
-      toast.error(`Error removing from wishlist: ${error.message}`);
-    }
+    if (!isLoggedIn || !user?._id) return;
+    // Mock Logic for demo
+    setWishlist((prevWishlist) => prevWishlist.filter((item) => item._id !== productId));
+    toast.error(`Item removed from wishlist.`);
   };
 
   const moveToCart = async (product) => {
-    // --- Backend Integration Point: Move to Cart ---
-    // This would involve two API calls: `api.customer.removeFromWishlist` and `api.customer.addToCart`.
-    try {
-      // await api.customer.removeFromWishlist(user.id, product.id);
-      // await api.customer.addToCart(user.id, product.id, 1);
-      // // Re-fetch both cart and wishlist or update based on responses
-      // toast.success(`${product.name} moved to cart!`);
-
-      // --- Mock Logic (for demo) ---
-      addToCart(product);
-      removeFromWishlist(product.id);
-    } catch (error) {
-      toast.error(`Error moving to cart: ${error.message}`);
-    }
+    if (!isLoggedIn || !user?._id) return;
+    // Mock Logic for demo
+    addToCart(product); // This will use the real addToCart API
+    removeFromWishlist(product._id);
   };
 
   const moveToWishlist = async (product) => {
-    // --- Backend Integration Point: Move to Wishlist ---
-    // This would involve two API calls: `api.customer.removeFromCart` and `api.customer.addToWishlist`.
-    try {
-      // await api.customer.removeFromCart(user.id, product.id);
-      // await api.customer.addToWishlist(user.id, product.id);
-      // // Re-fetch both cart and wishlist or update based on responses
-      // toast.success(`${product.name} moved to wishlist!`);
-
-      // --- Mock Logic (for demo) ---
-      addToWishlist(product);
-      removeFromCart(product.id);
-    } catch (error) {
-      toast.error(`Error moving to wishlist: ${error.message}`);
-    }
+    if (!isLoggedIn || !user?._id) return;
+    // Mock Logic for demo
+    addToWishlist(product);
+    removeFromCart(product._id); // This will use the real removeFromCart API
   };
 
-  // Vendor Product Management Functions (now updating allAppProducts)
+  // --- Vendor Product Management Functions (Backend Integrated) ---
   const addVendorProduct = async (newProduct) => {
-    if (!user?.storeId) {
-      toast.error('Vendor not associated with a store.');
+    if (!isLoggedIn || !isVendor || !user?.storeId) {
+      toast.error('You must be a logged-in vendor to add products.');
       return;
     }
-    // --- Backend Integration Point: Add Vendor Product ---
-    // In a real app, this would call `api.vendor.addProduct(user.storeId, newProduct)`
-    // and update `allAppProducts` based on the backend response.
     try {
-      // const response = await api.vendor.addProduct(user.storeId, newProduct);
-      // if (response.success) {
-      //   setAllAppProducts(prevProducts => [...prevProducts, response.product]);
-      //   toast.success(`${newProduct.name} added to your store!`);
-      // } else {
-      //   toast.error(response.message || 'Failed to add product.');
-      // }
-
-      // --- Mock Logic (for demo) ---
-      const productWithStoreId = { ...newProduct, storeId: user.storeId };
-      setAllAppProducts(prevProducts => [...prevProducts, productWithStoreId]);
+      const createdProduct = await api.vendor.addProduct(newProduct);
+      setAllAppProducts(prevProducts => [...prevProducts, createdProduct]);
       toast.success(`${newProduct.name} added to your store!`);
     } catch (error) {
       toast.error(`Error adding product: ${error.message}`);
@@ -299,23 +257,14 @@ export const AppProvider = ({ children }) => {
   };
 
   const editVendorProduct = async (productId, updatedProduct) => {
-    // --- Backend Integration Point: Edit Vendor Product ---
-    // In a real app, this would call `api.vendor.updateProduct(user.storeId, productId, updatedProduct)`
-    // and update `allAppProducts` based on the backend response.
+    if (!isLoggedIn || !isVendor || !user?.storeId) {
+      toast.error('You must be a logged-in vendor to edit products.');
+      return;
+    }
     try {
-      // const response = await api.vendor.updateProduct(user.storeId, productId, updatedProduct);
-      // if (response.success) {
-      //   setAllAppProducts(prevProducts =>
-      //     prevProducts.map(p => (p.id === productId ? { ...response.product, storeId: p.storeId } : p))
-      //   );
-      //   toast.success('Product updated!');
-      // } else {
-      //   toast.error(response.message || 'Failed to update product.');
-      // }
-
-      // --- Mock Logic (for demo) ---
+      const response = await api.vendor.updateProduct(productId, updatedProduct);
       setAllAppProducts(prevProducts =>
-        prevProducts.map(p => (p.id === productId ? { ...updatedProduct, storeId: p.storeId } : p))
+        prevProducts.map(p => (p._id === productId ? { ...p, ...response } : p))
       );
       toast.success('Product updated!');
     } catch (error) {
@@ -324,45 +273,29 @@ export const AppProvider = ({ children }) => {
   };
 
   const deleteVendorProduct = async (productId) => {
-    // --- Backend Integration Point: Delete Vendor Product ---
-    // In a real app, this would call `api.vendor.deleteProduct(user.storeId, productId)`
-    // and update `allAppProducts` based on the backend response.
+    if (!isLoggedIn || !isVendor || !user?.storeId) {
+      toast.error('You must be a logged-in vendor to delete products.');
+      return;
+    }
     try {
-      // const response = await api.vendor.deleteProduct(user.storeId, productId);
-      // if (response.success) {
-      //   setAllAppProducts(prevProducts => prevProducts.filter(p => p.id !== productId));
-      //   toast.error('Product deleted.');
-      // } else {
-      //   toast.error(response.message || 'Failed to delete product.');
-      // }
-
-      // --- Mock Logic (for demo) ---
-      setAllAppProducts(prevProducts => prevProducts.filter(p => p.id !== productId));
+      await api.vendor.deleteProduct(productId);
+      setAllAppProducts(prevProducts => prevProducts.filter(p => p._id !== productId));
       toast.error('Product deleted.');
     } catch (error) {
       toast.error(`Error deleting product: ${error.message}`);
     }
   };
 
-  // Admin Product Management Functions (for admin to manage any product)
+  // --- Admin Product Management Functions (Backend Integrated) ---
   const adminEditProduct = async (productId, updatedProduct) => {
-    // --- Backend Integration Point: Admin Edit Product ---
-    // In a real app, this would call `api.admin.updateProduct(productId, updatedProduct)`
-    // and update `allAppProducts` based on the backend response.
+    if (!isLoggedIn || !isAdmin) {
+      toast.error('You must be an admin to edit products.');
+      return;
+    }
     try {
-      // const response = await api.admin.updateProduct(productId, updatedProduct);
-      // if (response.success) {
-      //   setAllAppProducts(prevProducts =>
-      //     prevProducts.map(p => (p.id === productId ? { ...p, ...updatedProduct } : p))
-      //   );
-      //   toast.success('Product updated by Admin!');
-      // } else {
-      //   toast.error(response.message || 'Failed to update product by Admin.');
-      // }
-
-      // --- Mock Logic (for demo) ---
+      const response = await api.admin.updateProduct(productId, updatedProduct);
       setAllAppProducts(prevProducts =>
-        prevProducts.map(p => (p.id === productId ? { ...p, ...updatedProduct } : p))
+        prevProducts.map(p => (p._id === productId ? { ...p, ...response } : p))
       );
       toast.success('Product updated by Admin!');
     } catch (error) {
@@ -371,49 +304,30 @@ export const AppProvider = ({ children }) => {
   };
 
   const adminDeleteProduct = async (productId) => {
-    // --- Backend Integration Point: Admin Delete Product ---
-    // In a real app, this would call `api.admin.deleteProduct(productId)`
-    // and update `allAppProducts` based on the backend response.
+    if (!isLoggedIn || !isAdmin) {
+      toast.error('You must be an admin to delete products.');
+      return;
+    }
     try {
-      // const response = await api.admin.deleteProduct(productId);
-      // if (response.success) {
-      //   setAllAppProducts(prevProducts => prevProducts.filter(p => p.id !== productId));
-      //   toast.error('Product deleted by Admin.');
-      // } else {
-      //   toast.error(response.message || 'Failed to delete product by Admin.');
-      // }
-
-      // --- Mock Logic (for demo) ---
-      setAllAppProducts(prevProducts => prevProducts.filter(p => p.id !== productId));
+      await api.admin.deleteProduct(productId);
+      setAllAppProducts(prevProducts => prevProducts.filter(p => p._id !== productId));
       toast.error('Product deleted by Admin.');
     } catch (error) {
       toast.error(`Error deleting product by Admin: ${error.message}`);
     }
   };
 
-  // Order Functions
+  // --- Order Functions (Backend Integrated) ---
   const updateOrderStatus = async (orderId, newStatus) => {
-    // --- Backend Integration Point: Update Order Status ---
-    // In a real app, this would call `api.admin.updateOrderStatus(orderId, newStatus)`
-    // or `api.vendor.updateOrderStatus(user.storeId, orderId, newStatus)`
-    // and update `orders` based on the backend response.
+    if (!isLoggedIn || (!isVendor && !isAdmin)) {
+      toast.error('You are not authorized to update order status.');
+      return;
+    }
     try {
-      // const response = await api.admin.updateOrderStatus(orderId, newStatus); // Or vendor API
-      // if (response.success) {
-      //   setOrders(prevOrders =>
-      //     prevOrders.map(order =>
-      //       order.id === orderId ? { ...order, status: newStatus } : order
-      //     )
-      //   );
-      //   toast.success(`Order ${orderId} status updated to ${newStatus}.`);
-      // } else {
-      //   toast.error(response.message || 'Failed to update order status.');
-      // }
-
-      // --- Mock Logic (for demo) ---
+      const response = await api.admin.updateOrderStatus(orderId, newStatus); // Admin API for now, can be split for vendor
       setOrders(prevOrders =>
         prevOrders.map(order =>
-          order.id === orderId ? { ...order, status: newStatus } : order
+          order._id === orderId ? { ...order, orderStatus: newStatus } : order
         )
       );
       toast.success(`Order ${orderId} status updated to ${newStatus}.`);
@@ -423,108 +337,52 @@ export const AppProvider = ({ children }) => {
   };
 
   const confirmDeliveryWithOtp = async (orderId, enteredOtp) => {
-    // --- Backend Integration Point: Confirm Delivery with OTP ---
-    // In a real app, this would call `api.vendor.confirmDelivery(user.storeId, orderId, enteredOtp)`
-    // The backend would verify the OTP and update the order status.
+    if (!isLoggedIn || !isVendor) {
+      toast.error('You must be a vendor to confirm delivery.');
+      return false;
+    }
     try {
-      // const response = await api.vendor.confirmDelivery(user.storeId, orderId, enteredOtp);
-      // if (response.success) {
-      //   setOrders(prevOrders =>
-      //     prevOrders.map(o => (o.id === orderId ? { ...o, status: 'Delivered' } : o))
-      //   );
-      //   toast.success(`Delivery for Order ${orderId} confirmed!`);
-      //   return true;
-      // } else {
-      //   toast.error(response.message || 'Invalid OTP. Please try again.');
-      //   return false;
-      // }
-
-      // --- Mock Logic (for demo) ---
-      const orderIndex = orders.findIndex(o => o.id === orderId);
-      if (orderIndex === -1) {
-        toast.error('Order not found.');
-        return false;
-      }
-
-      const order = orders[orderIndex]; // Corrected to use orderIndex
-      if (order.otp === enteredOtp) {
-        setOrders(prevOrders =>
-          prevOrders.map((o, idx) =>
-            idx === orderIndex ? { ...o, status: 'Delivered' } : o
-          )
-        );
-        toast.success(`Delivery for Order ${orderId} confirmed!`);
-        return true;
-      } else {
-        toast.error('Invalid OTP. Please try again.');
-        return false;
-      }
+      const response = await api.vendor.confirmDelivery(orderId, enteredOtp);
+      setOrders(prevOrders =>
+        prevOrders.map(o => (o._id === orderId ? { ...o, orderStatus: 'Delivered' } : o))
+      );
+      toast.success(response.message); // Assuming backend sends a success message
+      return true;
     } catch (error) {
       toast.error(`Error confirming delivery: ${error.message}`);
       return false;
     }
   };
 
-  // Admin User Management Functions
+  // --- Admin User Management Functions (Backend Integrated) ---
   const deleteUser = async (userId) => {
-    // --- Backend Integration Point: Admin Delete User ---
-    // In a real app, this would call `api.admin.deleteUser(userId)`
-    // The backend would handle cascading deletions (e.g., deleting a vendor's products and store).
+    if (!isLoggedIn || !isAdmin) {
+      toast.error('You must be an admin to delete users.');
+      return;
+    }
     try {
-      // const response = await api.admin.deleteUser(userId);
-      // if (response.success) {
-      //   setAllAppUsers(prevUsers => prevUsers.filter(u => u.id !== userId));
-      //   // Also update products and stores if a vendor was deleted
-      //   const deletedUser = allAppUsers.find(u => u.id === userId);
-      //   if (deletedUser?.role === 'vendor' && deletedUser.storeId) {
-      //     setAllAppProducts(prevProducts => prevProducts.filter(p => p.storeId !== deletedUser.storeId));
-      //     setAppStores(prevStores => prevStores.filter(s => s.id !== deletedUser.storeId));
-      //     toast.error(`Vendor ${deletedUser.name}, their products, and store have been deleted.`);
-      //   } else {
-      //     toast.error(`User ${deletedUser.name} deleted.`);
-      //   }
-      // } else {
-      //   toast.error(response.message || 'Failed to delete user.');
-      // }
-
-      // --- Mock Logic (for demo) ---
-      setAllAppUsers(prevUsers => prevUsers.filter(u => u.id !== userId));
-      
-      const deletedUser = initialMockUsers.find(u => u.id === userId); // Use initialMockUsers for finding deleted user
-      if (deletedUser?.role === 'vendor' && deletedUser.storeId) {
-        setAllAppProducts(prevProducts => prevProducts.filter(p => p.storeId !== deletedUser.storeId));
-        setAppStores(prevStores => prevStores.filter(s => s.id !== deletedUser.storeId));
-        toast.error(`Vendor ${deletedUser.name}, their products, and store have been deleted.`);
-      } else {
-        toast.error(`User ${deletedUser.name} deleted.`);
-      }
+      const response = await api.admin.deleteUser(userId);
+      setAllAppUsers(prevUsers => prevUsers.filter(u => u._id !== userId));
+      // Re-fetch products and stores to reflect cascading deletions if a vendor was deleted
+      fetchAllProducts();
+      fetchAppStores();
+      toast.success(response.message);
     } catch (error) {
       toast.error(`Error deleting user: ${error.message}`);
     }
   };
 
   const updateUserStatus = async (userId, newStatus) => {
-    // --- Backend Integration Point: Admin Update User Status ---
-    // In a real app, this would call `api.admin.updateUserStatus(userId, newStatus)`
-    // and update `allAppUsers` based on the backend response.
+    if (!isLoggedIn || !isAdmin) {
+      toast.error('You must be an admin to update user status.');
+      return;
+    }
     try {
-      // const response = await api.admin.updateUserStatus(userId, newStatus);
-      // if (response.success) {
-      //   setAllAppUsers(prevUsers =>
-      //     prevUsers.map(u => (u.id === userId ? { ...u, isActive: newStatus } : u))
-      //   );
-      //   const userToUpdate = allAppUsers.find(u => u.id === userId);
-      //   toast.success(`${userToUpdate?.name}'s account is now ${newStatus ? 'active' : 'inactive'}.`);
-      // } else {
-      //   toast.error(response.message || 'Failed to update user status.');
-      // }
-
-      // --- Mock Logic (for demo) ---
+      const response = await api.admin.updateUserStatus(userId, newStatus);
       setAllAppUsers(prevUsers =>
-        prevUsers.map(u => (u.id === userId ? { ...u, isActive: newStatus } : u))
+        prevUsers.map(u => (u._id === userId ? { ...u, isActive: newStatus } : u))
       );
-      const userToUpdate = initialMockUsers.find(u => u.id === userId); // Use initialMockUsers for finding user
-      toast.success(`${userToUpdate?.name}'s account is now ${newStatus ? 'active' : 'inactive'}.`);
+      toast.success(response.message);
     } catch (error) {
       toast.error(`Error updating user status: ${error.message}`);
     }
@@ -549,11 +407,11 @@ export const AppProvider = ({ children }) => {
     removeFromCart,
     updateCartQuantity,
     checkout,
-    wishlist,
-    addToWishlist,
-    removeFromWishlist,
-    moveToCart,
-    moveToWishlist,
+    wishlist, // Still mock
+    addToWishlist, // Still mock
+    removeFromWishlist, // Still mock
+    moveToCart, // Still mock
+    moveToWishlist, // Still mock
     allAppProducts,
     vendorProducts,
     addVendorProduct,
