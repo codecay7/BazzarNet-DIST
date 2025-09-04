@@ -66,7 +66,8 @@ const useUsers = (isLoggedIn, isAdmin, fetchAllProducts, fetchAppStores) => {
     fetchAllUsers,
     deleteUser,
     updateUserStatus,
-    setAllAppUsers, // Now explicitly returning setAllAppUsers
+    setAllAppUsers,
+    setAllAppUsersMeta, // Explicitly return the setter for meta data
   };
 };
 
