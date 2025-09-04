@@ -89,6 +89,7 @@ export const AppProvider = ({ children }) => {
     fetchAllUsers,
     deleteUser,
     updateUserStatus,
+    setAllAppUsers, // Destructure setAllAppUsers here
   } = useUsers(isLoggedIn, isAdmin, fetchAllProducts, fetchAppStores);
 
   const {
@@ -188,7 +189,7 @@ export const AppProvider = ({ children }) => {
       setOrdersMeta({ page: 1, pages: 1, count: 0 });
       setAppStores([]);
       setAppStoresMeta({ page: 1, pages: 1, count: 0 });
-      setAllAppUsers([]);
+      setAllAppUsers([]); // This line should now work correctly
       setAllAppUsersMeta({ page: 1, pages: 1, count: 0 });
     }
   }, [isLoggedIn, user, isAdmin, isVendor, fetchAllProducts, fetchAppStores, fetchCart, fetchWishlist, fetchOrders, fetchAllUsers, fetchVendorProducts, setCart, setWishlist, setAllAppProducts, setAppStores, setOrders, setAllAppUsers]);
