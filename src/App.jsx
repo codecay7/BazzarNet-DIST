@@ -7,7 +7,10 @@ import PublicLayout from './components/PublicLayout';
 import Login from './pages/Login';
 import Register from './pages/Register';
 import Dashboard from './pages/Dashboard';
-import AdminDashboard from './pages/AdminDashboard'; // Import new AdminDashboard
+import AdminDashboard from './pages/AdminDashboard';
+import AdminUserManagement from './pages/AdminUserManagement'; // Import new AdminUserManagement
+import AdminProductManagement from './pages/AdminProductManagement'; // Import new AdminProductManagement
+import AdminOrderManagement from './pages/AdminOrderManagement'; // Import new AdminOrderManagement
 import Products from './pages/Products';
 import Stores from './pages/Stores';
 import StorePage from './pages/StorePage';
@@ -26,7 +29,7 @@ import About from './pages/About';
 import Profile from './pages/Profile';
 
 const App = () => {
-  const { theme, isLoggedIn, isVendor, isAdmin } = useContext(AppContext); // Get isAdmin from context
+  const { theme, isLoggedIn, isVendor, isAdmin } = useContext(AppContext);
 
   return (
     <div className={`font-poppins min-h-screen flex flex-col transition-all duration-300 ${theme === 'dark' ? 'bg-[#07080a] text-[#E0E0E0]' : 'bg-[#E0E0E0] text-[#333]'}`}>
@@ -37,6 +40,10 @@ const App = () => {
             {isAdmin ? (
               <>
                 <Route path="/admin-dashboard" element={<AdminDashboard />} />
+                <Route path="/admin-users" element={<AdminUserManagement />} />
+                <Route path="/admin-products" element={<AdminProductManagement />} />
+                <Route path="/admin-orders" element={<AdminOrderManagement />} />
+                {/* Redirect any other logged-in routes to admin dashboard for admin */}
                 <Route path="*" element={<Navigate to="/admin-dashboard" />} />
               </>
             ) : (

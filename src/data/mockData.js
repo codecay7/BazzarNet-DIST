@@ -121,3 +121,12 @@ export const adminDashboardData = {
     { name: 'Yearly', sales: 2850000, color: '#2196F3' }, // Blue
   ],
 };
+
+export const mockUsers = [
+  { id: 1, name: 'Aarav Sharma', email: 'aarav@example.com', password: 'password123', role: 'user', isActive: true },
+  { id: 2, name: 'Priya Patel', email: 'priya@example.com', password: 'password123', role: 'user', isActive: true },
+  { id: 3, name: 'Rohan Mehta', email: 'rohan@example.com', password: 'password123', role: 'user', isActive: true },
+  { id: 4, name: 'Vendor One', email: 'vendor1@example.com', password: 'vendor123', role: 'vendor', storeId: 1, storeName: 'Fresh Groceries', isActive: true },
+  { id: 5, name: 'Vendor Two', email: 'vendor2@example.com', password: 'vendor123', role: 'vendor', storeId: 2, storeName: 'Local Bakery', isActive: true },
+  { id: 6, name: 'Inactive User', email: 'inactive@example.com', password: 'password123', role: 'user', isActive: false },
+];

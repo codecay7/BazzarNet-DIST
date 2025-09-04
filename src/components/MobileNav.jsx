@@ -7,6 +7,7 @@ import {
 import { AppContext } from '../context/AppContext';
 import { Link, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Users, Package, Receipt } from 'lucide-react'; // Import Lucide icons for admin
 
 const MobileNav = () => {
   const { sidebarOpen, toggleSidebar, isVendor, isAdmin, logout } = useContext(AppContext);
@@ -20,12 +21,10 @@ const MobileNav = () => {
 
   const adminLinks = [
     { name: 'Dashboard', path: '/admin-dashboard', icon: faHome },
-    { name: 'Vendors', path: '/admin-vendors', icon: faStore }, // Placeholder for admin vendor management
-    { name: 'Customers', path: '/admin-customers', icon: faUsers }, // Placeholder for admin customer management
-    { name: 'Orders', path: '/admin-orders', icon: faBoxes }, // Placeholder for admin order management
-    { name: 'Sales', path: '/admin-sales', icon: faChartLine }, // Placeholder for admin sales reports
-    { name: 'Broadcasts', path: '/admin-broadcasts', icon: faBullhorn }, // Placeholder for admin broadcasts
-    { name: 'Settings', path: '/admin-settings', icon: faCog }, // Placeholder for admin settings
+    { name: 'Users', path: '/admin-users', icon: Users },
+    { name: 'Products', path: '/admin-products', icon: Package },
+    { name: 'Orders', path: '/admin-orders', icon: Receipt },
+    // Add other admin specific links here if needed for mobile nav
   ];
 
   const vendorLinks = [
@@ -76,7 +75,11 @@ const MobileNav = () => {
                   className="flex items-center text-[var(--text)] w-full justify-center my-2 p-3 no-underline text-lg font-medium hover:bg-white/10 rounded-lg transition-colors duration-200"
                   aria-label={link.name}
                 >
-                  <FontAwesomeIcon icon={link.icon} className="mr-3 w-5 text-center" aria-hidden="true" />
+                  {typeof link.icon === 'string' ? (
+                    <FontAwesomeIcon icon={link.icon} className="mr-3 w-5 text-center" aria-hidden="true" />
+                  ) : (
+                    React.createElement(link.icon, { size: 20, className: "mr-3 w-5 text-center", "aria-hidden": "true" })
+                  )}
                   {link.name}
                 </Link>
               ))}

@@ -7,6 +7,7 @@ import { AppContext } from '../context/AppContext';
 import MobileNav from './MobileNav';
 import { NavLink, useNavigate } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Users, Package, Receipt } from 'lucide-react'; // Import Lucide icons for admin
 
 const Header = () => {
   const { sidebarOpen, toggleSidebar, cart, theme, toggleTheme, isVendor, isAdmin, logout } = useContext(AppContext);
@@ -33,7 +34,9 @@ const Header = () => {
 
   const adminLinks = [
     { name: 'Dashboard', path: '/admin-dashboard' },
-    // Add other admin specific links here if needed for desktop nav
+    { name: 'Users', path: '/admin-users' },
+    { name: 'Products', path: '/admin-products' },
+    { name: 'Orders', path: '/admin-orders' },
   ];
 
   const vendorLinks = [
@@ -130,6 +133,19 @@ const Header = () => {
                     <NavLink to="/payments" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm hover:bg-white/10" role="menuitem">
                       <FontAwesomeIcon icon={faCreditCard} aria-hidden="true" /> Payments
                     </NavLink>
+                  )}
+                  {isAdmin && (
+                    <>
+                      <NavLink to="/admin-users" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm hover:bg-white/10" role="menuitem">
+                        <Users size={16} aria-hidden="true" /> Users
+                      </NavLink>
+                      <NavLink to="/admin-products" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm hover:bg-white/10" role="menuitem">
+                        <Package size={16} aria-hidden="true" /> Products
+                      </NavLink>
+                      <NavLink to="/admin-orders" onClick={() => setProfileOpen(false)} className="flex items-center gap-3 px-4 py-2 text-sm hover:bg-white/10" role="menuitem">
+                        <Receipt size={16} aria-hidden="true" /> Orders
+                      </NavLink>
+                    </>
                   )}
                   <button onClick={toggleTheme} className="flex items-center gap-3 px-4 py-2 text-sm hover:bg-white/10 w-full" role="menuitem" aria-label={`Toggle ${theme === 'light' ? 'Dark' : 'Light'} Mode`}>
                     <FontAwesomeIcon icon={theme === 'light' ? faMoon : faSun} aria-hidden="true" />
