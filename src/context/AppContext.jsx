@@ -15,9 +15,8 @@ export const AppProvider = ({ children }) => {
     loginAsVendor,
     loginAsAdmin,
     logout,
-    registerUser: authRegisterUser, // Rename to avoid conflict with local registerUser
-    registerVendor: authRegisterVendor, // Rename to avoid conflict with local registerVendor
     setUser: setAuthUser, // Rename setUser from useAuth to avoid conflict
+    loginUserInState, // Use this after successful registration
   } = useAuth(); // Use the custom authentication hook
 
   const [theme, setTheme] = useState('dark');
@@ -489,7 +488,7 @@ export const AppProvider = ({ children }) => {
     try {
       const response = await api.auth.registerUser(userData);
       if (response) {
-        authRegisterUser(response); // Use the auth hook's registerUser to set user state
+        loginUserInState(response); // Use loginUserInState from useAuth
         toast.success(`Welcome to BazzarNet, ${response.name}!`);
         return true;
       }
@@ -498,7 +497,7 @@ export const AppProvider = ({ children }) => {
       toast.error(error.message || 'Registration failed.');
       return false;
     }
-  }, [authRegisterUser]);
+  }, [loginUserInState]);
 
   const registerVendor = useCallback(async (formData) => {
     try {
@@ -515,7 +514,7 @@ export const AppProvider = ({ children }) => {
         address: formData.address,
       });
       if (response) {
-        authRegisterVendor(response); // Use the auth hook's registerVendor to set user state
+        loginUserInState(response); // Use loginUserInState from useAuth
         toast.success(`Welcome, ${response.name}! Your store is now live.`);
         return true;
       }
@@ -524,7 +523,7 @@ export const AppProvider = ({ children }) => {
       toast.error(error.message || 'Vendor registration failed.');
       return false;
     }
-  }, [authRegisterVendor]);
+  }, [loginUserInState]);
 
 
   const value = {

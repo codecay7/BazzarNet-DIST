@@ -17,7 +17,7 @@ const useAuth = () => {
     localStorage.setItem('user', JSON.stringify(userData));
   }, []);
 
-  // Login Functions
+  // Login Functions (these will still be called directly by AppContext)
   const loginAsUser = useCallback(async (email, password) => {
     try {
       const response = await api.auth.login({ email, password });
@@ -78,48 +78,6 @@ const useAuth = () => {
     }
   }, []);
 
-  // Registration Functions
-  const registerUser = useCallback(async (name, email, password) => {
-    try {
-      const response = await api.auth.registerUser({ name, email, password });
-      if (response) {
-        loginUserInState(response); // Auto-login after successful registration
-        toast.success(`Welcome to BazzarNet, ${response.name}!`);
-        return true;
-      }
-      return false;
-    } catch (error) {
-      toast.error(error.message || 'Registration failed.');
-      return false;
-    }
-  }, [loginUserInState]);
-
-  const registerVendor = useCallback(async (formData) => {
-    try {
-      const response = await api.auth.registerVendor({
-        name: formData.fullName,
-        email: formData.email,
-        password: formData.password,
-        storeName: formData.businessName,
-        businessDescription: formData.description,
-        category: formData.category,
-        phone: formData.phone,
-        pan: formData.pan,
-        gst: formData.gst,
-        address: formData.address,
-      });
-      if (response) {
-        loginUserInState(response); // Auto-login after successful registration
-        toast.success(`Welcome, ${response.name}! Your store is now live.`);
-        return true;
-      }
-      return false;
-    } catch (error) {
-      toast.error(error.message || 'Vendor registration failed.');
-      return false;
-    }
-  }, [loginUserInState]);
-
   // Auto-login from localStorage and fetch user profile
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
@@ -128,7 +86,7 @@ const useAuth = () => {
         try {
           const fetchedUser = await api.userProfile.getMe();
           loginUserInState({ ...fetchedUser, token: storedUser.token }); // Keep the token from local storage
-          toast.success(`Welcome back, ${fetchedUser.name}!`);
+          // No toast here, as it's an auto-login, avoid spamming
         } catch (error) {
           console.error('Auto-login failed:', error);
           toast.error('Your session expired. Please log in again.');
@@ -148,8 +106,8 @@ const useAuth = () => {
     loginAsVendor,
     loginAsAdmin,
     logout,
-    registerUser,
-    registerVendor,
+    setUser, // Expose setUser for AppContext to update user details
+    loginUserInState, // Expose loginUserInState for AppContext to use after registration
   };
 };
 
