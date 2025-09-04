@@ -178,6 +178,7 @@ export const general = {
   getCategories: () => apiRequest('/categories'), // This endpoint doesn't exist yet in backend
   getFAQ: () => apiRequest('/faq'), // This endpoint doesn't exist yet in backend
   getAboutContent: () => apiRequest('/about'), // This endpoint doesn't exist yet in backend
+  submitSupportRequest: (supportData) => apiRequest('/support/submit', { method: 'POST', body: JSON.stringify(supportData) }), // New support request endpoint
 };
 
 // --- Password Reset Endpoints ---

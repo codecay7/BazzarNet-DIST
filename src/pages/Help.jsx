@@ -1,12 +1,18 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faQuestionCircle, faEnvelope } from '@fortawesome/free-solid-svg-icons';
-import toast from 'react-hot-toast';
+import Modal from '../components/Modal'; // Import the Modal component
+import SupportForm from '../components/SupportForm'; // Import the new SupportForm
 
 const Help = () => {
-  const handleContactClick = (e, type) => {
-    e.preventDefault();
-    toast(`This is a demo ${type} link. In a real app, it would open a ${type} client or form.`);
+  const [isSupportModalOpen, setIsSupportModalOpen] = useState(false);
+
+  const handleOpenSupportModal = () => {
+    setIsSupportModalOpen(true);
+  };
+
+  const handleCloseSupportModal = () => {
+    setIsSupportModalOpen(false);
   };
 
   return (
@@ -28,12 +34,20 @@ const Help = () => {
             <FontAwesomeIcon icon={faEnvelope} className="text-5xl text-[var(--accent)] mb-4" aria-hidden="true" />
             <h3 className="text-xl font-semibold mb-2">Email Support</h3>
             <p className="text-base opacity-80 mb-4">Send us an email and we'll get back to you within 24 hours.</p>
-            <a href="mailto:support@bazzarnet.com" onClick={(e) => handleContactClick(e, 'email')} className="bg-[var(--accent)] text-white py-2 px-6 rounded-lg font-medium hover:bg-[var(--accent-dark)] transition-colors" aria-label="Email support">
+            <button 
+              onClick={handleOpenSupportModal} 
+              className="bg-[var(--accent)] text-white py-2 px-6 rounded-lg font-medium hover:bg-[var(--accent-dark)] transition-colors" 
+              aria-label="Open email support form"
+            >
               Send Email
-            </a>
+            </button>
           </div>
         </div>
       </div>
+
+      <Modal isOpen={isSupportModalOpen} onClose={handleCloseSupportModal} title="Submit a Support Request">
+        <SupportForm onClose={handleCloseSupportModal} />
+      </Modal>
     </section>
   );
 };
