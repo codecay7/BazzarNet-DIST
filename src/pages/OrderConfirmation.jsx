@@ -1,9 +1,9 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect } from 'react'; // Added useEffect for logging
 import { Link, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
-import QRCode from 'react-qr-code'; // Ensure this import is correct
+import QRCode from 'react-qr-code';
 
 // Helper function to format ISO timestamp
 const formatTimestamp = (isoString) => {
@@ -19,6 +19,18 @@ const OrderConfirmation = () => {
   const { user } = useContext(AppContext);
   const location = useLocation();
   const { orderDetails } = location.state || { orderDetails: null };
+
+  // --- DEBUGGING LOGS ---
+  useEffect(() => {
+    console.log('OrderConfirmation: location.state', location.state);
+    console.log('OrderConfirmation: orderDetails', orderDetails);
+    if (orderDetails) {
+      const { id: orderId, otp } = orderDetails;
+      const qrCodeValue = JSON.stringify({ orderId, otp });
+      console.log('OrderConfirmation: qrCodeValue', qrCodeValue);
+    }
+  }, [location.state, orderDetails]);
+  // --- END DEBUGGING LOGS ---
 
   if (!orderDetails) {
     return (
