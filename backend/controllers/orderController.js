@@ -1,6 +1,10 @@
 import asyncHandler from '../middleware/asyncHandler.js';
 import Order from '../models/Order.js';
+import Product from '../models/Product.js'; // Import Product model
+import Store from '../models/Store.js'; // Import Store model
 import { generateOtp } from '../utils/helpers.js'; // Assuming a helper for OTP generation
+import { sendEmail } from '../services/emailService.js';
+import env from '../config/env.js'; // Import env to use FRONTEND_URL
 
 // @desc    Place a new order (Customer)
 // @route   POST /api/orders
@@ -56,9 +60,35 @@ const placeOrder = asyncHandler(async (req, res) => {
 
   const createdOrder = await order.save();
 
+  // Send order confirmation email to customer
+  const orderItemsHtml = createdOrder.items.map(item => `
+    <li>${item.name} (Qty: ${item.quantity}) - ₹${item.price.toFixed(2)}</li>
+  `).join('');
+
+  const orderConfirmationEmailHtml = `
+    <p>Hello ${createdOrder.customerName},</p>
+    <p>Thank you for your order from BazzarNet!</p>
+    <p>Your order #${createdOrder._id} has been placed successfully and is being processed.</p>
+    
+    <h3>Order Summary:</h3>
+    <ul>
+      ${orderItemsHtml}
+    </ul>
+    <p><strong>Total Price:</strong> ₹${createdOrder.totalPrice.toFixed(2)}</p>
+    <p><strong>Payment Method:</strong> ${createdOrder.paymentMethod}</p>
+    <p><strong>Shipping Address:</strong></p>
+    <p>
+      ${createdOrder.shippingAddress.houseNo}, ${createdOrder.shippingAddress.landmark ? createdOrder.shippingAddress.landmark + ', ' : ''}
+      ${createdOrder.shippingAddress.city}, ${createdOrder.shippingAddress.state} - ${createdOrder.shippingAddress.pinCode}
+    </p>
+    <p>Your delivery OTP is: <strong>${createdOrder.deliveryOtp}</strong>. Please provide this to the delivery person.</p>
+    <p>You can track your order status here: <a href="${env.FRONTEND_URL}/my-orders/${createdOrder._id}">${env.FRONTEND_URL}/my-orders/${createdOrder._id}</a></p>
+    <p>The BazzarNet Team</p>
+  `;
+  await sendEmail(createdOrder.customerEmail, `BazzarNet Order Confirmation #${createdOrder._id}`, 'Your order has been placed!', orderConfirmationEmailHtml);
+
   // In a real app, you'd also:
   // - Clear the user's cart
-  // - Send order confirmation email to customer
   // - Notify the vendor of a new order
   // - Create a Payment record (if not COD)
 

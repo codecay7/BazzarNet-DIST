@@ -3,6 +3,7 @@ import Store from '../models/Store.js';
 import { generateToken } from '../utils/jwt.js';
 import asyncHandler from '../middleware/asyncHandler.js';
 import { sendEmail } from '../services/emailService.js';
+import env from '../config/env.js'; // Import env to use FRONTEND_URL
 
 // @desc    Register a new customer user
 // @route   POST /api/auth/register/customer
@@ -27,8 +28,16 @@ const registerUser = asyncHandler(async (req, res) => {
   });
 
   if (user) {
-    // In a real app, you might send a welcome email here
-    // await sendEmail(user.email, 'Welcome to BazzarNet!', 'Thank you for registering!');
+    // Send welcome email
+    const welcomeEmailHtml = `
+      <p>Hello ${user.name},</p>
+      <p>Welcome to BazzarNet! We're excited to have you on board.</p>
+      <p>You can now start exploring local stores and products.</p>
+      <p>Visit your dashboard: <a href="${env.FRONTEND_URL}/dashboard">${env.FRONTEND_URL}/dashboard</a></p>
+      <p>Happy shopping!</p>
+      <p>The BazzarNet Team</p>
+    `;
+    await sendEmail(user.email, 'Welcome to BazzarNet!', 'Thank you for registering!', welcomeEmailHtml);
 
     res.status(201).json({
       _id: user._id,
@@ -90,8 +99,15 @@ const registerVendor = asyncHandler(async (req, res) => {
     vendorUser.store = store.name;
     await vendorUser.save();
 
-    // In a real app, you might send a welcome email here
-    // await sendEmail(vendorUser.email, 'Welcome to BazzarNet Vendor!', 'Your store is now live!');
+    // Send welcome email to vendor
+    const vendorWelcomeEmailHtml = `
+      <p>Hello ${vendorUser.name},</p>
+      <p>Welcome to BazzarNet as a Vendor! Your store "${store.name}" is now live.</p>
+      <p>You can now start managing your products and orders from your vendor dashboard.</p>
+      <p>Visit your vendor dashboard: <a href="${env.FRONTEND_URL}/dashboard">${env.FRONTEND_URL}/dashboard</a></p>
+      <p>The BazzarNet Team</p>
+    `;
+    await sendEmail(vendorUser.email, 'Welcome to BazzarNet Vendor!', 'Your store is now live!', vendorWelcomeEmailHtml);
 
     res.status(201).json({
       _id: vendorUser._id,
