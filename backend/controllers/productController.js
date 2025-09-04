@@ -1,0 +1,123 @@
+import asyncHandler from '../middleware/asyncHandler.js';
+import Product from '../models/Product.js';
+
+// @desc    Fetch all products (public)
+// @route   GET /api/products
+// @access  Public
+const getAllProducts = asyncHandler(async (req, res) => {
+  const { search, category, store } = req.query;
+  const query = {};
+
+  if (search) {
+    query.name = { $regex: search, $options: 'i' };
+  }
+  if (category) {
+    query.category = category;
+  }
+  if (store) {
+    query.store = store;
+  }
+
+  const products = await Product.find(query).populate('store', 'name');
+  res.json(products);
+});
+
+// @desc    Fetch a single product by ID (public)
+// @route   GET /api/products/:id
+// @access  Public
+const getProductById = asyncHandler(async (req, res) => {
+  const product = await Product.findById(req.params.id).populate('store', 'name logo');
+  if (product) {
+    res.json(product);
+  } else {
+    res.status(404);
+    throw new Error('Product not found');
+  }
+});
+
+// @desc    Create a new product (vendor)
+// @route   POST /api/products
+// @access  Private/Vendor
+const createProduct = asyncHandler(async (req, res) => {
+  const { name, description, price, originalPrice, stock, category, image } = req.body;
+
+  if (!req.user.storeId) {
+    res.status(403);
+    throw new Error('User is not a vendor or does not have an associated store.');
+  }
+
+  const product = new Product({
+    name,
+    description,
+    price,
+    originalPrice,
+    stock,
+    category,
+    image,
+    store: req.user.storeId, // Link product to the logged-in vendor's store
+  });
+
+  const createdProduct = await product.save();
+  res.status(201).json(createdProduct);
+});
+
+// @desc    Update a product (vendor)
+// @route   PUT /api/products/:id
+// @access  Private/Vendor
+const updateProduct = asyncHandler(async (req, res) => {
+  const product = await Product.findById(req.params.id);
+
+  if (!product) {
+    res.status(404);
+    throw new Error('Product not found');
+  }
+
+  // Authorization check: Ensure the vendor owns this product
+  if (product.store.toString() !== req.user.storeId.toString()) {
+    res.status(403);
+    throw new Error('Not authorized to update this product.');
+  }
+
+  const { name, description, price, originalPrice, stock, category, image, isActive } = req.body;
+
+  product.name = name || product.name;
+  product.description = description || product.description;
+  product.price = price || product.price;
+  product.originalPrice = originalPrice !== undefined ? originalPrice : product.originalPrice;
+  product.stock = stock !== undefined ? stock : product.stock;
+  product.category = category || product.category;
+  product.image = image || product.image;
+  product.isActive = isActive !== undefined ? isActive : product.isActive;
+
+  const updatedProduct = await product.save();
+  res.json(updatedProduct);
+});
+
+// @desc    Delete a product (vendor)
+// @route   DELETE /api/products/:id
+// @access  Private/Vendor
+const deleteProduct = asyncHandler(async (req, res) => {
+  const product = await Product.findById(req.params.id);
+
+  if (!product) {
+    res.status(404);
+    throw new Error('Product not found');
+  }
+
+  // Authorization check
+  if (product.store.toString() !== req.user.storeId.toString()) {
+    res.status(403);
+    throw new Error('Not authorized to delete this product.');
+  }
+
+  await Product.deleteOne({ _id: product._id });
+  res.json({ message: 'Product removed' });
+});
+
+export {
+  getAllProducts,
+  getProductById,
+  createProduct,
+  updateProduct,
+  deleteProduct,
+};

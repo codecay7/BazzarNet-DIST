@@ -1,32 +1,39 @@
 import express from 'express';
 import { protect, authorizeRoles } from '../middleware/authMiddleware.js';
-import { getAllUsers, updateUserStatus, deleteUser } from '../controllers/adminController.js';
+import {
+  getAllUsers,
+  updateUserStatus,
+  deleteUser,
+  adminUpdateProduct,
+  adminDeleteProduct,
+  adminUpdateStore,
+  adminDeleteStore,
+} from '../controllers/adminController.js';
 import { validate } from '../middleware/validationMiddleware.js';
-import Joi from 'joi'; // Import Joi for simple validation here
+import { updateProductSchema } from '../validators/productValidator.js';
+import { updateStoreSchema } from '../validators/storeValidator.js';
+import Joi from 'joi';
 
 const router = express.Router();
 
-// Joi schema for updating user status
 const updateUserStatusSchema = Joi.object({
-  isActive: Joi.boolean().required().messages({
-    'any.required': 'isActive status is required.',
-    'boolean.base': 'isActive must be a boolean value.',
-  }),
+  isActive: Joi.boolean().required(),
 });
 
-// All admin routes should be protected and restricted to admin role
+// All admin routes are protected and restricted to admin role
 router.use(protect, authorizeRoles('admin'));
 
-// @route   GET /api/admin/users
-// @desc    Get all users
+// User management routes
 router.get('/users', getAllUsers);
-
-// @route   PUT /api/admin/users/:id/status
-// @desc    Update user status (activate/deactivate)
 router.put('/users/:id/status', validate(updateUserStatusSchema), updateUserStatus);
-
-// @route   DELETE /api/admin/users/:id
-// @desc    Delete a user
 router.delete('/users/:id', deleteUser);
+
+// Product management routes (Admin)
+router.put('/products/:id', validate(updateProductSchema), adminUpdateProduct);
+router.delete('/products/:id', adminDeleteProduct);
+
+// Store management routes (Admin)
+router.put('/stores/:id', validate(updateStoreSchema), adminUpdateStore);
+router.delete('/stores/:id', adminDeleteStore);
 
 export default router;
