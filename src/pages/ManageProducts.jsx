@@ -19,7 +19,7 @@ const ManageProducts = () => {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      await simulateLoading(800); // Simulate network delay
+      // Removed await simulateLoading(800); // Removed this line
       
       const params = {
         page: currentPage,
@@ -33,7 +33,7 @@ const ManageProducts = () => {
     if (user?.storeId) { // Only fetch if user is a vendor and has a storeId
       loadData();
     }
-  }, [searchTerm, currentPage, fetchVendorProducts, simulateLoading, user?.storeId]);
+  }, [searchTerm, currentPage, fetchVendorProducts, user?.storeId]); // Removed simulateLoading from dependencies
 
   const handleOpenModal = (product = null) => {
     setEditingProduct(product);
