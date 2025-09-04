@@ -1,11 +1,12 @@
 import asyncHandler from '../middleware/asyncHandler.js';
 import Product from '../models/Product.js';
+import mongoose from 'mongoose'; // Import mongoose
 
 // @desc    Fetch all products (public)
 // @route   GET /api/products
 // @access  Public
 const getAllProducts = asyncHandler(async (req, res) => {
-  console.log('Backend: Received request for all products.'); // Added log
+  console.log('Backend: Received request for all products.');
   const pageSize = Number(req.query.limit) || 10; // Default limit 10
   const page = Number(req.query.page) || 1; // Default page 1
 
@@ -22,12 +23,21 @@ const getAllProducts = asyncHandler(async (req, res) => {
     ? { category: req.query.category }
     : {};
 
-  const storeFilter = req.query.store && req.query.store !== 'all'
-    ? { store: req.query.store }
-    : {};
+  let storeFilter = {};
+  if (req.query.store && req.query.store !== 'all') {
+    console.log('Backend: getAllProducts - Value of req.query.store:', req.query.store);
+    // Validate if req.query.store is a valid ObjectId before using it in the query
+    if (!mongoose.Types.ObjectId.isValid(req.query.store)) {
+      res.status(400);
+      throw new Error('Invalid store ID format provided.'); // More specific error
+    }
+    storeFilter = { store: req.query.store };
+  } else {
+    console.log('Backend: getAllProducts - Not filtering by store. req.query.store is:', req.query.store);
+  }
 
   const finalQuery = { ...keyword, ...categoryFilter, ...storeFilter };
-  console.log('Backend: getAllProducts - Final Query:', finalQuery); // ADDED LOG HERE
+  console.log('Backend: getAllProducts - Final Query:', finalQuery);
 
   const count = await Product.countDocuments(finalQuery);
   const products = await Product.find(finalQuery)
