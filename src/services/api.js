@@ -31,9 +31,13 @@ const getAuthToken = () => {
 const apiRequest = async (endpoint, options = {}) => {
   const token = getAuthToken();
   const headers = {
-    'Content-Type': 'application/json',
-    ...options.headers,
+    ...options.headers, // Allow overriding headers, especially for file uploads
   };
+
+  // Only set Content-Type to application/json if not a FormData object
+  if (!(options.body instanceof FormData)) {
+    headers['Content-Type'] = 'application/json';
+  }
 
   if (token) {
     headers['Authorization'] = `Bearer ${token}`;
@@ -146,6 +150,11 @@ export const admin = {
   initiateRefund: (orderId) => apiRequest(`/admin/orders/${orderId}/refund`, { method: 'POST' }), // This endpoint doesn't exist yet in backend
   updateStore: (storeId, storeData) => apiRequest(`/admin/stores/${storeId}`, { method: 'PUT', body: JSON.stringify(storeData) }),
   deleteStore: (storeId) => apiRequest(`/admin/stores/${storeId}`, { method: 'DELETE' }),
+};
+
+// --- Upload Endpoints ---
+export const upload = {
+  uploadImage: (formData) => apiRequest('/upload', { method: 'POST', body: formData }),
 };
 
 // --- General Endpoints ---

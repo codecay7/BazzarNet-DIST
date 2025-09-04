@@ -140,7 +140,7 @@ export const AppProvider = ({ children }) => {
       fetchAllProducts();
       fetchAppStores();
       fetchCart();
-      fetchWishlist(); // This is the call site.
+      fetchWishlist(); 
       fetchOrders();
       if (isAdmin) {
         fetchAllUsers();
@@ -487,7 +487,7 @@ export const AppProvider = ({ children }) => {
     adminDeleteProduct,
     registerUser,
     registerVendor,
-    fetchWishlist, // Ensure fetchWishlist is exposed in the context value
+    fetchWishlist, 
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

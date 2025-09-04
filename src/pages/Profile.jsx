@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faStore, faPen, faSave } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
 import toast from 'react-hot-toast';
-import { Building2, Mail, Phone, CreditCard, Landmark, ChevronDown, FileText } from 'lucide-react';
+import { Building2, Mail, Phone, CreditCard, Landmark, ChevronDown, FileText, UploadCloud } from 'lucide-react'; // Added UploadCloud icon
 import * as api from '../services/api';
 
 const indianStates = [
@@ -114,16 +114,23 @@ const Profile = () => {
     }
   };
 
-  const handleImageChange = (e) => {
+  const handleImageChange = async (e) => {
     if (e.target.files && e.target.files[0]) {
-      const newImage = e.target.files[0];
-      // In a real app, you'd upload this to a server and get a URL back
-      // For now, we'll just use a local URL
-      setProfileData(prev => ({
-        ...prev,
-        profileImage: URL.createObjectURL(newImage)
-      }));
-      toast.info('Profile image updated locally. Save changes to persist.');
+      const file = e.target.files[0];
+      const formData = new FormData();
+      formData.append('image', file); // 'image' must match the field name in uploadMiddleware
+
+      try {
+        const uploadResponse = await api.upload.uploadImage(formData);
+        const imageUrl = uploadResponse.filePath; // Get the actual URL from the backend
+        setProfileData(prev => ({
+          ...prev,
+          profileImage: imageUrl
+        }));
+        toast.success('Image uploaded successfully! Click "Save Changes" to update your profile.');
+      } catch (uploadError) {
+        toast.error(`Image upload failed: ${uploadError.message}`);
+      }
     }
   };
 
