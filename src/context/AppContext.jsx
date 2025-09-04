@@ -17,6 +17,7 @@ export const AppProvider = ({ children }) => {
     logout,
     registerUser,
     registerVendor,
+    setUser: setAuthUser, // Rename setUser from useAuth to avoid conflict
   } = useAuth(); // Use the custom authentication hook
 
   const [theme, setTheme] = useState('dark');
@@ -186,6 +187,17 @@ export const AppProvider = ({ children }) => {
   const generateOtp = () => {
     return Math.floor(100000 + Math.random() * 900000).toString();
   };
+
+  // --- NEW: Function to update user in context after profile update ---
+  const updateUserInContext = useCallback((updatedUserData) => {
+    // Update the user state from useAuth hook
+    setAuthUser(prevUser => ({ ...prevUser, ...updatedUserData }));
+    // Also update localStorage to keep it consistent
+    const storedUser = JSON.parse(localStorage.getItem('user'));
+    if (storedUser) {
+      localStorage.setItem('user', JSON.stringify({ ...storedUser, ...updatedUserData }));
+    }
+  }, [setAuthUser]);
 
   // --- Cart Functions (Backend Integrated) ---
   const addToCart = async (product) => {
@@ -526,6 +538,7 @@ export const AppProvider = ({ children }) => {
     registerUser,
     registerVendor,
     fetchWishlist, 
+    updateUserInContext, // NEW: Expose the new function
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

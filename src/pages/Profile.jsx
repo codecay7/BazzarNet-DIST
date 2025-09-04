@@ -11,7 +11,7 @@ import CustomerProfileForm from '../components/profile/CustomerProfileForm';
 import VendorProfileForm from '../components/profile/VendorProfileForm';
 
 const Profile = () => {
-  const { user, isVendor, loginAsUser, loginAsVendor } = useContext(AppContext);
+  const { user, isVendor, updateUserInContext } = useContext(AppContext); // Use updateUserInContext
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
 
@@ -179,12 +179,13 @@ const Profile = () => {
       formData.append('image', file);
 
       try {
-        const uploadResponse = await api.upload.uploadImage(formData);
-        const imageUrl = uploadResponse.filePath;
+        const uploadResponse = await api.userProfile.uploadProfileImage(formData); // Use the dedicated upload API
+        const imageUrl = uploadResponse.profileImage; // Get the actual URL from the backend response
         setProfileData(prev => ({
           ...prev,
           profileImage: imageUrl
         }));
+        updateUserInContext({ profileImage: imageUrl }); // Update context immediately
         toast.success('Image uploaded successfully! Click "Save Changes" to update your profile.');
       } catch (uploadError) {
         toast.error(`Image upload failed: ${uploadError.message}`);
@@ -200,14 +201,7 @@ const Profile = () => {
 
     try {
       const updatedUser = await api.userProfile.updateProfile(profileData);
-      // Re-login to update the context with the latest user data
-      if (isVendor) {
-        // For vendor, we need to ensure store details are also refreshed in context
-        // The loginAsVendor function should handle fetching the full user object including store details
-        await loginAsVendor(updatedUser.email, user.password); 
-      } else {
-        await loginAsUser(updatedUser.email, user.password);
-      }
+      updateUserInContext(updatedUser); // Use the new function to update context
       toast.success('Profile updated successfully!');
       setIsEditing(false);
       resetErrors(); // Clear errors after successful save
