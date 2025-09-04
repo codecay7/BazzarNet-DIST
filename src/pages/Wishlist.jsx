@@ -1,17 +1,34 @@
-import React, { useContext } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCartPlus, faHeart } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
 import { Link } from 'react-router-dom';
+import SkeletonCard from '../components/SkeletonCard'; // Assuming you might need a skeleton for loading
 
 const Wishlist = () => {
-  const { wishlist, removeFromWishlist, moveToCart } = useContext(AppContext);
+  const { wishlist, removeFromWishlist, moveToCart, simulateLoading } = useContext(AppContext);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadData = async () => {
+      setLoading(true);
+      await simulateLoading(500); // Simulate loading for wishlist
+      setLoading(false);
+    };
+    loadData();
+  }, [simulateLoading, wishlist.length]); // Re-run loading when wishlist changes
 
   return (
     <section className="w-full max-w-[1200px] my-10">
       <div className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-8 mx-4">
         <h2 className="text-3xl font-bold mb-5 md:text-4xl">Your Wishlist</h2>
-        {wishlist.length === 0 ? (
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+            {[...Array(3)].map((_, index) => ( // Show a few skeleton cards
+              <SkeletonCard key={index} />
+            ))}
+          </div>
+        ) : wishlist.length === 0 ? (
           <div className="text-center py-10">
             <FontAwesomeIcon icon={faHeart} className="text-6xl text-[var(--accent)] mb-4" aria-hidden="true" />
             <p className="text-base md:text-lg mb-4">Your wishlist is empty.</p>
@@ -22,7 +39,7 @@ const Wishlist = () => {
         ) : (
           <div className="grid grid-cols-1 gap-4" role="list">
             {wishlist.map((item) => (
-              <div key={item._id} className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4" role="listitem" aria-label={`Wishlist item: ${item.name}, Price: ₹${item.price.toFixed(2)}`}>
+              <div key={item.product._id} className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4" role="listitem" aria-label={`Wishlist item: ${item.name}, Price: ₹${item.price.toFixed(2)}`}>
                 <div className="flex items-center gap-4">
                   <img src={item.image} alt={item.name} className="w-20 h-20 object-cover rounded-lg" />
                   <div>
@@ -40,7 +57,7 @@ const Wishlist = () => {
                   </button>
                   <button
                     className="bg-red-500 text-white border-none py-2 px-4 rounded-lg flex items-center gap-2 font-medium hover:bg-red-600 transition-all duration-300"
-                    onClick={() => removeFromWishlist(item._id)}
+                    onClick={() => removeFromWishlist(item.product._id)}
                     aria-label={`Remove ${item.name} from wishlist`}
                   >
                     Remove

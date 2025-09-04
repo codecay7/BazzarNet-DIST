@@ -2,52 +2,58 @@ import React, { useContext, useMemo, useState, useEffect } from 'react';
 import { AppContext } from '../context/AppContext';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, LineChart, Line, Legend } from 'recharts';
 import { Wallet, Package, Users, Tag, Search, Calendar as CalendarIcon } from 'lucide-react';
-import { salesData } from '../data/mockData'; // Removed allProducts import
 import StatCard from './StatCard';
 import { useNavigate } from 'react-router-dom';
 import SkeletonText from './SkeletonText';
+import * as api from '../services/api'; // Import API service
 
 const VendorDashboard = () => {
-  const { user, orders, vendorProducts, simulateLoading, allAppProducts } = useContext(AppContext);
+  const { user, simulateLoading } = useContext(AppContext);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [dashboardData, setDashboardData] = useState(null);
+
+  const fetchVendorDashboardStats = async () => {
+    if (!user || !user.storeId) return;
+    setLoading(true);
+    try {
+      const stats = await api.vendor.getDashboardStats(user._id); // Pass user._id as vendorId
+      setDashboardData(stats);
+    } catch (error) {
+      toast.error(`Failed to load vendor dashboard stats: ${error.message}`);
+      setDashboardData(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadData = async () => {
-      setLoading(true);
-      await simulateLoading(1000);
-      setLoading(false);
-    };
-    loadData();
-  }, [simulateLoading, orders.length, vendorProducts.length, allAppProducts.length]); // Added dependencies for data changes
+    fetchVendorDashboardStats();
+  }, [user]); // Re-fetch if user changes (e.g., login/logout)
 
-  // Calculate real-time stats
-  const totalRevenue = orders.reduce((sum, order) => sum + order.totalPrice, 0); // Use totalPrice
-  const totalOrders = orders.length;
-  const uniqueCustomers = new Set(orders.map(o => o.user)).size; // Use user ID for unique customers
-  const totalProducts = vendorProducts.length; // Use vendorProducts for count
+  const formatCurrency = (value) => {
+    return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(value);
+  };
 
-  const fastSellingItems = useMemo(() => {
-    const salesCount = {};
-    orders.forEach(order => {
-      order.items.forEach(item => {
-        salesCount[item.product] = (salesCount[item.product] || 0) + item.quantity; // Use item.product (ID)
-      });
-    });
-
-    return Object.entries(salesCount)
-      .sort(([, a], [, b]) => b - a)
-      .slice(0, 5)
-      .map(([id, sales]) => {
-        const product = allAppProducts.find(p => p._id === id); // Find product from allAppProducts using _id
-        return { ...product, sales };
-      })
-      .filter(Boolean); // Filter out any undefined products if not found
-  }, [orders, allAppProducts]);
+  const CustomTooltip = ({ active, payload, label }) => {
+    if (active && payload && payload.length) {
+      return (
+        <div className="bg-[var(--tooltip-bg)] text-[var(--tooltip-text)] p-2 rounded-md shadow-lg border border-white/10 text-sm">
+          <p className="font-bold">{label}</p>
+          {payload.map((entry, index) => (
+            <p key={`item-${index}`} style={{ color: entry.color }}>
+              {entry.name}: {entry.value}
+            </p>
+          ))}
+        </div>
+      );
+    }
+    return null;
+  };
 
   return (
     <div className="w-full max-w-[1400px] mx-auto my-10 px-4 md:px-8">
-      {loading ? (
+      {loading || !dashboardData ? (
         <>
           <div className="flex flex-col md:flex-row justify-between items-center mb-8 gap-4">
             <div>
@@ -140,13 +146,13 @@ const VendorDashboard = () => {
               </div>
             </div>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-              <StatCard icon={<Wallet />} title="Total Revenue" value={`₹${totalRevenue.toLocaleString('en-IN')}`} change="+12% this month" />
+              <StatCard icon={<Wallet />} title="Total Revenue" value={`₹${dashboardData.totalRevenue.toLocaleString('en-IN')}`} change="+12% this month" />
               <div onClick={() => navigate('/orders')} className="cursor-pointer">
-                <StatCard icon={<Package />} title="Total Orders" value={totalOrders} change="+5% this month" />
+                <StatCard icon={<Package />} title="Total Orders" value={dashboardData.totalOrders} change="+5% this month" />
               </div>
-              <StatCard icon={<Users />} title="Customers" value={uniqueCustomers} change="+8% this month" />
+              <StatCard icon={<Users />} title="Customers" value={dashboardData.uniqueCustomers} change="+8% this month" />
               <div onClick={() => navigate('/manage-products')} className="cursor-pointer">
-                <StatCard icon={<Tag />} title="Products" value={totalProducts} change="+2 this month" />
+                <StatCard icon={<Tag />} title="Products" value={dashboardData.totalProducts} change="+2 this month" />
               </div>
             </div>
           </div>
@@ -158,9 +164,9 @@ const VendorDashboard = () => {
               <div className="lg:col-span-2 bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-6">
                 <h3 className="text-xl font-semibold mb-4">Sales Over Time</h3>
                 <ResponsiveContainer width="100%" height={300}>
-                  <LineChart data={salesData} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                  <LineChart data={dashboardData.salesTrend} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
                     <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.1)" />
-                    <XAxis dataKey="name" stroke="var(--text)" />
+                    <XAxis dataKey="_id" stroke="var(--text)" /> {/* Use _id for date */}
                     <YAxis stroke="var(--text)" tickFormatter={(value) => `₹${value/100000}L`} />
                     <Tooltip contentStyle={{ backgroundColor: 'var(--card-bg)', border: '1px solid rgba(255,255,255,0.1)' }} formatter={(value) => new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR' }).format(value)} />
                     <Legend />
@@ -171,7 +177,7 @@ const VendorDashboard = () => {
               <div className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-6">
                 <h3 className="text-xl font-semibold mb-4">Fast Selling Items</h3>
                 <div className="space-y-4">
-                  {fastSellingItems.map(product => (
+                  {dashboardData.fastSellingItems.map(product => (
                     <div 
                       key={product._id} 
                       onClick={() => navigate('/manage-products')} 

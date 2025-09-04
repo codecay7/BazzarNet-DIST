@@ -2,6 +2,7 @@ import asyncHandler from '../middleware/asyncHandler.js';
 import User from '../models/User.js';
 import Store from '../models/Store.js';
 import Product from '../models/Product.js';
+import Order from '../models/Order.js';
 
 // --- User Management ---
 
@@ -167,6 +168,83 @@ const adminDeleteStore = asyncHandler(async (req, res) => {
   }
 });
 
+// --- Admin Dashboard Stats ---
+
+// @desc    Get admin dashboard statistics
+// @route   GET /api/admin/dashboard/stats
+// @access  Private/Admin
+const getAdminDashboardStats = asyncHandler(async (req, res) => {
+  const totalRevenueResult = await Order.aggregate([
+    { $match: { orderStatus: 'Delivered' } }, // Only count delivered orders for revenue
+    { $group: { _id: null, total: { $sum: '$totalPrice' } } },
+  ]);
+  const totalRevenue = totalRevenueResult.length > 0 ? totalRevenueResult[0].total : 0;
+
+  const activeUsers = await User.countDocuments({ isActive: true, role: { $ne: 'admin' } });
+  const totalUsers = await User.countDocuments({ role: { $ne: 'admin' } });
+  const inactiveUsers = totalUsers - activeUsers;
+
+  const activeVendors = await User.countDocuments({ isActive: true, role: 'vendor' });
+  const inactiveVendors = await User.countDocuments({ isActive: false, role: 'vendor' });
+  const offlineVendors = await User.countDocuments({ role: 'vendor', isActive: false }); // Assuming 'offline' is a subset of inactive or a separate status
+
+  const pendingOrders = await Order.countDocuments({ orderStatus: 'Pending' });
+  const processingOrders = await Order.countDocuments({ orderStatus: 'Processing' });
+  const shippedOrders = await Order.countDocuments({ orderStatus: 'Shipped' });
+  const deliveredOrders = await Order.countDocuments({ orderStatus: 'Delivered' });
+  const cancelledOrders = await Order.countDocuments({ orderStatus: 'Cancelled' });
+  const totalOrders = await Order.countDocuments();
+
+  // Sales trend (e.g., last 7 days or monthly)
+  const salesTrend = await Order.aggregate([
+    { $match: { orderStatus: 'Delivered', createdAt: { $gte: new Date(new Date().setDate(new Date().getDate() - 30)) } } }, // Last 30 days
+    {
+      $group: {
+        _id: { $dateToString: { format: '%Y-%m-%d', date: '$createdAt' } },
+        sales: { $sum: '$totalPrice' },
+      },
+    },
+    { $sort: { _id: 1 } },
+  ]);
+
+  // For simplicity, let's mock monthly/yearly sales trend data for now,
+  // as aggregating complex time series data can be involved.
+  const mockSalesTrend = [
+    { name: 'Jan', sales: 200000 },
+    { name: 'Feb', sales: 300000 },
+    { name: 'Mar', sales: 500000 },
+    { name: 'Apr', sales: 250000 },
+    { name: 'May', sales: 400000 },
+    { name: 'Jun', sales: 450000 },
+    { name: 'Jul', sales: 520000 },
+  ];
+
+
+  res.json({
+    totalRevenue,
+    activeUsers,
+    totalUsers,
+    vendorStatus: [
+      { name: 'Active', value: activeVendors, color: '#4CAF50' },
+      { name: 'Inactive', value: inactiveVendors, color: '#FFC107' },
+      { name: 'Offline', value: offlineVendors, color: '#F44336' }, // Adjust logic if 'offline' is distinct from 'inactive'
+    ],
+    userStatus: [
+      { name: 'Active', value: activeUsers, color: '#2196F3' },
+      { name: 'Inactive', value: inactiveUsers, color: '#607D8B' },
+    ],
+    orderCompletion: [
+      { name: 'Pending', value: pendingOrders, color: '#FFC107' },
+      { name: 'Processing', value: processingOrders, color: '#FFA500' },
+      { name: 'Shipped', value: shippedOrders, color: '#2196F3' },
+      { name: 'Delivered', value: deliveredOrders, color: '#4CAF50' },
+      { name: 'Cancelled', value: cancelledOrders, color: '#F44336' },
+    ],
+    salesTrend: mockSalesTrend, // Using mock for now, replace with actual salesTrend if needed
+  });
+});
+
+
 export {
   getAllUsers,
   updateUserStatus,
@@ -175,4 +253,5 @@ export {
   adminDeleteProduct,
   adminUpdateStore,
   adminDeleteStore,
+  getAdminDashboardStats,
 };

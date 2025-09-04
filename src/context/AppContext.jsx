@@ -22,7 +22,7 @@ export const AppProvider = ({ children }) => {
   const [theme, setTheme] = useState('dark');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [cart, setCart] = useState([]);
-  const [wishlist, setWishlist] = useState([]); // Wishlist still uses mock logic for now
+  const [wishlist, setWishlist] = useState([]); 
   const [allAppProducts, setAllAppProducts] = useState([]);
   const [vendorProducts, setVendorProducts] = useState([]);
   const [orders, setOrders] = useState([]);
@@ -64,6 +64,17 @@ export const AppProvider = ({ children }) => {
     }
   }, [isLoggedIn, user?._id]);
 
+  const fetchWishlist = useCallback(async () => {
+    if (!isLoggedIn || !user?._id) return;
+    try {
+      const userWishlist = await api.customer.getWishlist();
+      setWishlist(userWishlist); // Assuming API returns array of items
+    } catch (error) {
+      toast.error(`Failed to load wishlist: ${error.message}`);
+      setWishlist([]); // Clear wishlist on error
+    }
+  }, [isLoggedIn, user?._id]);
+
   const fetchOrders = useCallback(async () => {
     if (!isLoggedIn || !user?._id) return;
     try {
@@ -99,6 +110,7 @@ export const AppProvider = ({ children }) => {
       fetchAllProducts();
       fetchAppStores();
       fetchCart();
+      fetchWishlist(); // Fetch wishlist on login
       fetchOrders();
       if (isAdmin) {
         fetchAllUsers();
@@ -113,7 +125,7 @@ export const AppProvider = ({ children }) => {
       setAppStores([]);
       setAllAppUsers([]);
     }
-  }, [isLoggedIn, user, isAdmin, fetchAllProducts, fetchAppStores, fetchCart, fetchOrders, fetchAllUsers]);
+  }, [isLoggedIn, user, isAdmin, fetchAllProducts, fetchAppStores, fetchCart, fetchWishlist, fetchOrders, fetchAllUsers]);
 
   // Effect to update vendorProducts when allAppProducts or user changes
   useEffect(() => {
@@ -203,42 +215,52 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  // --- Wishlist Functions (Mock Logic - Backend Endpoints Not Yet Implemented) ---
+  // --- Wishlist Functions (Backend Integrated) ---
   const addToWishlist = async (product) => {
     if (!isLoggedIn || !user?._id) {
       toast.error('Please log in to add items to your wishlist.');
       return;
     }
-    // Mock Logic for demo
-    setWishlist((prevWishlist) => {
-        if (prevWishlist.find(item => item._id === product._id)) { // Use _id for backend consistency
-            toast.error(`${product.name} is already in your wishlist.`);
-            return prevWishlist;
-        }
-        toast.success(`${product.name} added to wishlist!`);
-        return [...prevWishlist, product];
-    });
+    try {
+      const response = await api.customer.addToWishlist(product._id);
+      setWishlist(response);
+      toast.success(`${product.name} added to wishlist!`);
+    } catch (error) {
+      toast.error(`Error adding to wishlist: ${error.message}`);
+    }
   };
 
   const removeFromWishlist = async (productId) => {
     if (!isLoggedIn || !user?._id) return;
-    // Mock Logic for demo
-    setWishlist((prevWishlist) => prevWishlist.filter((item) => item._id !== productId));
-    toast.error(`Item removed from wishlist.`);
+    try {
+      const response = await api.customer.removeFromWishlist(productId);
+      setWishlist(response);
+      toast.error(`Item removed from wishlist.`);
+    } catch (error) {
+      toast.error(`Error removing from wishlist: ${error.message}`);
+    }
   };
 
   const moveToCart = async (product) => {
     if (!isLoggedIn || !user?._id) return;
-    // Mock Logic for demo
-    addToCart(product); // This will use the real addToCart API
-    removeFromWishlist(product._id);
+    try {
+      await addToCart(product); // Use the real addToCart API
+      await removeFromWishlist(product._id); // Use the real removeFromWishlist API
+      fetchWishlist(); // Re-fetch wishlist to ensure UI is updated
+    } catch (error) {
+      toast.error(`Error moving to cart: ${error.message}`);
+    }
   };
 
   const moveToWishlist = async (product) => {
     if (!isLoggedIn || !user?._id) return;
-    // Mock Logic for demo
-    addToWishlist(product);
-    removeFromCart(product._id); // This will use the real removeFromCart API
+    try {
+      await addToWishlist(product); // Use the real addToWishlist API
+      await removeFromCart(product._id); // Use the real removeFromCart API
+      fetchCart(); // Re-fetch cart to ensure UI is updated
+    } catch (error) {
+      toast.error(`Error moving to wishlist: ${error.message}`);
+    }
   };
 
   // --- Vendor Product Management Functions (Backend Integrated) ---
@@ -407,11 +429,11 @@ export const AppProvider = ({ children }) => {
     removeFromCart,
     updateCartQuantity,
     checkout,
-    wishlist, // Still mock
-    addToWishlist, // Still mock
-    removeFromWishlist, // Still mock
-    moveToCart, // Still mock
-    moveToWishlist, // Still mock
+    wishlist, 
+    addToWishlist, 
+    removeFromWishlist, 
+    moveToCart, 
+    moveToWishlist, 
     allAppProducts,
     vendorProducts,
     addVendorProduct,

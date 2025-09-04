@@ -8,6 +8,7 @@ import {
   adminDeleteProduct,
   adminUpdateStore,
   adminDeleteStore,
+  getAdminDashboardStats, // Import new function
 } from '../controllers/adminController.js';
 import { validate } from '../middleware/validationMiddleware.js';
 import { updateProductSchema } from '../validators/productValidator.js';
@@ -22,6 +23,9 @@ const updateUserStatusSchema = Joi.object({
 
 // All admin routes are protected and restricted to admin role
 router.use(protect, authorizeRoles('admin'));
+
+// Admin Dashboard Stats
+router.get('/dashboard/stats', getAdminDashboardStats);
 
 // User management routes
 router.get('/users', getAllUsers);

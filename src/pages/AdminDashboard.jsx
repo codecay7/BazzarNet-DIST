@@ -5,21 +5,30 @@ import {
   PieChart, Pie, Cell, Legend, LineChart, Line
 } from 'recharts';
 import { Users, ShoppingBag, Package, Settings, Bell, Store } from 'lucide-react';
-import { adminDashboardData } from '../data/mockData';
 import SkeletonText from '../components/SkeletonText';
+import * as api from '../services/api'; // Import API service
 
 const AdminDashboard = () => {
   const { user, simulateLoading } = useContext(AppContext);
   const [loading, setLoading] = useState(true);
+  const [dashboardData, setDashboardData] = useState(null);
+
+  const fetchAdminDashboardStats = async () => {
+    setLoading(true);
+    try {
+      const stats = await api.admin.getDashboardStats();
+      setDashboardData(stats);
+    } catch (error) {
+      toast.error(`Failed to load admin dashboard stats: ${error.message}`);
+      setDashboardData(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
-    const loadData = async () => {
-      setLoading(true);
-      await simulateLoading(1200); // Simulate a longer load for admin dashboard
-      setLoading(false);
-    };
-    loadData();
-  }, [simulateLoading]);
+    fetchAdminDashboardStats();
+  }, [user]); // Re-fetch if user changes (e.g., login/logout)
 
   const formatCurrency = (value) => {
     return new Intl.NumberFormat('en-IN', { style: 'currency', currency: 'INR', maximumFractionDigits: 0 }).format(value);
@@ -41,14 +50,14 @@ const AdminDashboard = () => {
     return null;
   };
 
-  const COLORS_VENDOR_STATUS = adminDashboardData.vendorStatus.map(d => d.color);
-  const COLORS_USER_STATUS = adminDashboardData.userStatus.map(d => d.color);
-  const COLORS_ORDER_COMPLETION = adminDashboardData.orderCompletion.map(d => d.color);
-  const COLORS_SALES_TREND = adminDashboardData.salesTrend.map(d => d.color);
+  const COLORS_VENDOR_STATUS = ['#4CAF50', '#FFC107', '#F44336']; // Green, Yellow, Red
+  const COLORS_USER_STATUS = ['#2196F3', '#607D8B']; // Blue, Grey
+  const COLORS_ORDER_COMPLETION = ['#FFC107', '#FFA500', '#2196F3', '#4CAF50', '#F44336']; // Yellow, Orange, Blue, Green, Red
+  const COLORS_SALES_TREND = ['#00BCD4', '#2196F3']; // Cyan, Blue
 
   return (
     <div className="w-full max-w-[1400px] mx-auto my-10 px-4 md:px-8">
-      {loading ? (
+      {loading || !dashboardData ? (
         <>
           <SkeletonText width="250px" height="2.5rem" className="mb-2" />
           <SkeletonText width="200px" height="1.5rem" className="mb-8" />
@@ -95,11 +104,11 @@ const AdminDashboard = () => {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
             <div className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-6">
               <h3 className="text-xl font-semibold mb-2">Total Revenue</h3>
-              <p className="text-4xl font-bold text-[var(--accent)]">{formatCurrency(adminDashboardData.totalRevenue)}</p>
+              <p className="text-4xl font-bold text-[var(--accent)]">{formatCurrency(dashboardData.totalRevenue)}</p>
             </div>
             <div className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-6">
               <h3 className="text-xl font-semibold mb-2">Active Users</h3>
-              <p className="text-4xl font-bold text-[var(--accent)]">{adminDashboardData.activeUsers}</p>
+              <p className="text-4xl font-bold text-[var(--accent)]">{dashboardData.activeUsers}</p>
             </div>
           </div>
 
@@ -109,13 +118,13 @@ const AdminDashboard = () => {
             <div className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-6">
               <h3 className="text-xl font-semibold mb-4">Vendor Status</h3>
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={adminDashboardData.vendorStatus} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                <BarChart data={dashboardData.vendorStatus} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.1)" />
                   <XAxis dataKey="name" stroke="var(--text)" />
                   <YAxis stroke="var(--text)" />
                   <Tooltip content={<CustomTooltip />} />
                   <Bar dataKey="value" name="Vendors">
-                    {adminDashboardData.vendorStatus.map((entry, index) => (
+                    {dashboardData.vendorStatus.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS_VENDOR_STATUS[index % COLORS_VENDOR_STATUS.length]} />
                     ))}
                   </Bar>
@@ -129,7 +138,7 @@ const AdminDashboard = () => {
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
-                    data={adminDashboardData.userStatus}
+                    data={dashboardData.userStatus}
                     cx="50%"
                     cy="50%"
                     innerRadius={60}
@@ -139,7 +148,7 @@ const AdminDashboard = () => {
                     dataKey="value"
                     nameKey="name"
                   >
-                    {adminDashboardData.userStatus.map((entry, index) => (
+                    {dashboardData.userStatus.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS_USER_STATUS[index % COLORS_USER_STATUS.length]} />
                     ))}
                   </Pie>
@@ -157,7 +166,7 @@ const AdminDashboard = () => {
               <ResponsiveContainer width="100%" height={300}>
                 <PieChart>
                   <Pie
-                    data={adminDashboardData.orderCompletion}
+                    data={dashboardData.orderCompletion}
                     cx="50%"
                     cy="50%"
                     innerRadius={60}
@@ -167,7 +176,7 @@ const AdminDashboard = () => {
                     dataKey="value"
                     nameKey="name"
                   >
-                    {adminDashboardData.orderCompletion.map((entry, index) => (
+                    {dashboardData.orderCompletion.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS_ORDER_COMPLETION[index % COLORS_ORDER_COMPLETION.length]} />
                     ))}
                   </Pie>
@@ -181,13 +190,13 @@ const AdminDashboard = () => {
             <div className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-6">
               <h3 className="text-xl font-semibold mb-4">Sales Trend</h3>
               <ResponsiveContainer width="100%" height={300}>
-                <BarChart data={adminDashboardData.salesTrend} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
+                <BarChart data={dashboardData.salesTrend} margin={{ top: 5, right: 20, left: -10, bottom: 5 }}>
                   <CartesianGrid strokeDasharray="3 3" stroke="rgba(255, 255, 255, 0.1)" />
                   <XAxis dataKey="name" stroke="var(--text)" />
                   <YAxis stroke="var(--text)" tickFormatter={(value) => formatCurrency(value)} />
                   <Tooltip content={<CustomTooltip />} />
                   <Bar dataKey="sales" name="Sales">
-                    {adminDashboardData.salesTrend.map((entry, index) => (
+                    {dashboardData.salesTrend.map((entry, index) => (
                       <Cell key={`cell-${index}`} fill={COLORS_SALES_TREND[index % COLORS_SALES_TREND.length]} />
                     ))}
                   </Bar>

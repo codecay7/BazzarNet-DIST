@@ -104,7 +104,7 @@ export const stores = {
 
 // --- Vendor Specific Endpoints ---
 export const vendor = {
-  getDashboardStats: (vendorId, params) => apiRequest(`/vendors/${vendorId}/dashboard/stats?${new URLSearchParams(params)}`), // This endpoint doesn't exist yet in backend
+  getDashboardStats: (vendorId) => apiRequest(`/vendors/${vendorId}/dashboard/stats`), // Fetch vendor dashboard stats
   getSalesTrend: (vendorId, params) => apiRequest(`/vendors/${vendorId}/dashboard/sales-trend?${new URLSearchParams(params)}`), // This endpoint doesn't exist yet in backend
   getFastSellingItems: (vendorId, params) => apiRequest(`/vendors/${vendorId}/dashboard/fast-selling-items?${new URLSearchParams(params)}`), // This endpoint doesn't exist yet in backend
   getProducts: (vendorId, params) => apiRequest(`/products?store=${vendorId}&${new URLSearchParams(params)}`), // Using general products endpoint with store filter
@@ -114,8 +114,8 @@ export const vendor = {
   getOrders: (storeId, params) => apiRequest(`/orders/store/${storeId}?${new URLSearchParams(params)}`), // Vendor orders
   updateOrderStatus: (orderId, status) => apiRequest(`/orders/${orderId}/status`, { method: 'PUT', body: JSON.stringify({ status }) }), // Vendor updates order status
   confirmDelivery: (orderId, otp) => apiRequest(`/orders/${orderId}/confirm-delivery`, { method: 'POST', body: JSON.stringify({ otp }) }), // Vendor confirms delivery
-  getPayments: (vendorId, params) => apiRequest(`/vendors/${vendorId}/payments?${new URLSearchParams(params)}`), // This endpoint doesn't exist yet in backend
-  reportPaymentIssue: (vendorId, paymentId) => apiRequest(`/vendors/${vendorId}/payments/${paymentId}/report-issue`, { method: 'POST' }), // This endpoint doesn't exist yet in backend
+  getPayments: (vendorId, params) => apiRequest(`/payments/vendor/${vendorId}?${new URLSearchParams(params)}`), // Fetch payments for a vendor
+  reportPaymentIssue: (paymentId) => apiRequest(`/payments/${paymentId}/report-issue`, { method: 'POST' }), // Report payment issue
 };
 
 // --- Customer Specific Endpoints ---
@@ -124,9 +124,9 @@ export const customer = {
   addToCart: (productId, quantity = 1) => apiRequest(`/cart`, { method: 'POST', body: JSON.stringify({ productId, quantity }) }),
   updateCartItem: (itemId, quantity) => apiRequest(`/cart/${itemId}`, { method: 'PUT', body: JSON.stringify({ quantity }) }),
   removeFromCart: (itemId) => apiRequest(`/cart/${itemId}`, { method: 'DELETE' }),
-  getWishlist: (userId) => apiRequest(`/customers/${userId}/wishlist`), // This endpoint doesn't exist yet in backend
-  addToWishlist: (userId, productId) => apiRequest(`/customers/${userId}/wishlist`, { method: 'POST', body: JSON.stringify({ productId }) }), // This endpoint doesn't exist yet in backend
-  removeFromWishlist: (userId, productId) => apiRequest(`/customers/${userId}/wishlist/${productId}`, { method: 'DELETE' }), // This endpoint doesn't exist yet in backend
+  getWishlist: () => apiRequest(`/wishlist`), // Fetch current user's wishlist
+  addToWishlist: (productId) => apiRequest(`/wishlist`, { method: 'POST', body: JSON.stringify({ productId }) }),
+  removeFromWishlist: (productId) => apiRequest(`/wishlist/${productId}`, { method: 'DELETE' }),
   placeOrder: (orderData) => apiRequest(`/orders`, { method: 'POST', body: JSON.stringify(orderData) }), // Place order
   getOrders: (userId, params) => apiRequest(`/orders/user/${userId}?${new URLSearchParams(params)}`), // Customer orders
   getOrderById: (orderId) => apiRequest(`/orders/${orderId}`), // This endpoint doesn't exist yet in backend
@@ -134,7 +134,7 @@ export const customer = {
 
 // --- Admin Specific Endpoints ---
 export const admin = {
-  getDashboardStats: (params) => apiRequest(`/admin/dashboard/stats?${new URLSearchParams(params)}`), // This endpoint doesn't exist yet in backend
+  getDashboardStats: () => apiRequest(`/admin/dashboard/stats`), // Fetch admin dashboard stats
   getUsers: (params) => apiRequest(`/admin/users?${new URLSearchParams(params)}`),
   updateUserStatus: (userId, isActive) => apiRequest(`/admin/users/${userId}/status`, { method: 'PUT', body: JSON.stringify({ isActive }) }),
   deleteUser: (userId) => apiRequest(`/admin/users/${userId}`, { method: 'DELETE' }),
