@@ -64,6 +64,7 @@ const placeOrder = asyncHandler(async (req, res) => {
     image: item.image,
     price: item.price,
     quantity: item.quantity,
+    unit: item.unit, // Include unit in order item
   }));
 
   const order = new Order({
@@ -84,7 +85,7 @@ const placeOrder = asyncHandler(async (req, res) => {
 
   // Send order confirmation email to customer
   const orderItemsHtml = createdOrder.items.map(item => `
-    <li>${item.name} (Qty: ${item.quantity}) - ₹${item.price.toFixed(2)}</li>
+    <li>${item.name} (Qty: ${item.quantity} ${item.unit}) - ₹${item.price.toFixed(2)}</li>
   `).join('');
 
   const orderConfirmationEmailHtml = `

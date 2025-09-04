@@ -14,6 +14,7 @@ const orderItemSchema = new mongoose.Schema({
     required: true,
     min: 1,
   },
+  unit: { type: String, required: true }, // New field for unit
 });
 
 const orderSchema = new mongoose.Schema({
@@ -54,7 +55,7 @@ const orderSchema = new mongoose.Schema({
   },
   orderStatus: {
     type: String,
-    enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'],
+    enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Refunded'], // Added Refunded
     default: 'Pending',
   },
   deliveryOtp: { // OTP for delivery confirmation

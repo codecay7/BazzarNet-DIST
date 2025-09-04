@@ -10,6 +10,7 @@ const ProductForm = ({ onSubmit, initialData = null }) => {
     price: '',
     originalPrice: '',
     stock: '',
+    unit: 'pc', // New field with default value
     category: '',
     description: '',
     image: '', // This will store the URL
@@ -21,6 +22,8 @@ const ProductForm = ({ onSubmit, initialData = null }) => {
     'Groceries', 'Bakery', 'Butcher', 'Cafe', 'Electronics', 
     'Furniture', 'Decor', 'Clothing', 'Other'
   ];
+
+  const units = ['pc', 'kg', 'g', 'L', 'ml', 'dozen', 'pack', 'set', 'pair', 'unit']; // Available units
 
   // Define the validation logic for the product form
   const productValidationLogic = useCallback((data) => {
@@ -34,6 +37,9 @@ const ProductForm = ({ onSubmit, initialData = null }) => {
     }
     if (!data.category) {
       newErrors.category = 'Category is required.';
+    }
+    if (!data.unit) { // Validate unit
+      newErrors.unit = 'Unit is required.';
     }
     if (isNaN(priceValue) || priceValue <= 0) {
       newErrors.price = 'Price must be a positive number.';
@@ -71,6 +77,7 @@ const ProductForm = ({ onSubmit, initialData = null }) => {
         price: initialData.price || '',
         originalPrice: initialData.originalPrice || '',
         stock: initialData.stock || '',
+        unit: initialData.unit || 'pc', // Set initial unit
         category: initialData.category || '',
         description: initialData.description || '',
         image: initialData.image || '', // Keep existing image URL
@@ -80,6 +87,7 @@ const ProductForm = ({ onSubmit, initialData = null }) => {
       // Reset form for new product
       setProduct({
         name: '', price: '', originalPrice: '', stock: '',
+        unit: 'pc', // Reset unit
         category: '', description: '', image: '',
       });
       // Removed setImageFile(null);
@@ -218,6 +226,24 @@ const ProductForm = ({ onSubmit, initialData = null }) => {
           {errors.stock && <p id="productStock-error" className="text-red-400 text-xs mt-1">{errors.stock}</p>}
         </div>
       </div>
+      {/* New Unit Selection Field */}
+      <div className="relative">
+        <label htmlFor="productUnit" className="block text-sm font-medium mb-1">Unit</label>
+        <select 
+          name="unit" 
+          id="productUnit"
+          value={product.unit} 
+          onChange={handleChange} 
+          className={`${inputClasses} appearance-none pr-8`}
+          aria-invalid={!!errors.unit}
+          aria-describedby={errors.unit ? "productUnit-error" : undefined}
+        >
+          {units.map(unit => <option key={unit} value={unit}>{unit}</option>)}
+        </select>
+        <div className="pointer-events-none absolute inset-y-0 right-0 top-6 flex items-center px-2 text-[var(--text)]" aria-hidden="true"><ChevronDown size={20} /></div>
+        {errors.unit && <p id="productUnit-error" className="text-red-400 text-xs mt-1">{errors.unit}</p>}
+      </div>
+
       <div>
         <label htmlFor="productDescription" className="block text-sm font-medium mb-1">Description</label>
         <textarea 

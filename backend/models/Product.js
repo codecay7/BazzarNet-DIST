@@ -27,6 +27,12 @@ const productSchema = new mongoose.Schema({
     min: 0,
     default: 0,
   },
+  unit: { // New field for unit of measurement
+    type: String,
+    enum: ['pc', 'kg', 'g', 'L', 'ml', 'dozen', 'pack', 'set', 'pair', 'unit'], // Common units
+    required: true,
+    default: 'pc', // Default to 'piece'
+  },
   category: {
     type: String,
     enum: ['Groceries', 'Bakery', 'Butcher', 'Cafe', 'Electronics', 'Furniture', 'Decor', 'Clothing', 'Other'],

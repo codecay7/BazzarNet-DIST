@@ -55,7 +55,7 @@ const OrderConfirmation = () => {
                 <ul role="list">
                     {items.map(item => (
                         <li key={item.product} className="flex justify-between py-1" role="listitem">
-                            <span>{item.name} x {item.quantity}</span>
+                            <span>{item.name} x {item.quantity} {item.unit}</span> {/* Display unit */}
                             <span>₹{(item.price * item.quantity).toFixed(2)}</span>
                         </li>
                     ))}

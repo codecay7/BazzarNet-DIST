@@ -31,7 +31,7 @@ const Cart = () => {
                     <img src={item.image} alt={item.name} className="w-20 h-20 object-cover rounded-lg" />
                     <div>
                       <h3 className="text-xl font-semibold">{item.name}</h3>
-                      <p className="text-base">₹{item.price.toFixed(2)}</p>
+                      <p className="text-base">₹{item.price.toFixed(2)} / {item.unit}</p> {/* Display unit */}
                     </div>
                   </div>
                   <div className="flex flex-col sm:flex-row items-center gap-4 mt-4 md:mt-0">

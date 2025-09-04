@@ -153,7 +153,7 @@ const Products = () => {
                     <div className="p-4 flex-grow flex-col">
                       <h3 className="text-xl font-semibold mb-2">{product.name}</h3>
                       <div className="flex items-baseline gap-2 mb-2">
-                        <p className="text-lg font-bold text-[var(--accent)]">₹{product.price.toFixed(2)}</p>
+                        <p className="text-lg font-bold text-[var(--accent)]">₹{product.price.toFixed(2)} / {product.unit}</p> {/* Display unit */}
                         {product.originalPrice && discount > 0 && (
                           <p className="text-sm text-gray-400 line-through">₹{product.originalPrice.toFixed(2)}</p>
                         )}

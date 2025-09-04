@@ -139,11 +139,11 @@ export const vendor = {
 // --- Customer Specific Endpoints ---
 export const customer = {
   getCart: () => apiRequest(`/cart`), // Fetch current user's cart
-  addToCart: (productId, quantity = 1) => apiRequest(`/cart`, { method: 'POST', body: JSON.stringify({ productId, quantity }) }),
+  addToCart: (productId, quantity = 1, unit) => apiRequest(`/cart`, { method: 'POST', body: JSON.stringify({ productId, quantity, unit }) }), // Pass unit
   updateCartItem: (itemId, quantity) => apiRequest(`/cart/${itemId}`, { method: 'PUT', body: JSON.stringify({ quantity }) }),
   removeFromCart: (itemId) => apiRequest(`/cart/${itemId}`, { method: 'DELETE' }),
   getWishlist: () => apiRequest(`/wishlist`), // Fetch current user's wishlist
-  addToWishlist: (productId) => apiRequest(`/wishlist`, { method: 'POST', body: JSON.stringify({ productId }) }),
+  addToWishlist: (productId, unit) => apiRequest(`/wishlist`, { method: 'POST', body: JSON.stringify({ productId, unit }) }), // Pass unit
   removeFromWishlist: (productId) => apiRequest(`/wishlist/${productId}`, { method: 'DELETE' }),
   placeOrder: (orderData) => apiRequest(`/orders`, { method: 'POST', body: JSON.stringify(orderData) }), // Place order
   getOrders: (userId, params) => apiRequest(`/orders/user/${userId}?${new URLSearchParams(params)}`), // Customer orders

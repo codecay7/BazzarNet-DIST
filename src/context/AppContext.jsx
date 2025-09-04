@@ -215,7 +215,7 @@ export const AppProvider = ({ children }) => {
       return;
     }
     try {
-      const response = await api.customer.addToCart(product._id, 1); // Assuming quantity is 1 for initial add
+      const response = await api.customer.addToCart(product._id, 1, product.unit); // Pass unit
       setCart(response.items); // Assuming backend returns updated cart items
       toast.success(`${product.name} added to cart!`);
     } catch (error) {
@@ -272,7 +272,7 @@ export const AppProvider = ({ children }) => {
       return;
     }
     try {
-      const response = await api.customer.addToWishlist(product._id);
+      const response = await api.customer.addToWishlist(product._id, product.unit); // Pass unit
       setWishlist(response);
       toast.success(`${product.name} added to wishlist!`);
     } catch (error) {

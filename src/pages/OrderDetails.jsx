@@ -76,7 +76,7 @@ const OrderDetails = () => {
               <ul className="space-y-2" role="list">
                 {order.items.map(item => (
                   <li key={item.product} className="flex justify-between" role="listitem">
-                    <span>{item.name} (Qty: {item.quantity})</span>
+                    <span>{item.name} (Qty: {item.quantity} {item.unit})</span> {/* Display unit */}
                     <span>₹{(item.price * item.quantity).toFixed(2)}</span>
                   </li>
                 ))}
@@ -122,6 +122,7 @@ const OrderDetails = () => {
                   <option>Shipped</option>
                   <option>Delivered</option>
                   <option>Cancelled</option>
+                  <option>Refunded</option>
                 </select>
                 <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-[var(--text)]" aria-hidden="true"><ChevronDown size={20} /></div>
               </div>

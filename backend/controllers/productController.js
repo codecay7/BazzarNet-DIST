@@ -69,7 +69,7 @@ const getRecommendedProducts = asyncHandler(async (req, res) => {
   // In a real app, this would involve recommendation logic
   const products = await Product.aggregate([
     { $sample: { size: 6 } }, // Get 6 random products
-    { $project: { name: 1, image: 1, price: 1, originalPrice: 1, store: 1 } } // Select relevant fields
+    { $project: { name: 1, image: 1, price: 1, originalPrice: 1, store: 1, unit: 1 } } // Select relevant fields including unit
   ]);
   res.json(products);
 });
@@ -78,7 +78,7 @@ const getRecommendedProducts = asyncHandler(async (req, res) => {
 // @route   POST /api/products
 // @access  Private/Vendor
 const createProduct = asyncHandler(async (req, res) => {
-  const { name, description, price, originalPrice, stock, category, image } = req.body;
+  const { name, description, price, originalPrice, stock, category, image, unit } = req.body; // Include unit
 
   if (!req.user.storeId) {
     res.status(403);
@@ -93,6 +93,7 @@ const createProduct = asyncHandler(async (req, res) => {
     stock,
     category,
     image,
+    unit, // Assign unit
     store: req.user.storeId, // Link product to the logged-in vendor's store
   });
 
@@ -117,7 +118,7 @@ const updateProduct = asyncHandler(async (req, res) => {
     throw new Error('Not authorized to update this product.');
   }
 
-  const { name, description, price, originalPrice, stock, category, image, isActive } = req.body;
+  const { name, description, price, originalPrice, stock, category, image, isActive, unit } = req.body; // Include unit
 
   product.name = name || product.name;
   product.description = description || product.description;
@@ -127,6 +128,7 @@ const updateProduct = asyncHandler(async (req, res) => {
   product.category = category || product.category;
   product.image = image || product.image;
   product.isActive = isActive !== undefined ? isActive : product.isActive;
+  product.unit = unit || product.unit; // Update unit
 
   const updatedProduct = await product.save();
   res.json(updatedProduct);

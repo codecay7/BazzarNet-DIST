@@ -32,8 +32,8 @@ const CustomerOrderDetails = () => {
     const currentStatus = order?.orderStatus || ''; // Use orderStatus
     return [
       { name: 'Ordered', completed: true, icon: faBox },
-      { name: 'Processing', completed: ['Processing', 'Shipped', 'Delivered'].includes(currentStatus), icon: faBox }, // Added Processing
-      { name: 'Shipped', completed: ['Shipped', 'Delivered'].includes(currentStatus), icon: faTruck },
+      { name: 'Processing', completed: ['Processing', 'Shipped', 'Delivered', 'Refunded'].includes(currentStatus), icon: faBox }, // Added Processing, Refunded
+      { name: 'Shipped', completed: ['Shipped', 'Delivered', 'Refunded'].includes(currentStatus), icon: faTruck },
       { name: 'Delivered', completed: currentStatus === 'Delivered', icon: faHome },
     ];
   }, [order?.orderStatus]); // Dependency on order.orderStatus
@@ -83,7 +83,7 @@ const CustomerOrderDetails = () => {
                 <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-md" />
                 <div className="flex-grow">
                   <p className="font-semibold">{item.name}</p>
-                  <p className="text-sm opacity-80">Quantity: {item.quantity}</p>
+                  <p className="text-sm opacity-80">Quantity: {item.quantity} {item.unit}</p> {/* Display unit */}
                 </div>
                 <p className="font-semibold">₹{(item.price * item.quantity).toFixed(2)}</p>
               </div>

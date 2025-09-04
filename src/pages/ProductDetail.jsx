@@ -44,7 +44,7 @@ const ProductDetail = () => {
               <div className="flex">{renderStars(product.rating)}</div>
               <span className="text-sm text-[var(--text)] opacity-80">({product.reviews} reviews)</span>
             </div>
-            <p className="text-2xl font-semibold text-[var(--accent)] mb-4">₹{product.price.toFixed(2)}</p>
+            <p className="text-2xl font-semibold text-[var(--accent)] mb-4">₹{product.price.toFixed(2)} / {product.unit}</p> {/* Display unit */}
             <p className="text-base md:text-lg mb-6">{product.description}</p>
             <div className="flex gap-4">
               <button
