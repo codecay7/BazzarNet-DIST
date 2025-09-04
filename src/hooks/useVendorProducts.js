@@ -79,6 +79,7 @@ const useVendorProducts = (isLoggedIn, isVendor, user) => {
     addVendorProduct,
     editVendorProduct,
     deleteVendorProduct,
+    setVendorProducts, // Explicitly return the setter
   };
 };
 

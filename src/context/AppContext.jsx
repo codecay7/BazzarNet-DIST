@@ -100,6 +100,7 @@ export const AppProvider = ({ children }) => {
     addVendorProduct,
     editVendorProduct,
     deleteVendorProduct,
+    setVendorProducts, // Destructure setVendorProducts here
   } = useVendorProducts(isLoggedIn, isVendor, user);
 
   const {
@@ -193,7 +194,7 @@ export const AppProvider = ({ children }) => {
       setAllAppUsers([]); // This line should now work correctly
       setAllAppUsersMeta({ page: 1, pages: 1, count: 0 });
     }
-  }, [isLoggedIn, user, isAdmin, isVendor, fetchAllProducts, fetchAppStores, fetchCart, fetchWishlist, fetchOrders, fetchAllUsers, fetchVendorProducts, setCart, setWishlist, setAllAppProducts, setAllAppProductsMeta, setAppStores, setOrders, setAllAppUsers]);
+  }, [isLoggedIn, user, isAdmin, isVendor, fetchAllProducts, fetchAppStores, fetchCart, fetchWishlist, fetchOrders, fetchAllUsers, fetchVendorProducts, setCart, setWishlist, setAllAppProducts, setAllAppProductsMeta, setAppStores, setOrders, setAllAppUsers, setVendorProducts, setVendorProductsMeta]);
 
 
   const value = {
