@@ -499,19 +499,19 @@ export const AppProvider = ({ children }) => {
     }
   }, [loginUserInState]);
 
-  const registerVendor = useCallback(async (formData) => {
+  const registerVendor = useCallback(async (vendorData) => { // Changed parameter name to vendorData for clarity
     try {
       const response = await api.auth.registerVendor({
-        name: formData.fullName,
-        email: formData.email,
-        password: formData.password,
-        storeName: formData.businessName,
-        businessDescription: formData.description,
-        category: formData.category,
-        phone: formData.phone,
-        pan: formData.pan,
-        gst: formData.gst,
-        address: formData.address,
+        name: vendorData.name, // Corrected: Use vendorData.name directly
+        email: vendorData.email,
+        password: vendorData.password,
+        storeName: vendorData.storeName,
+        businessDescription: vendorData.businessDescription, // Corrected: Use vendorData.businessDescription directly
+        category: vendorData.category,
+        phone: vendorData.phone,
+        pan: vendorData.pan,
+        gst: vendorData.gst,
+        address: vendorData.address,
       });
       if (response) {
         loginUserInState(response); // Use loginUserInState from useAuth
