@@ -75,6 +75,17 @@ export const AppProvider = ({ children }) => {
     }
   }, [isLoggedIn, user?._id]);
 
+  const fetchWishlist = useCallback(async () => {
+    if (!isLoggedIn || !user?._id) return;
+    try {
+      const userWishlist = await api.customer.getWishlist();
+      setWishlist(userWishlist); // Assuming API returns array of items
+    } catch (error) {
+      toast.error(`Failed to load wishlist: ${error.message}`);
+      setWishlist([]); // Clear wishlist on error
+    }
+  }, [isLoggedIn, user?._id]);
+
   const fetchOrders = useCallback(async (params = {}) => {
     if (!isLoggedIn || !user?._id) return;
     try {
@@ -129,7 +140,7 @@ export const AppProvider = ({ children }) => {
       fetchAllProducts();
       fetchAppStores();
       fetchCart();
-      fetchWishlist(); 
+      fetchWishlist(); // This is the call site.
       fetchOrders();
       if (isAdmin) {
         fetchAllUsers();
@@ -476,6 +487,7 @@ export const AppProvider = ({ children }) => {
     adminDeleteProduct,
     registerUser,
     registerVendor,
+    fetchWishlist, // Ensure fetchWishlist is exposed in the context value
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
