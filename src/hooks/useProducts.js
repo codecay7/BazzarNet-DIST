@@ -44,7 +44,8 @@ const useProducts = () => {
     recommendedProducts,
     recommendedLoading,
     fetchRecommendedProducts,
-    setAllAppProducts // Expose for admin/vendor product updates
+    setAllAppProducts, // Expose for admin/vendor product updates
+    setAllAppProductsMeta // Expose the setter for meta data
   };
 };
 

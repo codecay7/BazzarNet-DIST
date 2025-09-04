@@ -1,7 +1,7 @@
 import React, { useContext } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCartPlus, faHeart } from '@fortawesome/free-solid-svg-icons';
+import { faCartPlus, faHeart, faStar, faStarHalfAlt } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
 
 const StorePage = () => {
@@ -26,6 +26,19 @@ const StorePage = () => {
   const calculateDiscount = (price, originalPrice) => {
     if (!originalPrice || originalPrice <= price) return 0;
     return Math.round(((originalPrice - price) / originalPrice) * 100);
+  };
+
+  const renderStars = (rating) => {
+    const fullStars = Math.floor(rating);
+    const halfStar = rating % 1 !== 0;
+    const stars = [];
+    for (let i = 0; i < fullStars; i++) {
+      stars.push(<FontAwesomeIcon key={`full-${i}`} icon={faStar} className="text-yellow-400" aria-hidden="true" />);
+    }
+    if (halfStar) {
+      stars.push(<FontAwesomeIcon key="half" icon={faStarHalfAlt} className="text-yellow-400" aria-hidden="true" />);
+    }
+    return stars;
   };
 
   return (
@@ -53,11 +66,16 @@ const StorePage = () => {
                     <div className="p-4 flex-grow flex-col">
                       <h3 className="text-xl font-semibold mb-2">{product.name}</h3>
                       <div className="flex items-baseline gap-2 mb-2">
-                        <p className="text-lg font-bold text-[var(--accent)]">₹{product.price.toFixed(2)}</p>
+                        <p className="text-lg font-bold text-[var(--accent)]">₹{product.price.toFixed(2)} / {product.unit}</p> {/* Display unit */}
                         {product.originalPrice && discount > 0 && (
                           <p className="text-sm text-gray-400 line-through">₹{product.originalPrice.toFixed(2)}</p>
                         )}
                       </div>
+                      <div className="flex items-center gap-2 text-sm mb-2">
+                        <div className="flex">{renderStars(product.rating)}</div>
+                        <span className="opacity-80">({product.reviews})</span>
+                      </div>
+                      <p className="text-sm opacity-80">Stock: {product.stock}</p>
                     </div>
                   </Link>
                   <div className="flex gap-2 mt-4 p-4 pt-0">

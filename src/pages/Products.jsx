@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useContext, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCartPlus, faHeart } from '@fortawesome/free-solid-svg-icons';
+import { faCartPlus, faHeart, faStar, faStarHalfAlt } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
 import { Link } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
@@ -38,6 +38,19 @@ const Products = () => {
   const calculateDiscount = (price, originalPrice) => {
     if (!originalPrice || originalPrice <= price) return 0;
     return ((originalPrice - price) / originalPrice) * 100;
+  };
+
+  const renderStars = (rating) => {
+    const fullStars = Math.floor(rating);
+    const halfStar = rating % 1 !== 0;
+    const stars = [];
+    for (let i = 0; i < fullStars; i++) {
+      stars.push(<FontAwesomeIcon key={`full-${i}`} icon={faStar} className="text-yellow-400" aria-hidden="true" />);
+    }
+    if (halfStar) {
+      stars.push(<FontAwesomeIcon key="half" icon={faStarHalfAlt} className="text-yellow-400" aria-hidden="true" />);
+    }
+    return stars;
   };
 
   const sortedProducts = useMemo(() => {
@@ -158,6 +171,11 @@ const Products = () => {
                           <p className="text-sm text-gray-400 line-through">₹{product.originalPrice.toFixed(2)}</p>
                         )}
                       </div>
+                      <div className="flex items-center gap-2 text-sm mb-2">
+                        <div className="flex">{renderStars(product.rating)}</div>
+                        <span className="opacity-80">({product.reviews})</span>
+                      </div>
+                      <p className="text-sm opacity-80">Stock: {product.stock}</p>
                     </div>
                   </Link>
                   <div className="flex gap-2 mt-4 p-4 pt-0">

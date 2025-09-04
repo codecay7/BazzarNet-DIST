@@ -25,7 +25,7 @@ const OrderSummary = ({ cart, total, shippingAddress, onEditAddress, onNextStep,
                 <img src={item.image} alt={item.name} className="w-12 h-12 object-cover rounded-md" />
                 <div>
                   <p className="font-medium">{item.name}</p>
-                  <p className="text-sm opacity-70">Qty: {item.quantity}</p>
+                  <p className="text-sm opacity-70">Qty: {item.quantity} {item.unit}</p> {/* Display unit */}
                 </div>
               </div>
               <p className="font-semibold">₹{(item.price * item.quantity).toFixed(2)}</p>
