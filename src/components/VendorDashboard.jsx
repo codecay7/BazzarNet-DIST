@@ -8,7 +8,7 @@ import { useNavigate } from 'react-router-dom';
 import SkeletonText from './SkeletonText';
 
 const VendorDashboard = () => {
-  const { user, orders, vendorProducts, simulateLoading, allAppProducts } = useContext(AppContext); // Use allAppProducts
+  const { user, orders, vendorProducts, simulateLoading, allAppProducts } = useContext(AppContext);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
@@ -19,19 +19,19 @@ const VendorDashboard = () => {
       setLoading(false);
     };
     loadData();
-  }, [simulateLoading]);
+  }, [simulateLoading, orders.length, vendorProducts.length, allAppProducts.length]); // Added dependencies for data changes
 
   // Calculate real-time stats
-  const totalRevenue = orders.reduce((sum, order) => sum + order.total, 0);
+  const totalRevenue = orders.reduce((sum, order) => sum + order.totalPrice, 0); // Use totalPrice
   const totalOrders = orders.length;
-  const uniqueCustomers = new Set(orders.map(o => o.customer.name)).size;
+  const uniqueCustomers = new Set(orders.map(o => o.user)).size; // Use user ID for unique customers
   const totalProducts = vendorProducts.length; // Use vendorProducts for count
 
   const fastSellingItems = useMemo(() => {
     const salesCount = {};
     orders.forEach(order => {
       order.items.forEach(item => {
-        salesCount[item.id] = (salesCount[item.id] || 0) + item.quantity;
+        salesCount[item.product] = (salesCount[item.product] || 0) + item.quantity; // Use item.product (ID)
       });
     });
 
@@ -39,10 +39,11 @@ const VendorDashboard = () => {
       .sort(([, a], [, b]) => b - a)
       .slice(0, 5)
       .map(([id, sales]) => {
-        const product = allAppProducts.find(p => p.id === parseInt(id)); // Find product from allAppProducts
+        const product = allAppProducts.find(p => p._id === id); // Find product from allAppProducts using _id
         return { ...product, sales };
-      });
-  }, [orders, allAppProducts]); // Add allAppProducts to dependency array
+      })
+      .filter(Boolean); // Filter out any undefined products if not found
+  }, [orders, allAppProducts]);
 
   return (
     <div className="w-full max-w-[1400px] mx-auto my-10 px-4 md:px-8">
@@ -172,7 +173,7 @@ const VendorDashboard = () => {
                 <div className="space-y-4">
                   {fastSellingItems.map(product => (
                     <div 
-                      key={product.id} 
+                      key={product._id} 
                       onClick={() => navigate('/manage-products')} 
                       className="flex items-center gap-4 cursor-pointer hover:bg-white/10 p-2 rounded-lg transition-colors"
                     >

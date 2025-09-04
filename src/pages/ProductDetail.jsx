@@ -5,9 +5,9 @@ import { faCartPlus, faHeart, faStar, faStarHalfAlt } from '@fortawesome/free-so
 import { AppContext } from '../context/AppContext';
 
 const ProductDetail = () => {
-  const { addToCart, addToWishlist, allAppProducts } = useContext(AppContext); // Use allAppProducts
+  const { addToCart, addToWishlist, allAppProducts } = useContext(AppContext);
   const { id } = useParams();
-  const product = allAppProducts.find(p => p.id === parseInt(id)); // Find product from allAppProducts
+  const product = allAppProducts.find(p => p._id === id); // Find product using _id
 
   if (!product) {
     return (

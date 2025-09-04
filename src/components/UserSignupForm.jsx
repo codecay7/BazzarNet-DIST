@@ -7,7 +7,7 @@ import { faUserPlus } from '@fortawesome/free-solid-svg-icons';
 import toast from 'react-hot-toast';
 
 const UserSignupForm = () => {
-  const { loginAsUser } = useContext(AppContext);
+  const { registerUser } = useContext(AppContext); // Use registerUser
   const navigate = useNavigate();
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
@@ -33,13 +33,10 @@ const UserSignupForm = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSignup = (e) => {
+  const handleSignup = async (e) => { // Made async
     e.preventDefault();
     if (validateForm()) {
-      // In a real app, this would be a registration call.
-      // For now, we'll just log the user in.
-      toast.success('Registration successful! Logging you in.');
-      if (loginAsUser(name, email, password)) {
+      if (await registerUser(name, email, password)) { // Call registerUser
         navigate('/dashboard');
       }
     } else {

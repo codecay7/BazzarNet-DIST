@@ -45,7 +45,7 @@ const AdminProductManagement = () => {
 
   const handleFormSubmit = (productData) => {
     if (editingProduct) {
-      adminEditProduct(editingProduct.id, productData);
+      adminEditProduct(editingProduct._id, productData);
     } else {
       // Admin adding a product would need to assign a storeId,
       // For simplicity, we'll just edit existing products for now.
@@ -71,7 +71,7 @@ const AdminProductManagement = () => {
     }
 
     if (filterStore !== 'all') {
-      products = products.filter(product => product.storeId === parseInt(filterStore));
+      products = products.filter(product => product.store._id === filterStore); // Filter by populated store._id
     }
 
     if (filterCategory !== 'all') {
@@ -83,7 +83,7 @@ const AdminProductManagement = () => {
 
   const totalPages = Math.ceil(filteredProducts.length / itemsPerPage);
   const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage; // Corrected from lastItemIndex
+  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
   const currentProducts = filteredProducts.slice(indexOfFirstItem, indexOfLastItem);
 
   const handlePageChange = (pageNumber) => {
@@ -123,7 +123,7 @@ const AdminProductManagement = () => {
               >
                 <option value="all">All Stores</option>
                 {appStores.map(store => (
-                  <option key={store.id} value={store.id}>{store.name}</option>
+                  <option key={store._id} value={store._id}>{store.name}</option>
                 ))}
               </select>
               <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-[var(--text)]" aria-hidden="true"><Store size={20} /></div>
@@ -155,9 +155,9 @@ const AdminProductManagement = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8" role="list">
               {currentProducts.map((product) => {
                 const discount = calculateDiscount(product.price, product.originalPrice);
-                const storeName = appStores.find(s => s.id === product.storeId)?.name || 'N/A';
+                const storeName = appStores.find(s => s._id === product.store._id)?.name || 'N/A'; // Use product.store._id
                 return (
-                  <div key={product.id} className="bg-black/10 border border-white/10 rounded-2xl overflow-hidden shadow-lg flex flex-col" role="listitem" aria-label={`Product: ${product.name}`}>
+                  <div key={product._id} className="bg-black/10 border border-white/10 rounded-2xl overflow-hidden shadow-lg flex flex-col" role="listitem" aria-label={`Product: ${product.name}`}>
                     <div className="relative">
                       <img src={product.image} alt={product.name} className="w-full h-48 object-cover" />
                       {discount > 0 && (
@@ -179,7 +179,7 @@ const AdminProductManagement = () => {
                         <button onClick={() => handleOpenModal(product)} className="flex-1 bg-white/10 text-[var(--text)] py-2 px-4 rounded-lg font-medium hover:bg-white/20 transition-colors flex items-center justify-center gap-2" aria-label={`Edit ${product.name}`}>
                           <FontAwesomeIcon icon={faEdit} aria-hidden="true" /> Edit
                         </button>
-                        <button onClick={() => adminDeleteProduct(product.id)} className="bg-red-500/20 text-red-400 py-2 px-4 rounded-lg font-medium hover:bg-red-500/40 transition-colors flex items-center justify-center gap-2" aria-label={`Delete ${product.name}`}>
+                        <button onClick={() => adminDeleteProduct(product._id)} className="bg-red-500/20 text-red-400 py-2 px-4 rounded-lg font-medium hover:bg-red-500/40 transition-colors flex items-center justify-center gap-2" aria-label={`Delete ${product.name}`}>
                           <FontAwesomeIcon icon={faTrash} aria-hidden="true" />
                         </button>
                       </div>

@@ -7,7 +7,7 @@ import SkeletonText from '../components/SkeletonText';
 import SkeletonCard from '../components/SkeletonCard';
 
 const CustomerDashboard = () => {
-  const { user, cart, wishlist, simulateLoading, allAppProducts, orders, addToCart } = useContext(AppContext); // Added addToCart
+  const { user, cart, wishlist, simulateLoading, allAppProducts, orders, addToCart } = useContext(AppContext);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
 
@@ -18,17 +18,17 @@ const CustomerDashboard = () => {
       setLoading(false);
     };
     loadData();
-  }, [simulateLoading]);
+  }, [simulateLoading, user, cart.length, wishlist.length, orders.length, allAppProducts.length]); // Added dependencies for data changes
 
   // Dynamically find the latest order for the logged-in user (still needed for stats)
   const latestOrder = useMemo(() => {
     if (!user || !user.email || orders.length === 0) return null;
     
-    const userOrders = orders.filter(order => order.customerEmail === user.email); // Filter by customerEmail
+    const userOrders = orders.filter(order => order.user === user._id); // Filter by user._id
     if (userOrders.length === 0) return null;
 
     // Sort by date to get the latest order
-    return userOrders.sort((a, b) => new Date(b.date) - new Date(a.date))[0];
+    return userOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0]; // Use createdAt
   }, [user, orders]);
 
   const recommendedProducts = allAppProducts.slice(0, 6); // Increased to 6 recommended products
@@ -36,7 +36,7 @@ const CustomerDashboard = () => {
   const stats = [
     { icon: faShoppingBag, label: 'Items in Cart', value: cart.length, path: '/cart' },
     { icon: faHeart, label: 'Wishlisted Items', value: wishlist.length, path: '/wishlist' },
-    { icon: faReceipt, label: 'Total Orders', value: orders.filter(order => order.customerEmail === user?.email).length, path: '/orders' }, // Dynamic total orders
+    { icon: faReceipt, label: 'Total Orders', value: orders.filter(order => order.user === user?._id).length, path: '/orders' }, // Dynamic total orders
   ];
 
   return (
@@ -90,7 +90,7 @@ const CustomerDashboard = () => {
               <h2 className="text-2xl font-bold mb-4">Recommended Products</h2>
               <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                 {recommendedProducts.map(product => (
-                  <div key={product.id} className="flex flex-col bg-black/10 p-3 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                  <div key={product._id} className="flex flex-col bg-black/10 p-3 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
                     <img src={product.image} alt={product.name} className="w-full h-32 object-cover rounded-md mb-2" />
                     <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
                     <p className="text-sm opacity-70 mb-2">₹{product.price.toFixed(2)}</p>

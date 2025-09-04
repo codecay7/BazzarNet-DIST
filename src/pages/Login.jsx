@@ -12,20 +12,21 @@ const Login = () => {
   const [activeTab, setActiveTab] = useState('user');
 
   // User Login State
-  const [userName, setUserName] = useState('');
+  const [userName, setUserName] = useState(''); // Not used in backend login, but kept for form consistency
   const [userEmail, setUserEmail] = useState('');
   const [userPassword, setUserPassword] = useState('');
   const [userErrors, setUserErrors] = useState({});
 
   // Vendor Login State
-  const [vendorName, setVendorName] = useState('');
-  const [vendorStore, setVendorStore] = useState('');
+  const [vendorName, setVendorName] = useState(''); // Not used in backend login, but kept for form consistency
+  const [vendorStore, setVendorStore] = useState(''); // Not used in backend login, but kept for form consistency
   const [vendorEmail, setVendorEmail] = useState('');
   const [vendorPassword, setVendorPassword] = useState('');
   const [vendorErrors, setVendorErrors] = useState({});
 
   // Admin Login State
-  const [adminUsername, setAdminUsername] = useState('');
+  const [adminUsername, setAdminUsername] = useState(''); // Not used in backend login, but kept for form consistency
+  const [adminEmail, setAdminEmail] = useState(''); // Using email for admin login
   const [adminPassword, setAdminPassword] = useState('');
   const [adminErrors, setAdminErrors] = useState({});
 
@@ -72,8 +73,10 @@ const Login = () => {
 
   const validateAdminLogin = () => {
     let newErrors = {};
-    if (!adminUsername.trim()) {
-      newErrors.username = 'Username is required.';
+    if (!adminEmail.trim()) { // Using adminEmail for validation
+      newErrors.email = 'Email is required.';
+    } else if (!/\S+@\S+\.\S+/.test(adminEmail)) {
+      newErrors.email = 'Email address is invalid.';
     }
     if (!adminPassword) {
       newErrors.password = 'Password is required.';
@@ -82,10 +85,10 @@ const Login = () => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleUserLogin = (e) => {
+  const handleUserLogin = async (e) => {
     e.preventDefault();
     if (validateUserLogin()) {
-      if (loginAsUser(userName, userEmail, userPassword)) {
+      if (await loginAsUser(userEmail, userPassword)) { // Pass email and password
         navigate('/dashboard');
       }
     } else {
@@ -93,10 +96,10 @@ const Login = () => {
     }
   };
 
-  const handleVendorLogin = (e) => {
+  const handleVendorLogin = async (e) => {
     e.preventDefault();
     if (validateVendorLogin()) {
-      if (loginAsVendor(vendorName, vendorStore, vendorEmail, vendorPassword)) {
+      if (await loginAsVendor(vendorEmail, vendorPassword)) { // Pass email and password
         navigate('/dashboard');
       }
     } else {
@@ -104,11 +107,11 @@ const Login = () => {
     }
   };
 
-  const handleAdminLogin = (e) => {
+  const handleAdminLogin = async (e) => {
     e.preventDefault();
     if (validateAdminLogin()) {
-      if (loginAsAdmin(adminUsername, adminPassword)) {
-        navigate('/admin-dashboard'); // Navigate to admin-specific dashboard
+      if (await loginAsAdmin(adminEmail, adminPassword)) { // Pass email and password
+        navigate('/admin-dashboard');
       }
     } else {
       toast.error('Please fill in all required fields.');
@@ -308,18 +311,18 @@ const Login = () => {
               id="admin-login-panel"
               aria-labelledby="admin-login-tab"
             >
-              <label htmlFor="adminUsername" className="sr-only">Admin Username</label>
+              <label htmlFor="adminEmail" className="sr-only">Admin Email</label>
               <input
-                type="text"
-                id="adminUsername"
-                value={adminUsername}
-                onChange={(e) => setAdminUsername(e.target.value)}
-                placeholder="Username"
+                type="email"
+                id="adminEmail"
+                value={adminEmail}
+                onChange={(e) => setAdminEmail(e.target.value)}
+                placeholder="Email"
                 className={inputClasses}
-                aria-invalid={!!adminErrors.username}
-                aria-describedby={adminErrors.username ? "adminUsername-error" : undefined}
+                aria-invalid={!!adminErrors.email}
+                aria-describedby={adminErrors.email ? "adminEmail-error" : undefined}
               />
-              {adminErrors.username && <p id="adminUsername-error" className="text-red-400 text-xs text-left -mt-1 mb-2">{adminErrors.username}</p>}
+              {adminErrors.email && <p id="adminEmail-error" className="text-red-400 text-xs text-left -mt-1 mb-2">{adminErrors.email}</p>}
 
               <label htmlFor="adminPassword" className="sr-only">Admin Password</label>
               <input

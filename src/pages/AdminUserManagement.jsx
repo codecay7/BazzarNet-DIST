@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 import * as api from '../services/api'; // Import API service
 
 const AdminUserManagement = () => {
-  const { simulateLoading } = useContext(AppContext); // Removed allAppUsers, deleteUser, updateUserStatus from context
+  const { simulateLoading } = useContext(AppContext);
   const [users, setUsers] = useState([]); // Manage users locally
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState('all'); // 'all', 'customer', 'vendor'

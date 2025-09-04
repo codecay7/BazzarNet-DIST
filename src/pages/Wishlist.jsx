@@ -21,8 +21,8 @@ const Wishlist = () => {
           </div>
         ) : (
           <div className="grid grid-cols-1 gap-4" role="list">
-            {wishlist.map((item, index) => (
-              <div key={index} className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4" role="listitem" aria-label={`Wishlist item: ${item.name}, Price: ₹${item.price.toFixed(2)}`}>
+            {wishlist.map((item) => (
+              <div key={item._id} className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4" role="listitem" aria-label={`Wishlist item: ${item.name}, Price: ₹${item.price.toFixed(2)}`}>
                 <div className="flex items-center gap-4">
                   <img src={item.image} alt={item.name} className="w-20 h-20 object-cover rounded-lg" />
                   <div>
@@ -40,7 +40,7 @@ const Wishlist = () => {
                   </button>
                   <button
                     className="bg-red-500 text-white border-none py-2 px-4 rounded-lg flex items-center gap-2 font-medium hover:bg-red-600 transition-all duration-300"
-                    onClick={() => removeFromWishlist(item.id)}
+                    onClick={() => removeFromWishlist(item._id)}
                     aria-label={`Remove ${item.name} from wishlist`}
                   >
                     Remove

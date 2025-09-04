@@ -1,6 +1,6 @@
 import React, { useState, useMemo, useContext, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCartPlus, faHeart, faSpinner } from '@fortawesome/free-solid-svg-icons';
+import { faCartPlus, faHeart } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
 import { Link } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
@@ -8,7 +8,7 @@ import SkeletonCard from '../components/SkeletonCard';
 import Pagination from '../components/Pagination';
 
 const Products = () => {
-  const { addToCart, addToWishlist, simulateLoading, allAppProducts, appStores } = useContext(AppContext); // Use allAppProducts and appStores
+  const { addToCart, addToWishlist, simulateLoading, allAppProducts, appStores } = useContext(AppContext);
   const [searchTerm, setSearchTerm] = useState('');
   const [selectedStore, setSelectedStore] = useState('all');
   const [sortBy, setSortBy] = useState('name-asc');
@@ -31,11 +31,11 @@ const Products = () => {
   };
 
   const filteredAndSortedProducts = useMemo(() => {
-    let products = allAppProducts; // Use allAppProducts
+    let products = allAppProducts;
 
     if (selectedStore !== 'all') {
-      const storeId = parseInt(selectedStore);
-      products = products.filter(p => p.storeId === storeId);
+      const storeId = selectedStore; // storeId is already a string (ObjectId)
+      products = products.filter(p => p.store._id === storeId); // Filter by populated store._id
     }
 
     if (searchTerm) {
@@ -110,8 +110,8 @@ const Products = () => {
               aria-label="Filter products by store"
             >
               <option value="all">All Stores</option>
-              {appStores.map(store => ( // Use appStores
-                <option key={store.id} value={store.id}>{store.name}</option>
+              {appStores.map(store => (
+                <option key={store._id} value={store._id}>{store.name}</option>
               ))}
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-[var(--text)]" aria-hidden="true"><ChevronDown size={20} /></div>
@@ -147,8 +147,8 @@ const Products = () => {
             {currentProducts.map((product) => {
               const discount = calculateDiscount(product.price, product.originalPrice);
               return (
-                <div key={product.id} className="bg-black/10 border border-white/10 rounded-2xl overflow-hidden shadow-lg flex flex-col" role="listitem">
-                  <Link to={`/products/${product.id}`} className="flex-grow" aria-label={`View details for ${product.name}`}>
+                <div key={product._id} className="bg-black/10 border border-white/10 rounded-2xl overflow-hidden shadow-lg flex flex-col" role="listitem">
+                  <Link to={`/products/${product._id}`} className="flex-grow" aria-label={`View details for ${product.name}`}>
                     <div className="relative">
                       <img
                         src={product.image}
@@ -159,7 +159,7 @@ const Products = () => {
                         <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded" aria-label={`${Math.round(discount)} percent off`}>{Math.round(discount)}% OFF</span>
                       )}
                     </div>
-                    <div className="p-4 flex-grow flex flex-col">
+                    <div className="p-4 flex-grow flex-col">
                       <h3 className="text-xl font-semibold mb-2">{product.name}</h3>
                       <div className="flex items-baseline gap-2 mb-2">
                         <p className="text-lg font-bold text-[var(--accent)]">₹{product.price.toFixed(2)}</p>

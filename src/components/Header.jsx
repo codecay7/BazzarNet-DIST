@@ -13,7 +13,7 @@ const Header = () => {
   const { sidebarOpen, toggleSidebar, cart, theme, toggleTheme, isVendor, isAdmin, logout } = useContext(AppContext);
   const [profileOpen, setProfileOpen] = useState(false);
   const profileRef = useRef(null);
-  const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0);
+  const cartItemCount = cart.reduce((sum, item) => sum + item.quantity, 0); // Use cart from context
   const navigate = useNavigate();
 
   const handleLogout = () => {

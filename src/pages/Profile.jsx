@@ -3,8 +3,8 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faUser, faStore, faPen, faSave } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
 import toast from 'react-hot-toast';
-import { Building2, Mail, Phone, CreditCard, Landmark, ChevronDown, FileText } from 'lucide-react'; // Added FileText
-import * as api from '../services/api'; // Import API service
+import { Building2, Mail, Phone, CreditCard, Landmark, ChevronDown, FileText } from 'lucide-react';
+import * as api from '../services/api';
 
 const indianStates = [
   "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
@@ -16,7 +16,7 @@ const indianStates = [
 ];
 
 const Profile = () => {
-  const { user, isVendor, loginAsUser, loginAsVendor } = useContext(AppContext); // Get login functions to update user in context
+  const { user, isVendor, loginAsUser, loginAsVendor } = useContext(AppContext);
   const [isEditing, setIsEditing] = useState(false);
   const fileInputRef = useRef(null);
   const [loading, setLoading] = useState(true);
@@ -132,9 +132,11 @@ const Profile = () => {
       const updatedUser = await api.userProfile.updateProfile(profileData);
       // Update the user in AppContext as well
       if (isVendor) {
-        loginAsVendor(updatedUser.name, updatedUser.store, updatedUser.email, user.password); // Re-login vendor to update context
+        // Re-login vendor to update context with new store details if applicable
+        loginAsVendor(updatedUser.email, user.password); // Only email and password needed for login
       } else {
-        loginAsUser(updatedUser.name, updatedUser.email, user.password); // Re-login user to update context
+        // Re-login user to update context
+        loginAsUser(updatedUser.email, user.password); // Only email and password needed for login
       }
       toast.success('Profile updated successfully!');
       setIsEditing(false);
@@ -430,7 +432,7 @@ const Profile = () => {
                 </div>
               </div>
               <div className="flex items-start gap-3">
-                <Landmark size={20} className="mt-1 text-[var(--accent)]" aria-hidden="true" /> {/* Reusing Landmark icon for UPI, consider a specific UPI icon if available */}
+                <Landmark size={20} className="mt-1 text-[var(--accent)]" aria-hidden="true" />
                 <div>
                   <p className="text-sm opacity-70">UPI ID</p>
                   {isEditing ? <input type="text" name="upiId" value={profileData.upiId} onChange={handleInputChange} className={inputClasses} placeholder="UPI ID" aria-label="UPI ID" /> : <p className="font-medium">{profileData.upiId}</p>}

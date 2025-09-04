@@ -1,6 +1,6 @@
 import React, { useContext, useState } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faCreditCard, faMapMarkerAlt, faShoppingCart, faChevronRight, faChevronLeft } from '@fortawesome/free-solid-svg-icons';
+import { faCreditCard, faShoppingCart, faChevronRight, faChevronLeft } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -158,18 +158,24 @@ const Checkout = () => {
     }
   };
 
-  const handlePlaceOrder = async () => { // Made async
+  const handlePlaceOrder = async () => {
     if (validatePaymentForm()) {
       const orderDetails = {
-          total,
-          cart,
+          totalPrice: total, // Use totalPrice to match backend schema
+          items: cart.map(item => ({ // Map cart items to orderItemSchema
+            product: item.product._id,
+            name: item.name,
+            image: item.image,
+            price: item.price,
+            quantity: item.quantity,
+          })),
           shippingAddress: paymentMethod === 'card' ? cardFormData.shippingAddress : upiFormData.shippingAddress,
           paymentMethod: paymentMethod === 'card' ? 'Credit Card' : 'UPI',
       };
       
-      const newOrder = await checkout(orderDetails); // Await the checkout function
-      if (newOrder) { // Only navigate if newOrder is successfully returned
-        navigate('/confirmation', { state: { orderDetails: newOrder } }); // Pass the full new order with OTP
+      const newOrder = await checkout(orderDetails);
+      if (newOrder) {
+        navigate('/confirmation', { state: { orderDetails: newOrder } });
       }
     } else {
       toast.error('Please correct the errors in the payment form.');
@@ -333,7 +339,7 @@ const Checkout = () => {
                 <h4 className="font-semibold text-lg mb-3 border-b border-white/20 pb-2">Items in Cart</h4>
                 <ul className="space-y-3" role="list">
                   {cart.map(item => (
-                    <li key={item.id} className="flex justify-between items-center" role="listitem">
+                    <li key={item.product._id} className="flex justify-between items-center" role="listitem">
                       <div className="flex items-center gap-3">
                         <img src={item.image} alt={item.name} className="w-12 h-12 object-cover rounded-md" />
                         <div>

@@ -1,4 +1,4 @@
-import React, { useContext, useEffect } from 'react'; // Added useEffect for logging
+import React, { useContext, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
@@ -20,18 +20,6 @@ const OrderConfirmation = () => {
   const location = useLocation();
   const { orderDetails } = location.state || { orderDetails: null };
 
-  // --- DEBUGGING LOGS ---
-  useEffect(() => {
-    console.log('OrderConfirmation: location.state', location.state);
-    console.log('OrderConfirmation: orderDetails', orderDetails);
-    if (orderDetails) {
-      const { id: orderId, otp } = orderDetails;
-      const qrCodeValue = JSON.stringify({ orderId, otp });
-      console.log('OrderConfirmation: qrCodeValue', qrCodeValue);
-    }
-  }, [location.state, orderDetails]);
-  // --- END DEBUGGING LOGS ---
-
   if (!orderDetails) {
     return (
         <div className="text-center py-20">
@@ -43,10 +31,10 @@ const OrderConfirmation = () => {
     );
   }
 
-  const { id: orderId, total, cart, otp, timestamp, paymentMethod, transactionId } = orderDetails;
+  const { _id: orderId, totalPrice, items, deliveryOtp, createdAt, paymentMethod, transactionId } = orderDetails;
 
   // Data to encode in QR code (e.g., order ID and OTP)
-  const qrCodeValue = JSON.stringify({ orderId, otp });
+  const qrCodeValue = JSON.stringify({ orderId, deliveryOtp });
 
   return (
     <section className="w-full max-w-[1200px] my-10">
@@ -58,15 +46,15 @@ const OrderConfirmation = () => {
         <div className="text-left max-w-md mx-auto bg-black/10 p-6 rounded-lg" aria-labelledby="order-summary-heading">
             <h3 id="order-summary-heading" className="text-xl font-semibold mb-4 border-b border-white/20 pb-2">Order Summary</h3>
             <p className="mb-2"><strong>Order ID:</strong> {orderId}</p>
-            <p className="mb-2"><strong>Order Date:</strong> {formatTimestamp(timestamp)}</p>
+            <p className="mb-2"><strong>Order Date:</strong> {formatTimestamp(createdAt)}</p>
             <p className="mb-2"><strong>Payment Method:</strong> {paymentMethod}</p>
-            <p className="mb-4"><strong>Transaction ID:</strong> {transactionId}</p>
-            <p className="mb-4"><strong>Total:</strong> ₹{total.toFixed(2)}</p>
+            <p className="mb-4"><strong>Transaction ID:</strong> {transactionId || 'N/A'}</p>
+            <p className="mb-4"><strong>Total:</strong> ₹{totalPrice.toFixed(2)}</p>
             <div className="mb-4">
                 <h4 className="font-semibold">Items:</h4>
                 <ul role="list">
-                    {cart.map(item => (
-                        <li key={item.id} className="flex justify-between py-1" role="listitem">
+                    {items.map(item => (
+                        <li key={item.product} className="flex justify-between py-1" role="listitem">
                             <span>{item.name} x {item.quantity}</span>
                             <span>₹{(item.price * item.quantity).toFixed(2)}</span>
                         </li>
@@ -81,9 +69,9 @@ const OrderConfirmation = () => {
             <h3 className="text-xl font-semibold mb-4">Delivery Confirmation</h3>
             <p className="mb-4">Please show this QR code to the delivery person to confirm your order.</p>
             <div className="flex justify-center mb-4 p-2 bg-white rounded-lg">
-                <QRCode value={qrCodeValue} size={180} level="H" className="rounded-lg" aria-label={`QR code for order ${orderId} with OTP ${otp}`} />
+                <QRCode value={qrCodeValue} size={180} level="H" className="rounded-lg" aria-label={`QR code for order ${orderId} with OTP ${deliveryOtp}`} />
             </div>
-            <p className="text-lg font-bold">OTP: <span className="text-[var(--accent)]">{otp}</span></p>
+            <p className="text-lg font-bold">OTP: <span className="text-[var(--accent)]">{deliveryOtp}</span></p>
             <p className="text-sm opacity-80 mt-2">The delivery person will scan this QR or ask for the OTP.</p>
         </div>
 

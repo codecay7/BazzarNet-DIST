@@ -1,4 +1,4 @@
-import React, { useContext, useMemo } from 'react'; // Import useMemo
+import React, { useContext, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { AppContext } from '../context/AppContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
@@ -17,7 +17,7 @@ const formatTimestamp = (isoString) => {
 const CustomerOrderDetails = () => {
   const { orderId } = useParams();
   const { orders } = useContext(AppContext);
-  const order = orders.find(o => o.id === `#${orderId}`);
+  const order = orders.find(o => o._id === orderId); // Find order using _id
 
   if (!order) {
     return (
@@ -29,27 +29,27 @@ const CustomerOrderDetails = () => {
   }
 
   const steps = useMemo(() => {
-    // Ensure currentStatus is always a string for array includes check (added for robustness)
-    const currentStatus = order?.status || ''; 
+    const currentStatus = order?.orderStatus || ''; // Use orderStatus
     return [
       { name: 'Ordered', completed: true, icon: faBox },
+      { name: 'Processing', completed: ['Processing', 'Shipped', 'Delivered'].includes(currentStatus), icon: faBox }, // Added Processing
       { name: 'Shipped', completed: ['Shipped', 'Delivered'].includes(currentStatus), icon: faTruck },
       { name: 'Delivered', completed: currentStatus === 'Delivered', icon: faHome },
     ];
-  }, [order?.status]); // Dependency on order.status
+  }, [order?.orderStatus]); // Dependency on order.orderStatus
 
   return (
     <section className="w-full max-w-[1200px] my-10">
       <div className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-8 mx-4">
         <h2 className="text-3xl font-bold mb-2">Order Details</h2>
-        <p className="text-lg text-[var(--text)] opacity-80 mb-2">Order ID: {order.id}</p>
-        <p className="text-lg text-[var(--text)] opacity-80 mb-8">Order Placed: {formatTimestamp(order.timestamp)}</p> {/* Display formatted timestamp */}
+        <p className="text-lg text-[var(--text)] opacity-80 mb-2">Order ID: {order._id}</p>
+        <p className="text-lg text-[var(--text)] opacity-80 mb-8">Order Placed: {formatTimestamp(order.createdAt)}</p> {/* Display formatted timestamp */}
 
         {/* Order Tracker */}
         <div className="bg-black/10 p-6 rounded-xl mb-8">
-          <h3 className="text-xl font-semibold mb-6">Order Status: <span className="text-[var(--accent)]">{order.status}</span></h3>
-          {steps && steps.length > 0 && ( // Defensive check added here
-            <div className="flex items-center" role="progressbar" aria-valuenow={steps.filter(s => s.completed).length} aria-valuemin="0" aria-valuemax={steps.length} aria-label={`Order ${order.id} progress`}>
+          <h3 className="text-xl font-semibold mb-6">Order Status: <span className="text-[var(--accent)]">{order.orderStatus}</span></h3>
+          {steps && steps.length > 0 && (
+            <div className="flex items-center" role="progressbar" aria-valuenow={steps.filter(s => s.completed).length} aria-valuemin="0" aria-valuemax={steps.length} aria-label={`Order ${order._id} progress`}>
               {steps.map((step, index) => (
                 <React.Fragment key={step.name}>
                   <div className="flex flex-col items-center">
@@ -71,7 +71,7 @@ const CustomerOrderDetails = () => {
         <div className="bg-black/10 p-6 rounded-xl mb-8">
           <h3 className="text-xl font-semibold mb-4">Payment Information</h3>
           <p className="mb-2"><strong>Payment Method:</strong> {order.paymentMethod}</p>
-          <p><strong>Transaction ID:</strong> {order.transactionId}</p>
+          <p><strong>Transaction ID:</strong> {order.transactionId || 'N/A'}</p>
         </div>
 
         {/* Items List */}
@@ -79,7 +79,7 @@ const CustomerOrderDetails = () => {
           <h3 className="text-xl font-semibold mb-4">Items in Your Order</h3>
           <div className="space-y-4" role="list">
             {order.items.map(item => (
-              <div key={item.id} className="flex items-center gap-4 bg-black/10 p-3 rounded-lg" role="listitem" aria-label={`Item: ${item.name}, Quantity: ${item.quantity}, Price: ₹{(item.price * item.quantity).toFixed(2)}`}>
+              <div key={item.product} className="flex items-center gap-4 bg-black/10 p-3 rounded-lg" role="listitem" aria-label={`Item: ${item.name}, Quantity: ${item.quantity}, Price: ₹{(item.price * item.quantity).toFixed(2)}`}>
                 <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-md" />
                 <div className="flex-grow">
                   <p className="font-semibold">{item.name}</p>
@@ -90,7 +90,7 @@ const CustomerOrderDetails = () => {
             ))}
           </div>
           <div className="text-right mt-4 pt-4 border-t border-white/20">
-            <p className="text-xl font-bold">Total: ₹{order.total.toFixed(2)}</p>
+            <p className="text-xl font-bold">Total: ₹{order.totalPrice.toFixed(2)}</p>
           </div>
         </div>
         

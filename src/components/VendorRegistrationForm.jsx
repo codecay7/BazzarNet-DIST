@@ -6,7 +6,7 @@ import toast from 'react-hot-toast';
 import { ChevronDown } from 'lucide-react';
 
 const VendorRegistrationForm = () => {
-  const { loginAsVendor } = useContext(AppContext);
+  const { registerVendor } = useContext(AppContext); // Use registerVendor
   const navigate = useNavigate();
   const [formData, setFormData] = useState({
     fullName: '',
@@ -15,10 +15,16 @@ const VendorRegistrationForm = () => {
     phone: '',
     pan: '',
     gst: '',
-    address: '',
+    address: {
+      houseNo: '',
+      landmark: '',
+      city: '',
+      state: '',
+      pinCode: '',
+    },
     description: '',
     category: 'Groceries',
-    password: '', // Added password field
+    password: '',
   });
   const [errors, setErrors] = useState({});
 
@@ -29,7 +35,18 @@ const VendorRegistrationForm = () => {
 
   const handleChange = (e) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    if (name.startsWith('address.')) {
+      const field = name.split('.')[1];
+      setFormData(prev => ({
+        ...prev,
+        address: {
+          ...prev.address,
+          [field]: value
+        }
+      }));
+    } else {
+      setFormData(prev => ({ ...prev, [name]: value }));
+    }
   };
 
   const validateForm = () => {
@@ -55,8 +72,19 @@ const VendorRegistrationForm = () => {
     } else if (!/^[A-Z]{5}[0-9]{4}[A-Z]{1}$/.test(formData.pan)) {
       newErrors.pan = 'Invalid PAN format.';
     }
-    if (!formData.address.trim()) {
-      newErrors.address = 'Address is required.';
+    if (!formData.address.houseNo.trim()) {
+      newErrors.address = { ...newErrors.address, houseNo: 'House No. is required.' };
+    }
+    if (!formData.address.city.trim()) {
+      newErrors.address = { ...newErrors.address, city: 'City is required.' };
+    }
+    if (!formData.address.state.trim()) {
+      newErrors.address = { ...newErrors.address, state: 'State is required.' };
+    }
+    if (!formData.address.pinCode.trim()) {
+      newErrors.address = { ...newErrors.address, pinCode: 'Pin Code is required.' };
+    } else if (!/^\d{6}$/.test(formData.address.pinCode)) {
+      newErrors.address = { ...newErrors.address, pinCode: 'Pin Code must be 6 digits.' };
     }
     if (!formData.description.trim()) {
       newErrors.description = 'Business Description is required.';
@@ -64,22 +92,19 @@ const VendorRegistrationForm = () => {
     if (!formData.category) {
       newErrors.category = 'Category is required.';
     }
-    if (!formData.password) { // Password validation
+    if (!formData.password) {
       newErrors.password = 'Password is required.';
     } else if (formData.password.length < 6) {
       newErrors.password = 'Password must be at least 6 characters long.';
     }
     setErrors(newErrors);
-    return Object.keys(newErrors).length === 0;
+    return Object.keys(newErrors).length === 0 && Object.keys(newErrors.address || {}).length === 0;
   };
 
-  const handleRegistration = (e) => {
+  const handleRegistration = async (e) => { // Made async
     e.preventDefault();
     if (validateForm()) {
-      // In a real app, this would be a registration call.
-      // For now, we'll just log the vendor in.
-      toast.success('Registration successful! Logging you in.');
-      if (loginAsVendor(formData.fullName, formData.businessName, formData.email, formData.password)) {
+      if (await registerVendor(formData)) { // Call registerVendor
         navigate('/dashboard');
       }
     } else {
@@ -189,18 +214,76 @@ const VendorRegistrationForm = () => {
         </div>
       </div>
       <div>
-        <label htmlFor="vendorAddress" className="text-sm font-medium">Address</label>
+        <label htmlFor="vendorAddressHouseNo" className="text-sm font-medium">House No., Street</label>
         <input 
           type="text" 
-          id="vendorAddress"
-          name="address" 
-          value={formData.address} 
+          id="vendorAddressHouseNo"
+          name="address.houseNo" 
+          value={formData.address.houseNo} 
           onChange={handleChange} 
           className={inputClasses} 
-          aria-invalid={!!errors.address}
-          aria-describedby={errors.address ? "vendorAddress-error" : undefined}
+          aria-invalid={!!errors.address?.houseNo}
+          aria-describedby={errors.address?.houseNo ? "vendorAddressHouseNo-error" : undefined}
         />
-        {errors.address && <p id="vendorAddress-error" className="text-red-400 text-xs mt-1">{errors.address}</p>}
+        {errors.address?.houseNo && <p id="vendorAddressHouseNo-error" className="text-red-400 text-xs mt-1">{errors.address.houseNo}</p>}
+      </div>
+      <div>
+        <label htmlFor="vendorAddressLandmark" className="text-sm font-medium">Landmark (optional)</label>
+        <input 
+          type="text" 
+          id="vendorAddressLandmark"
+          name="address.landmark" 
+          value={formData.address.landmark} 
+          onChange={handleChange} 
+          className={inputClasses} 
+        />
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div>
+          <label htmlFor="vendorAddressCity" className="text-sm font-medium">City</label>
+          <input 
+            type="text" 
+            id="vendorAddressCity"
+            name="address.city" 
+            value={formData.address.city} 
+            onChange={handleChange} 
+            className={inputClasses} 
+            aria-invalid={!!errors.address?.city}
+            aria-describedby={errors.address?.city ? "vendorAddressCity-error" : undefined}
+          />
+          {errors.address?.city && <p id="vendorAddressCity-error" className="text-red-400 text-xs mt-1">{errors.address.city}</p>}
+        </div>
+        <div className="relative">
+          <label htmlFor="vendorAddressState" className="text-sm font-medium">State</label>
+          <select 
+            name="address.state" 
+            id="vendorAddressState"
+            value={formData.address.state} 
+            onChange={handleChange} 
+            className={`${inputClasses} appearance-none pr-8`}
+            aria-invalid={!!errors.address?.state}
+            aria-describedby={errors.address?.state ? "vendorAddressState-error" : undefined}
+          >
+            <option value="" disabled>Select State</option>
+            {indianStates.map(state => <option key={state} value={state}>{state}</option>)}
+          </select>
+          <div className="pointer-events-none absolute inset-y-0 right-0 top-0 flex items-center px-2 text-[var(--text)]" aria-hidden="true"><ChevronDown size={20} /></div>
+          {errors.address?.state && <p id="vendorAddressState-error" className="text-red-400 text-xs mt-1">{errors.address.state}</p>}
+        </div>
+      </div>
+      <div>
+        <label htmlFor="vendorAddressPinCode" className="text-sm font-medium">Pin Code</label>
+        <input 
+          type="text" 
+          id="vendorAddressPinCode"
+          name="address.pinCode" 
+          value={formData.address.pinCode} 
+          onChange={handleChange} 
+          className={inputClasses} 
+          aria-invalid={!!errors.address?.pinCode}
+          aria-describedby={errors.address?.pinCode ? "vendorAddressPinCode-error" : undefined}
+        />
+        {errors.address?.pinCode && <p id="vendorAddressPinCode-error" className="text-red-400 text-xs mt-1">{errors.address.pinCode}</p>}
       </div>
       <div>
         <label htmlFor="vendorDescription" className="text-sm font-medium">Business Description</label>

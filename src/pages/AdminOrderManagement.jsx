@@ -1,7 +1,7 @@
 import React, { useContext, useState, useMemo, useEffect } from 'react';
 import { AppContext } from '../context/AppContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faReceipt, faTruck, faTimesCircle, faCheckCircle, faMoneyBillWave } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faMoneyBillWave } from '@fortawesome/free-solid-svg-icons';
 import SkeletonText from '../components/SkeletonText';
 import Pagination from '../components/Pagination';
 import toast from 'react-hot-toast';
@@ -16,7 +16,7 @@ const formatTimestamp = (isoString) => {
 const AdminOrderManagement = () => {
   const { orders, updateOrderStatus, simulateLoading } = useContext(AppContext);
   const [searchTerm, setSearchTerm] = useState('');
-  const [filterStatus, setFilterStatus] = useState('all'); // 'all', 'Pending', 'Shipped', 'Delivered', 'Cancelled'
+  const [filterStatus, setFilterStatus] = useState('all'); // 'all', 'Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
@@ -35,15 +35,15 @@ const AdminOrderManagement = () => {
 
     if (searchTerm) {
       currentOrders = currentOrders.filter(order =>
-        order.id.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.customer.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        order.customer.email.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        order._id.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        order.customerName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+        order.customerEmail.toLowerCase().includes(searchTerm.toLowerCase()) ||
         order.items.some(item => item.name.toLowerCase().includes(searchTerm.toLowerCase()))
       );
     }
 
     if (filterStatus !== 'all') {
-      currentOrders = currentOrders.filter(order => order.status === filterStatus);
+      currentOrders = currentOrders.filter(order => order.orderStatus === filterStatus);
     }
 
     return currentOrders;
@@ -66,6 +66,7 @@ const AdminOrderManagement = () => {
   const getStatusClasses = (status) => {
     switch (status) {
       case 'Pending': return 'bg-yellow-500/20 text-yellow-400';
+      case 'Processing': return 'bg-orange-500/20 text-orange-400'; // Added Processing status class
       case 'Shipped': return 'bg-blue-500/20 text-blue-400';
       case 'Delivered': return 'bg-green-500/20 text-green-400';
       case 'Cancelled': return 'bg-red-500/20 text-red-400';
@@ -105,6 +106,7 @@ const AdminOrderManagement = () => {
             >
               <option value="all">All Statuses</option>
               <option value="Pending">Pending</option>
+              <option value="Processing">Processing</option> {/* Added Processing status */}
               <option value="Shipped">Shipped</option>
               <option value="Delivered">Delivered</option>
               <option value="Cancelled">Cancelled</option>
@@ -143,37 +145,38 @@ const AdminOrderManagement = () => {
               </thead>
               <tbody className="divide-y divide-white/5">
                 {currentOrders.map((order) => (
-                  <tr key={order.id} className="hover:bg-black/5 transition-colors duration-200">
-                    <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">{order.id}</td>
+                  <tr key={order._id} className="hover:bg-black/5 transition-colors duration-200">
+                    <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">{order._id.substring(0, 6)}...</td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm">
-                      <p>{order.customer.name}</p>
-                      <p className="text-xs opacity-70">{order.customer.email}</p>
+                      <p>{order.customerName}</p>
+                      <p className="text-xs opacity-70">{order.customerEmail}</p>
                     </td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm">{formatTimestamp(order.timestamp)}</td>
-                    <td className="px-4 py-4 whitespace-nowrap text-sm">₹{order.total.toFixed(2)}</td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm">{formatTimestamp(order.createdAt)}</td>
+                    <td className="px-4 py-4 whitespace-nowrap text-sm">₹{order.totalPrice.toFixed(2)}</td>
                     <td className="px-4 py-4 whitespace-nowrap text-sm">
-                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClasses(order.status)}`}>
-                        {order.status}
+                      <span className={`px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${getStatusClasses(order.orderStatus)}`}>
+                        {order.orderStatus}
                       </span>
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex justify-end gap-2">
                         <select
-                          value={order.status}
-                          onChange={(e) => updateOrderStatus(order.id, e.target.value)}
+                          value={order.orderStatus}
+                          onChange={(e) => updateOrderStatus(order._id, e.target.value)}
                           className="p-2 rounded-lg bg-white/10 border border-black/30 text-[var(--text)] text-sm focus:outline-none focus:ring-2 focus:ring-[var(--accent)]"
-                          aria-label={`Update status for order ${order.id}`}
+                          aria-label={`Update status for order ${order._id}`}
                         >
                           <option value="Pending">Pending</option>
+                          <option value="Processing">Processing</option> {/* Added Processing status */}
                           <option value="Shipped">Shipped</option>
                           <option value="Delivered">Delivered</option>
                           <option value="Cancelled">Cancelled</option>
                         </select>
                         <button
-                          onClick={() => handleRefund(order.id)}
+                          onClick={() => handleRefund(order._id)}
                           className="p-2 rounded-full bg-red-500/20 hover:bg-red-500/40 text-red-400 transition-colors duration-200"
                           title="Initiate Refund"
-                          aria-label={`Initiate refund for order ${order.id}`}
+                          aria-label={`Initiate refund for order ${order._id}`}
                         >
                           <FontAwesomeIcon icon={faMoneyBillWave} size="sm" />
                         </button>

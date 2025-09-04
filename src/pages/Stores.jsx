@@ -7,7 +7,7 @@ import SkeletonCard from '../components/SkeletonCard';
 
 const Stores = () => {
   const navigate = useNavigate();
-  const { simulateLoading, appStores } = useContext(AppContext); // Use appStores
+  const { simulateLoading, appStores } = useContext(AppContext);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
 
@@ -20,7 +20,7 @@ const Stores = () => {
     loadData();
   }, [searchTerm, simulateLoading, appStores]); // Re-run loading when appStores changes
 
-  const filteredStores = appStores.filter(store => // Filter appStores
+  const filteredStores = appStores.filter(store =>
     store.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     store.description.toLowerCase().includes(searchTerm.toLowerCase())
   );
@@ -49,7 +49,7 @@ const Stores = () => {
         ) : filteredStores.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {filteredStores.map((store) => (
-              <div key={store.id} className="bg-black/10 border border-white/10 rounded-2xl p-6 hover:-translate-y-1 transition-transform duration-300 flex flex-col shadow-lg">
+              <div key={store._id} className="bg-black/10 border border-white/10 rounded-2xl p-6 hover:-translate-y-1 transition-transform duration-300 flex flex-col shadow-lg">
                 <div className="flex-grow">
                   <FontAwesomeIcon icon={faStore} className="text-4xl text-[var(--accent)] mb-4" />
                   <h3 className="text-2xl font-semibold mb-3">{store.name}</h3>
@@ -57,7 +57,7 @@ const Stores = () => {
                 </div>
                 <button
                   className="bg-[var(--accent)] text-white border-none py-2 px-6 rounded-lg flex items-center justify-center gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300 mt-4 self-start"
-                  onClick={() => navigate(`/stores/${store.id}`)}
+                  onClick={() => navigate(`/stores/${store._id}`)}
                 >
                   Visit Store
                 </button>

@@ -5,9 +5,9 @@ import { faCartPlus, faHeart } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
 
 const StorePage = () => {
-  const { addToCart, addToWishlist, allAppProducts, appStores } = useContext(AppContext); // Use allAppProducts and appStores
+  const { addToCart, addToWishlist, allAppProducts, appStores } = useContext(AppContext);
   const { storeId } = useParams();
-  const store = appStores.find(s => s.id === parseInt(storeId)); // Find store from appStores
+  const store = appStores.find(s => s._id === storeId); // Find store using _id
 
   if (!store) {
     return (
@@ -21,7 +21,7 @@ const StorePage = () => {
   }
 
   // Filter products belonging to this store from allAppProducts
-  const storeProducts = allAppProducts.filter(product => product.storeId === store.id);
+  const storeProducts = allAppProducts.filter(product => product.store._id === store._id); // Filter by populated store._id
 
   const calculateDiscount = (price, originalPrice) => {
     if (!originalPrice || originalPrice <= price) return 0;
@@ -42,15 +42,15 @@ const StorePage = () => {
             {storeProducts.map((product) => {
               const discount = calculateDiscount(product.price, product.originalPrice);
               return (
-                <div key={product.id} className="bg-black/10 border border-white/10 rounded-2xl overflow-hidden shadow-lg flex flex-col" role="listitem">
-                  <Link to={`/products/${product.id}`} className="flex-grow" aria-label={`View details for ${product.name}`}>
+                <div key={product._id} className="bg-black/10 border border-white/10 rounded-2xl overflow-hidden shadow-lg flex flex-col" role="listitem">
+                  <Link to={`/products/${product._id}`} className="flex-grow" aria-label={`View details for ${product.name}`}>
                     <div className="relative">
                       <img src={product.image} alt={product.name} className="w-full h-48 object-cover" />
                       {discount > 0 && (
                         <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded" aria-label={`${discount} percent off`}>{discount}% OFF</span>
                       )}
                     </div>
-                    <div className="p-4 flex-grow flex flex-col">
+                    <div className="p-4 flex-grow flex-col">
                       <h3 className="text-xl font-semibold mb-2">{product.name}</h3>
                       <div className="flex items-baseline gap-2 mb-2">
                         <p className="text-lg font-bold text-[var(--accent)]">₹{product.price.toFixed(2)}</p>

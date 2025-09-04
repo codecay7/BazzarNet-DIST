@@ -17,13 +17,13 @@ const formatTimestamp = (isoString) => {
 const OrderDetails = () => {
   const { orderId } = useParams();
   const { orders, updateOrderStatus, confirmDeliveryWithOtp } = useContext(AppContext);
-  const order = orders.find(o => o.id === `#${orderId}`);
-  const [status, setStatus] = useState(order?.status || '');
+  const order = orders.find(o => o._id === orderId); // Find order using _id
+  const [status, setStatus] = useState(order?.orderStatus || ''); // Use orderStatus
   const [otpInput, setOtpInput] = useState('');
 
   useEffect(() => {
     if (order) {
-      setStatus(order.status);
+      setStatus(order.orderStatus);
     }
   }, [order]);
 
@@ -37,11 +37,11 @@ const OrderDetails = () => {
   }
 
   const handleStatusUpdate = () => {
-    updateOrderStatus(order.id, status);
+    updateOrderStatus(order._id, status);
   };
 
-  const handleConfirmDelivery = () => {
-    if (confirmDeliveryWithOtp(order.id, otpInput)) {
+  const handleConfirmDelivery = async () => {
+    if (await confirmDeliveryWithOtp(order._id, otpInput)) {
       // Status will be updated by confirmDeliveryWithOtp, so just clear input
       setOtpInput('');
       setStatus('Delivered'); // Update local state to reflect change
@@ -58,35 +58,36 @@ const OrderDetails = () => {
             <div className="bg-black/10 p-6 rounded-xl">
               <h3 className="text-xl font-semibold mb-4">Order Information</h3>
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <p><strong>Order ID:</strong> {order.id}</p>
-                <p><strong>Customer:</strong> {order.customer.name}</p>
-                <p><strong>Order Placed:</strong> {formatTimestamp(order.timestamp)}</p> {/* Display formatted timestamp */}
-                <p><strong>Total:</strong> ₹{order.total.toFixed(2)}</p>
+                <p><strong>Order ID:</strong> {order._id}</p>
+                <p><strong>Customer:</strong> {order.customerName}</p>
+                <p><strong>Order Placed:</strong> {formatTimestamp(order.createdAt)}</p> {/* Display formatted timestamp */}
+                <p><strong>Total:</strong> ₹{order.totalPrice.toFixed(2)}</p>
                 <p><strong>Status:</strong> <span className="font-semibold text-[var(--accent)]">{status}</span></p>
-                <p><strong>Delivery OTP:</strong> <span className="font-semibold text-[var(--accent)]">{order.otp}</span></p> {/* Display OTP for vendor */}
+                <p><strong>Delivery OTP:</strong> <span className="font-semibold text-[var(--accent)]">{order.deliveryOtp}</span></p> {/* Display OTP for vendor */}
               </div>
             </div>
             <div className="bg-black/10 p-6 rounded-xl">
               <h3 className="text-xl font-semibold mb-4">Payment & Transaction Details</h3>
               <p className="mb-2"><strong>Payment Method:</strong> {order.paymentMethod}</p>
-              <p><strong>Transaction ID:</strong> {order.transactionId}</p>
+              <p><strong>Transaction ID:</strong> {order.transactionId || 'N/A'}</p>
             </div>
             <div className="bg-black/10 p-6 rounded-xl">
               <h3 className="text-xl font-semibold mb-4">Items</h3>
               <ul className="space-y-2" role="list">
                 {order.items.map(item => (
-                  <li key={item.id} className="flex justify-between" role="listitem">
+                  <li key={item.product} className="flex justify-between" role="listitem">
                     <span>{item.name} (Qty: {item.quantity})</span>
                     <span>₹{(item.price * item.quantity).toFixed(2)}</span>
                   </li>
                 ))}
               </ul>
             </div>
-            <div className="bg-black/10 p-6 rounded-xl">
+            {/* Shipping details are not in the new Order model, removing for now */}
+            {/* <div className="bg-black/10 p-6 rounded-xl">
               <h3 className="text-xl font-semibold mb-4">Shipping Details</h3>
               <p><strong>Tracking Number:</strong> {order.shipping.trackingNumber}</p>
               <p><strong>Carrier:</strong> {order.shipping.carrier}</p>
-            </div>
+            </div> */}
           </div>
 
           {/* Actions & Contact */}
@@ -117,6 +118,7 @@ const OrderDetails = () => {
                   disabled={status === 'Delivered'} // Disable if already delivered by OTP
                 >
                   <option>Pending</option>
+                  <option>Processing</option> {/* Added Processing status */}
                   <option>Shipped</option>
                   <option>Delivered</option>
                   <option>Cancelled</option>
@@ -126,8 +128,8 @@ const OrderDetails = () => {
               <button onClick={handleStatusUpdate} className="w-full bg-[var(--accent)] text-white py-2 px-4 rounded-lg font-medium" disabled={status === 'Delivered'}>Save Changes</button>
             </div>
             <div className="bg-black/10 p-6 rounded-xl space-y-3">
-              <button onClick={() => toast.error('Refund issued!')} className="w-full bg-red-500/20 text-red-400 py-2 px-4 rounded-lg font-medium" aria-label={`Issue refund for order ${order.id}`}>Issue Refund</button>
-              <button onClick={() => toast.success('Invoice downloaded!')} className="w-full bg-white/10 text-[var(--text)] py-2 px-4 rounded-lg font-medium" aria-label={`Download invoice for order ${order.id}`}>Download Invoice</button>
+              <button onClick={() => toast.error('Refund issued!')} className="w-full bg-red-500/20 text-red-400 py-2 px-4 rounded-lg font-medium" aria-label={`Issue refund for order ${order._id}`}>Issue Refund</button>
+              <button onClick={() => toast.success('Invoice downloaded!')} className="w-full bg-white/10 text-[var(--text)] py-2 px-4 rounded-lg font-medium" aria-label={`Download invoice for order ${order._id}`}>Download Invoice</button>
             </div>
           </div>
         </div>
