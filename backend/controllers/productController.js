@@ -26,8 +26,11 @@ const getAllProducts = asyncHandler(async (req, res) => {
     ? { store: req.query.store }
     : {};
 
-  const count = await Product.countDocuments({ ...keyword, ...categoryFilter, ...storeFilter });
-  const products = await Product.find({ ...keyword, ...categoryFilter, ...storeFilter })
+  const finalQuery = { ...keyword, ...categoryFilter, ...storeFilter };
+  console.log('Backend: getAllProducts - Final Query:', finalQuery); // ADDED LOG HERE
+
+  const count = await Product.countDocuments(finalQuery);
+  const products = await Product.find(finalQuery)
     .populate('store', 'name') // Populate store name
     .limit(pageSize)
     .skip(pageSize * (page - 1));

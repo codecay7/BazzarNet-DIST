@@ -45,6 +45,7 @@ export const AppProvider = ({ children }) => {
       const { products, page, pages, count } = await api.products.getAll(params);
       setAllAppProducts(products);
       setAllAppProductsMeta({ page, pages, count });
+      console.log('AppContext: fetchAllProducts - Fetched products:', products); // ADDED LOG HERE
     } catch (error) {
       toast.error(`Failed to load products: ${error.message}`);
       setAllAppProducts([]);
