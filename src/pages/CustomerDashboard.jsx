@@ -1,24 +1,43 @@
 import React, { useContext, useState, useEffect, useMemo } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faShoppingBag, faBoxOpen, faHeart, faMapMarkerAlt, faCheckCircle, faReceipt, faCartPlus } from '@fortawesome/free-solid-svg-icons';
+import { faShoppingBag, faHeart, faReceipt, faCartPlus } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
 import { useNavigate } from 'react-router-dom';
 import SkeletonText from '../components/SkeletonText';
 import SkeletonCard from '../components/SkeletonCard';
+import * as api from '../services/api'; // Import API service
 
 const CustomerDashboard = () => {
-  const { user, cart, wishlist, simulateLoading, allAppProducts, orders, addToCart } = useContext(AppContext);
+  const { user, cart, wishlist, simulateLoading, orders, addToCart } = useContext(AppContext);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
+  const [recommendedProducts, setRecommendedProducts] = useState([]);
+  const [recommendedLoading, setRecommendedLoading] = useState(true);
 
   useEffect(() => {
-    const loadData = async () => {
+    const loadDashboardData = async () => {
       setLoading(true);
       await simulateLoading(1000);
       setLoading(false);
     };
-    loadData();
-  }, [simulateLoading, user, cart.length, wishlist.length, orders.length, allAppProducts.length]); // Added dependencies for data changes
+    loadDashboardData();
+  }, [simulateLoading]);
+
+  useEffect(() => {
+    const fetchRecommended = async () => {
+      setRecommendedLoading(true);
+      try {
+        const products = await api.products.getRecommended();
+        setRecommendedProducts(products);
+      } catch (error) {
+        console.error('Failed to fetch recommended products:', error);
+        setRecommendedProducts([]);
+      } finally {
+        setRecommendedLoading(false);
+      }
+    };
+    fetchRecommended();
+  }, []); // Fetch recommended products once on component mount
 
   // Dynamically find the latest order for the logged-in user (still needed for stats)
   const latestOrder = useMemo(() => {
@@ -30,8 +49,6 @@ const CustomerDashboard = () => {
     // Sort by date to get the latest order
     return userOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))[0]; // Use createdAt
   }, [user, orders]);
-
-  const recommendedProducts = allAppProducts.slice(0, 6); // Increased to 6 recommended products
 
   const stats = [
     { icon: faShoppingBag, label: 'Items in Cart', value: cart.length, path: '/cart' },
@@ -88,22 +105,32 @@ const CustomerDashboard = () => {
             {/* Recommended Products Section */}
             <div className="bg-black/10 p-6 rounded-xl">
               <h2 className="text-2xl font-bold mb-4">Recommended Products</h2>
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                {recommendedProducts.map(product => (
-                  <div key={product._id} className="flex flex-col bg-black/10 p-3 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
-                    <img src={product.image} alt={product.name} className="w-full h-32 object-cover rounded-md mb-2" />
-                    <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
-                    <p className="text-sm opacity-70 mb-2">₹{product.price.toFixed(2)}</p>
-                    <button 
-                      onClick={() => addToCart(product)} 
-                      className="bg-[var(--accent)] text-white py-2 px-3 rounded-lg text-sm flex items-center justify-center gap-2 font-medium hover:bg-[var(--accent-dark)] transition-colors mt-auto"
-                      aria-label={`Add ${product.name} to cart`}
-                    >
-                      <FontAwesomeIcon icon={faCartPlus} aria-hidden="true" /> Add to Cart
-                    </button>
-                  </div>
-                ))}
-              </div>
+              {recommendedLoading ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {[...Array(6)].map((_, index) => (
+                    <SkeletonCard key={index} />
+                  ))}
+                </div>
+              ) : recommendedProducts.length > 0 ? (
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                  {recommendedProducts.map(product => (
+                    <div key={product._id} className="flex flex-col bg-black/10 p-3 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
+                      <img src={product.image} alt={product.name} className="w-full h-32 object-cover rounded-md mb-2" />
+                      <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
+                      <p className="text-sm opacity-70 mb-2">₹{product.price.toFixed(2)}</p>
+                      <button 
+                        onClick={() => addToCart(product)} 
+                        className="bg-[var(--accent)] text-white py-2 px-3 rounded-lg text-sm flex items-center justify-center gap-2 font-medium hover:bg-[var(--accent-dark)] transition-colors mt-auto"
+                        aria-label={`Add ${product.name} to cart`}
+                      >
+                        <FontAwesomeIcon icon={faCartPlus} aria-hidden="true" /> Add to Cart
+                      </button>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p className="text-center text-lg opacity-80 py-10">No recommended products available.</p>
+              )}
             </div>
           </>
         )}

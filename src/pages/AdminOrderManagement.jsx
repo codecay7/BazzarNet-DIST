@@ -6,6 +6,7 @@ import SkeletonText from '../components/SkeletonText';
 import Pagination from '../components/Pagination';
 import toast from 'react-hot-toast';
 import { ChevronDown } from 'lucide-react';
+import * as api from '../services/api'; // Import API service
 
 const formatTimestamp = (isoString) => {
   const date = new Date(isoString);
@@ -54,13 +55,21 @@ const AdminOrderManagement = () => {
       case 'Shipped': return 'bg-blue-500/20 text-blue-400';
       case 'Delivered': return 'bg-green-500/20 text-green-400';
       case 'Cancelled': return 'bg-red-500/20 text-red-400';
+      case 'Refunded': return 'bg-purple-500/20 text-purple-400'; // Added Refunded status class
       default: return 'bg-gray-500/20 text-gray-400';
     }
   };
 
-  const handleRefund = (orderId) => {
-    toast.success(`Refund initiated for Order ${orderId}.`);
-    // In a real app, this would trigger a backend refund process.
+  const handleRefund = async (orderId) => {
+    if (window.confirm(`Are you sure you want to initiate a refund for Order ${orderId}?`)) {
+      try {
+        const response = await api.admin.initiateRefund(orderId);
+        toast.success(response.message);
+        fetchOrders({ page: currentPage, limit: itemsPerPage, search: searchTerm, status: filterStatus === 'all' ? undefined : filterStatus }); // Re-fetch orders
+      } catch (error) {
+        toast.error(`Failed to initiate refund: ${error.message}`);
+      }
+    }
   };
 
   return (
@@ -94,6 +103,7 @@ const AdminOrderManagement = () => {
               <option value="Shipped">Shipped</option>
               <option value="Delivered">Delivered</option>
               <option value="Cancelled">Cancelled</option>
+              <option value="Refunded">Refunded</option> {/* Added Refunded status */}
             </select>
             <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-[var(--text)]" aria-hidden="true"><ChevronDown size={20} /></div>
           </div>
@@ -155,12 +165,14 @@ const AdminOrderManagement = () => {
                           <option value="Shipped">Shipped</option>
                           <option value="Delivered">Delivered</option>
                           <option value="Cancelled">Cancelled</option>
+                          <option value="Refunded">Refunded</option> {/* Added Refunded status */}
                         </select>
                         <button
                           onClick={() => handleRefund(order._id)}
                           className="p-2 rounded-full bg-red-500/20 hover:bg-red-500/40 text-red-400 transition-colors duration-200"
                           title="Initiate Refund"
                           aria-label={`Initiate refund for order ${order._id}`}
+                          disabled={order.orderStatus === 'Refunded' || order.orderStatus === 'Cancelled'}
                         >
                           <FontAwesomeIcon icon={faMoneyBillWave} size="sm" />
                         </button>
