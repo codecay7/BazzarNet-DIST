@@ -8,13 +8,14 @@ import adminRoutes from './routes/adminRoutes.js';
 import productRoutes from './routes/productRoutes.js';
 import storeRoutes from './routes/storeRoutes.js';
 import wishlistRoutes from './routes/wishlistRoutes.js';
+import cartRoutes from './routes/cartRoutes.js'; // Import cart routes
 import paymentRoutes from './routes/paymentRoutes.js';
 import vendorRoutes from './routes/vendorRoutes.js';
 import orderRoutes from './routes/orderRoutes.js';
-import uploadRoutes from './routes/uploadRoutes.js'; // Import upload routes
-import passwordResetRoutes from './routes/passwordResetRoutes.js'; // Import password reset routes
+import uploadRoutes from './routes/uploadRoutes.js';
+import passwordResetRoutes from './routes/passwordResetRoutes.js';
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
-import path from 'path'; // Import path module
+import path from 'path';
 
 // Initialize Express app
 const app = express();
@@ -38,11 +39,12 @@ app.use('/api/admin', adminRoutes);
 app.use('/api/products', productRoutes);
 app.use('/api/stores', storeRoutes);
 app.use('/api/wishlist', wishlistRoutes);
+app.use('/api/cart', cartRoutes); // Mount cart routes
 app.use('/api/payments', paymentRoutes);
 app.use('/api/vendors', vendorRoutes);
 app.use('/api/orders', orderRoutes);
-app.use('/api/upload', uploadRoutes); // Mount upload routes
-app.use('/api/password-reset', passwordResetRoutes); // Mount password reset routes
+app.use('/api/upload', uploadRoutes);
+app.use('/api/password-reset', passwordResetRoutes);
 
 
 // Serve static files from the 'uploads' directory
