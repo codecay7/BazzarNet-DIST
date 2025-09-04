@@ -15,27 +15,14 @@ const LandingPage = () => {
     <section className="w-full max-w-[1200px] my-10">
       {/* Hero Section */}
       <div className="text-center py-16 px-5 bg-gradient-to-br from-[var(--accent)] to-[var(--accent-dark)] text-white rounded-2xl mx-4 md:py-20 md:px-10">
-        <h1 className="text-4xl md:text-5xl font-extrabold leading-tight md:leading-snug mb-4 text-gray-900 tracking-tight">
+        <h1 className="text-5xl md:text-6xl font-extrabold leading-tight md:leading-snug mb-4 text-gray-900 tracking-tight">
           Shop Locally, Delivered Fast with
           <span className="inline-block ml-2 px-2 py-1 bg-black text-[#4CAF50] rounded-md shadow-md text-[1.2em]">
             BazzarNet
           </span>
         </h1>
-        <p className="text-lg md:text-xl mb-5">Support your favorite local stores with quick doorstep delivery.</p>
-        <div className="flex flex-wrap justify-center gap-5">
-          <button
-            className="bg-[var(--accent)] text-white py-2 px-6 rounded-lg flex items-center gap-2 font-medium hover:bg-[var(--accent-dark)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.15)] hover:-translate-y-0.5 active:translate-y-0 active:shadow-[0_2px_10px_rgba(0,0,0,0.1)] transition-all duration-300 m-1.5"
-            onClick={() => navigate('/login')}
-          >
-            <FontAwesomeIcon icon={faShoppingBag} /> Start Shopping
-          </button>
-          <button
-            className="bg-[var(--accent)] text-white py-2 px-6 rounded-lg flex items-center gap-2 font-medium hover:bg-[var(--accent-dark)] hover:shadow-[0_6px_20px_rgba(0,0,0,0.15)] hover:-translate-y-0.5 active:translate-y-0 active:shadow-[0_2px_10px_rgba(0,0,0,0.1)] transition-all duration-300 m-1.5"
-            onClick={() => navigate('/login')}
-          >
-            <FontAwesomeIcon icon={faStore} /> Become a Vendor
-          </button>
-        </div>
+        <p className="text-xl md:text-2xl mb-5">Support your favorite local stores with quick doorstep delivery.</p>
+        {/* Removed Start Shopping and Become a Vendor buttons */}
       </div>
 
       {/* How It Works Section */}
