@@ -1,6 +1,6 @@
 import React, { createContext, useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
-import { mockOrders as allMockOrders, allProducts as initialAllProducts, stores as initialStores, mockUsers as initialMockUsers } from '../data/mockData'; // Import mockUsers
+import { mockOrders as allMockOrders, allProducts as initialAllProducts, stores as initialStores, mockUsers as initialMockUsers } from '../data/mockData';
 import * as api from '../services/api'; // Import the API service
 
 export const AppContext = createContext();
@@ -14,11 +14,11 @@ export const AppProvider = ({ children }) => {
   const [isAdmin, setIsAdmin] = useState(false);
   const [cart, setCart] = useState([]);
   const [wishlist, setWishlist] = useState([]);
-  const [allAppProducts, setAllAppProducts] = useState(initialAllProducts); // Central source of truth for all products
-  const [vendorProducts, setVendorProducts] = useState([]); // Products specific to the logged-in vendor
+  const [allAppProducts, setAllAppProducts] = useState(initialAllProducts);
+  const [vendorProducts, setVendorProducts] = useState([]);
   const [orders, setOrders] = useState(allMockOrders);
-  const [appStores, setAppStores] = useState(initialStores); // Central source of truth for all stores
-  const [allAppUsers, setAllAppUsers] = useState(initialMockUsers); // New state for all users (customers and vendors)
+  const [appStores, setAppStores] = useState(initialStores);
+  const [allAppUsers, setAllAppUsers] = useState(initialMockUsers); // This will eventually be managed by backend
 
   // Set initial theme on mount
   useEffect(() => {
@@ -57,216 +57,116 @@ export const AppProvider = ({ children }) => {
   };
 
   // Login Functions
-  const loginAsUser = async (name, email, password) => {
-    // --- Backend Integration Point: User Login ---
-    // In a real app, this would call `api.auth.login({ email, password, role: 'user' })`
-    // and handle the response (token, user data).
-    try {
-      // const response = await api.auth.login({ email, password, role: 'user' });
-      // if (response.success) {
-      //   const fetchedUser = response.user; // Assume backend returns user data
-      //   setUser(fetchedUser);
-      //   setIsLoggedIn(true);
-      //   setIsVendor(false);
-      //   setIsAdmin(false);
-      //   localStorage.setItem('user', JSON.stringify(fetchedUser));
-      //   toast.success(`Welcome back, ${fetchedUser.name}!`);
-      //   return true;
-      // } else {
-      //   toast.error(response.message || 'Login failed.');
-      //   return false;
-      // }
+  const loginUserInState = (userData) => {
+    setUser(userData);
+    setIsLoggedIn(true);
+    setIsVendor(userData.role === 'vendor');
+    setIsAdmin(userData.role === 'admin');
+    localStorage.setItem('user', JSON.stringify(userData));
+  };
 
-      // --- Mock Logic (for demo) ---
-      const existingUser = allAppUsers.find(u => u.email === email && u.role === 'user');
-      if (existingUser) {
-        if (!existingUser.isActive) {
-          toast.error('Your account is currently inactive. Please contact support.');
-          return false;
-        }
-        if (password !== existingUser.password) {
-          toast.error('Invalid password.');
-          return false;
-        }
-        setUser(existingUser);
-        setIsLoggedIn(true);
-        setIsVendor(false);
-        setIsAdmin(false);
-        localStorage.setItem('user', JSON.stringify(existingUser));
-        toast.success(`Welcome back, ${name}!`);
-        return true;
-      } else {
-        // Simplified registration for demo if user doesn't exist
-        const newUserId = Math.max(...allAppUsers.map(u => u.id)) + 1;
-        const newUser = {
-          id: newUserId,
-          name,
-          email,
-          password: password,
-          role: 'user',
-          isActive: true,
-          address: { 
-            houseNo: '123 Customer Apt',
-            landmark: 'Near Main Market',
-            city: 'Bengaluru',
-            state: 'Karnataka',
-            pinCode: '560001'
-          }
-        };
-        setAllAppUsers(prev => [...prev, newUser]);
-        setUser(newUser);
-        setIsLoggedIn(true);
-        setIsVendor(false);
-        setIsAdmin(false);
-        localStorage.setItem('user', JSON.stringify(newUser));
-        toast.success(`Welcome to BazzarNet, ${name}!`);
+  const loginAsUser = async (name, email, password) => {
+    try {
+      const response = await api.auth.login({ email, password });
+      if (response) {
+        loginUserInState(response);
+        toast.success(`Welcome back, ${response.name}!`);
         return true;
       }
+      return false;
     } catch (error) {
-      toast.error(`Login error: ${error.message}`);
+      toast.error(error.message || 'Login failed.');
       return false;
     }
   };
 
   const loginAsVendor = async (name, storeName, email, password) => {
-    // --- Backend Integration Point: Vendor Login ---
-    // In a real app, this would call `api.auth.login({ email, password, role: 'vendor' })`
-    // and handle the response (token, user data including storeId).
     try {
-      // const response = await api.auth.login({ email, password, role: 'vendor' });
-      // if (response.success) {
-      //   const fetchedVendor = response.user; // Assume backend returns vendor data
-      //   setUser(fetchedVendor);
-      //   setIsLoggedIn(true);
-      //   setIsVendor(true);
-      //   setIsAdmin(false);
-      //   localStorage.setItem('user', JSON.stringify(fetchedVendor));
-      //   toast.success(`Welcome, ${fetchedVendor.name}! Manage your store now.`);
-      //   return true;
-      // } else {
-      //   toast.error(response.message || 'Login failed.');
-      //   return false;
-      // }
-
-      // --- Mock Logic (for demo) ---
-      const store = initialStores.find(s => s.name === storeName);
-      if (!store) {
-        toast.error('Store not found. Please register your store first.');
-        return false;
-      }
-
-      const existingVendor = allAppUsers.find(u => u.email === email && u.role === 'vendor');
-      if (existingVendor) {
-        if (!existingVendor.isActive) {
-          toast.error('Your vendor account is currently inactive. Please contact support.');
-          return false;
-        }
-        if (password !== existingVendor.password) {
-          toast.error('Invalid password.');
-          return false;
-        }
-        setUser(existingVendor);
-        setIsLoggedIn(true);
-        setIsVendor(true);
-        setIsAdmin(false);
-        localStorage.setItem('user', JSON.stringify(existingVendor));
-        toast.success(`Welcome, ${name}! Manage your store now.`);
-        return true;
-      } else {
-        // Simplified registration for demo if vendor doesn't exist
-        const newVendorId = Math.max(...allAppUsers.map(u => u.id)) + 1;
-        const newVendor = {
-          id: newVendorId,
-          name,
-          store: storeName,
-          email,
-          password: password,
-          role: 'vendor',
-          storeId: store.id,
-          isActive: true,
-          address: { 
-            houseNo: '456 Vendor Plaza',
-            landmark: 'Opposite Central Park',
-            city: 'Mumbai',
-            state: 'Maharashtra',
-            pinCode: '400001'
-          }
-        };
-        setAllAppUsers(prev => [...prev, newVendor]);
-        setUser(newVendor);
-        setIsLoggedIn(true);
-        setIsVendor(true);
-        setIsAdmin(false);
-        localStorage.setItem('user', JSON.stringify(newVendor));
-        toast.success(`Welcome, ${name}! Manage your store now.`);
+      const response = await api.auth.login({ email, password });
+      if (response) {
+        loginUserInState(response);
+        toast.success(`Welcome, ${response.name}! Manage your store now.`);
         return true;
       }
+      return false;
     } catch (error) {
-      toast.error(`Login error: ${error.message}`);
+      toast.error(error.message || 'Login failed.');
       return false;
     }
   };
 
-  const loginAsAdmin = async (username, password) => {
-    // --- Backend Integration Point: Admin Login ---
-    // In a real app, this would call `api.auth.login({ username, password, role: 'admin' })`
-    // and handle the response (token, user data).
+  const loginAsAdmin = async (email, password) => {
     try {
-      // const response = await api.auth.login({ username, password, role: 'admin' });
-      // if (response.success) {
-      //   const fetchedAdmin = response.user; // Assume backend returns admin data
-      //   setUser(fetchedAdmin);
-      //   setIsLoggedIn(true);
-      //   setIsVendor(false);
-      //   setIsAdmin(true);
-      //   localStorage.setItem('user', JSON.stringify(fetchedAdmin));
-      //   toast.success('Welcome, Super Admin!');
-      //   return true;
-      // } else {
-      //   toast.error(response.message || 'Login failed.');
-      //   return false;
-      // }
-
-      // --- Mock Logic (for demo) ---
-      if (username === 'admin' && password === 'admin123') {
-        const adminData = {
-          id: 0,
-          name: 'Super Admin',
-          email: 'admin@bazzarnet.com',
-          role: 'admin',
-          isActive: true,
-        };
-        setUser(adminData);
-        setIsLoggedIn(true);
-        setIsVendor(false);
-        setIsAdmin(true);
-        localStorage.setItem('user', JSON.stringify(adminData));
+      const response = await api.auth.login({ email, password });
+      if (response) {
+        loginUserInState(response);
         toast.success('Welcome, Super Admin!');
         return true;
-      } else {
-        toast.error('Invalid admin credentials.');
-        return false;
       }
+      return false;
     } catch (error) {
-      toast.error(`Login error: ${error.message}`);
+      toast.error(error.message || 'Login failed.');
       return false;
     }
   };
 
   const logout = async () => {
-    // --- Backend Integration Point: Logout ---
-    // In a real app, this would call `api.auth.logout()` to invalidate the session/token on the server.
     try {
-      // await api.auth.logout();
+      // In a real app, you might call a backend logout endpoint here
+      // await api.auth.logout(); 
       localStorage.removeItem('user');
       setUser(null);
       setIsLoggedIn(false);
       setIsVendor(false);
       setIsAdmin(false);
+      setCart([]); // Clear cart on logout
+      setWishlist([]); // Clear wishlist on logout
       setVendorProducts([]);
       toast.success('You have been logged out.');
     } catch (error) {
       toast.error(`Logout error: ${error.message}`);
+    }
+  };
+
+  // Registration Functions
+  const registerUser = async (name, email, password) => {
+    try {
+      const response = await api.auth.registerUser({ name, email, password });
+      if (response) {
+        loginUserInState(response); // Auto-login after successful registration
+        toast.success(`Welcome to BazzarNet, ${response.name}!`);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      toast.error(error.message || 'Registration failed.');
+      return false;
+    }
+  };
+
+  const registerVendor = async (formData) => {
+    try {
+      const response = await api.auth.registerVendor({
+        name: formData.fullName,
+        email: formData.email,
+        password: formData.password,
+        storeName: formData.businessName,
+        businessDescription: formData.description,
+        category: formData.category,
+        phone: formData.phone,
+        pan: formData.pan,
+        gst: formData.gst,
+        address: formData.address,
+      });
+      if (response) {
+        loginUserInState(response); // Auto-login after successful registration
+        toast.success(`Welcome, ${response.name}! Your store is now live.`);
+        return true;
+      }
+      return false;
+    } catch (error) {
+      toast.error(error.message || 'Vendor registration failed.');
+      return false;
     }
   };
 
@@ -650,7 +550,7 @@ export const AppProvider = ({ children }) => {
         return false;
       }
 
-      const order = orders[orderIndex];
+      const order = orders[order[orderIndex].id === orderId ? orderIndex : -1]; // Corrected to use orderIndex
       if (order.otp === enteredOtp) {
         setOrders(prevOrders =>
           prevOrders.map((o, idx) =>
@@ -734,15 +634,22 @@ export const AppProvider = ({ children }) => {
     }
   };
 
-  // Auto-login from localStorage
+  // Auto-login from localStorage and fetch user profile
   useEffect(() => {
     const storedUser = JSON.parse(localStorage.getItem('user'));
-    if (storedUser) {
-      setUser(storedUser);
-      setIsLoggedIn(true);
-      setIsVendor(storedUser.role === 'vendor');
-      setIsAdmin(storedUser.role === 'admin');
-      // In a real app, you might want to validate the token with the backend here
+    if (storedUser && storedUser.token) {
+      const fetchUserProfile = async () => {
+        try {
+          const fetchedUser = await api.userProfile.getMe();
+          loginUserInState({ ...fetchedUser, token: storedUser.token }); // Keep the token from local storage
+          toast.success(`Welcome back, ${fetchedUser.name}!`);
+        } catch (error) {
+          console.error('Auto-login failed:', error);
+          toast.error('Your session expired. Please log in again.');
+          logout(); // Log out if token is invalid or expired
+        }
+      };
+      fetchUserProfile();
     }
   }, []);
 
@@ -785,6 +692,8 @@ export const AppProvider = ({ children }) => {
     updateUserStatus,
     adminEditProduct,
     adminDeleteProduct,
+    registerUser, // Added registerUser to context value
+    registerVendor, // Added registerVendor to context value
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
