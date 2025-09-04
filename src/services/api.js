@@ -96,7 +96,10 @@ export const products = {
   getAll: (params) => apiRequest(`/products?${new URLSearchParams(params)}`),
   getById: (productId) => apiRequest(`/products/${productId}`),
   getStoreProducts: (storeId, params) => apiRequest(`/stores/${storeId}/products?${new URLSearchParams(params)}`),
-  getRecommended: (params) => apiRequest(`/products/recommended?${new URLSearchParams(params)}`), // This endpoint doesn't exist yet in backend
+  getRecommended: (params) => {
+    console.log('Frontend: Fetching recommended products from /products/recommended'); // Added log
+    return apiRequest(`/products/recommended?${new URLSearchParams(params)}`);
+  },
 };
 
 // --- Store Endpoints ---
