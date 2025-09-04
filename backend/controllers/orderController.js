@@ -131,6 +131,32 @@ const getCustomerOrders = asyncHandler(async (req, res) => {
   res.json({ orders, page, pages: Math.ceil(count / pageSize) });
 });
 
+// @desc    Get a single order by ID (Customer/Vendor/Admin)
+// @route   GET /api/orders/:id
+// @access  Private
+const getOrderById = asyncHandler(async (req, res) => {
+  const order = await Order.findById(req.params.id)
+    .populate('user', 'name email')
+    .populate('store', 'name');
+
+  if (!order) {
+    res.status(404);
+    throw new Error('Order not found');
+  }
+
+  // Authorization: Only the customer who placed the order, the vendor of the store, or an admin can view
+  if (
+    req.user._id.toString() === order.user._id.toString() || // Customer
+    (req.user.role === 'vendor' && req.user.storeId.toString() === order.store._id.toString()) || // Vendor
+    req.user.role === 'admin' // Admin
+  ) {
+    res.json(order);
+  } else {
+    res.status(403);
+    throw new Error('Not authorized to view this order.');
+  }
+});
+
 // @desc    Get orders for a specific vendor's store
 // @route   GET /api/orders/store/:storeId
 // @access  Private/Vendor
@@ -234,6 +260,7 @@ const confirmDelivery = asyncHandler(async (req, res) => {
 export {
   placeOrder,
   getCustomerOrders,
+  getOrderById, // Export new function
   getVendorOrders,
   updateOrderStatus,
   confirmDelivery,

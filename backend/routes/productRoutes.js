@@ -2,6 +2,7 @@ import express from 'express';
 import {
   getAllProducts,
   getProductById,
+  getRecommendedProducts, // Import new function
   createProduct,
   updateProduct,
   deleteProduct,
@@ -14,6 +15,7 @@ const router = express.Router();
 
 // Public routes
 router.route('/').get(getAllProducts);
+router.route('/recommended').get(getRecommendedProducts); // New route for recommended products
 router.route('/:id').get(getProductById);
 
 // Vendor-only routes

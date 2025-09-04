@@ -209,6 +209,39 @@ const getAdminOrders = asyncHandler(async (req, res) => {
   res.json({ orders, page, pages: Math.ceil(count / pageSize) });
 });
 
+// @desc    Initiate a refund for an order (Admin)
+// @route   POST /api/admin/orders/:id/refund
+// @access  Private/Admin
+const initiateRefund = asyncHandler(async (req, res) => {
+  const order = await Order.findById(req.params.id);
+
+  if (!order) {
+    res.status(404);
+    throw new Error('Order not found');
+  }
+
+  // In a real application, this would involve:
+  // 1. Interacting with a payment gateway to process the refund.
+  // 2. Updating the order status to 'Refunded'.
+  // 3. Creating a new Payment record with status 'Refunded' or updating an existing one.
+  // 4. Notifying the customer and vendor.
+
+  // For this demo, we'll just update the order status and send a success message.
+  if (order.orderStatus === 'Delivered' || order.orderStatus === 'Shipped') {
+    // A refund might be possible even after delivery, depending on policy
+    order.orderStatus = 'Refunded';
+    await order.save();
+    res.json({ message: `Refund initiated for order ${order._id}. Order status updated to Refunded.` });
+  } else if (order.orderStatus === 'Cancelled') {
+    res.status(400);
+    throw new Error('Order is already cancelled, no refund needed.');
+  } else {
+    order.orderStatus = 'Cancelled'; // If not delivered/shipped, just cancel it
+    await order.save();
+    res.json({ message: `Order ${order._id} cancelled and refund initiated.` });
+  }
+});
+
 
 // --- Admin Dashboard Stats ---
 
@@ -296,5 +329,6 @@ export {
   adminUpdateStore,
   adminDeleteStore,
   getAdminOrders, // Export new function
+  initiateRefund, // Export new function
   getAdminDashboardStats,
 };

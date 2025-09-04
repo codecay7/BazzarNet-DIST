@@ -47,6 +47,19 @@ const getProductById = asyncHandler(async (req, res) => {
   }
 });
 
+// @desc    Get recommended products (public)
+// @route   GET /api/products/recommended
+// @access  Public
+const getRecommendedProducts = asyncHandler(async (req, res) => {
+  // For demo purposes, return a random selection of products
+  // In a real app, this would involve recommendation logic
+  const products = await Product.aggregate([
+    { $sample: { size: 6 } }, // Get 6 random products
+    { $project: { name: 1, image: 1, price: 1, originalPrice: 1, store: 1 } } // Select relevant fields
+  ]);
+  res.json(products);
+});
+
 // @desc    Create a new product (vendor)
 // @route   POST /api/products
 // @access  Private/Vendor
@@ -129,6 +142,7 @@ const deleteProduct = asyncHandler(async (req, res) => {
 export {
   getAllProducts,
   getProductById,
+  getRecommendedProducts, // Export new function
   createProduct,
   updateProduct,
   deleteProduct,

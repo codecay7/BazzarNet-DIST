@@ -9,6 +9,7 @@ import {
   adminUpdateStore,
   adminDeleteStore,
   getAdminOrders, // Import new function
+  initiateRefund, // Import new function
   getAdminDashboardStats,
 } from '../controllers/adminController.js';
 import { validate } from '../middleware/validationMiddleware.js';
@@ -43,6 +44,7 @@ router.delete('/stores/:id', adminDeleteStore);
 
 // Admin Order Management routes
 router.get('/orders', getAdminOrders); // Admin can get all orders
+router.post('/orders/:id/refund', initiateRefund); // New route for initiating refund
 // Note: updateOrderStatus is handled in orderRoutes.js and allows admin role.
 
 export default router;
