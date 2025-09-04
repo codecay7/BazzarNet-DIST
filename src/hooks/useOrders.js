@@ -77,7 +77,8 @@ const useOrders = (isLoggedIn, user, isVendor, isAdmin) => {
     fetchOrders,
     updateOrderStatus,
     confirmDeliveryWithOtp,
-    setOrders // Expose setOrders for external updates (e.g., after checkout)
+    setOrders,
+    setOrdersMeta, // Explicitly return the setter for meta data
   };
 };
 
