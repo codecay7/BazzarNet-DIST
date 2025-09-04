@@ -59,6 +59,11 @@ const apiRequest = async (endpoint, options = {}) => {
         // If JSON parsing fails, use status text
         throw new Error(response.statusText || `API Error: ${response.status}`);
       }
+      // IMPORTANT: If there are specific validation errors, throw them
+      if (errorData.errors && Array.isArray(errorData.errors)) {
+        const validationErrors = errorData.errors.map(err => err.message).join(', ');
+        throw new Error(validationErrors || errorData.message || `API Error: ${response.statusText}`);
+      }
       throw new Error(errorData.message || `API Error: ${response.statusText}`);
     }
     
