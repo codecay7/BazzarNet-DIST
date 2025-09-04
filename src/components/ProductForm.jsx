@@ -14,8 +14,8 @@ const ProductForm = ({ onSubmit, initialData = null }) => {
     description: '',
     image: '', // This will store the URL
   });
-  const [imageFile, setImageFile] = useState(null); // To store the actual file object
-  const fileInputRef = useRef(null); // Ref for the hidden file input
+  // Removed imageFile state as we're now using URL input directly
+  // Removed fileInputRef as we're no longer using a hidden file input
 
   const categories = [
     'Groceries', 'Bakery', 'Butcher', 'Cafe', 'Electronics', 
@@ -49,13 +49,17 @@ const ProductForm = ({ onSubmit, initialData = null }) => {
     }
     if (!data.description.trim()) {
       newErrors.description = 'Description is required.';
+    } else if (data.description.trim().length < 10) { // Updated validation for description length
+      newErrors.description = 'Description must be at least 10 characters long.';
     }
-    // Image validation is now handled by file input, but we still need a URL
-    if (!data.image && !imageFile) { // If no existing image URL and no new file selected
-      newErrors.image = 'Product image is required.';
+    // Image validation: check if it's a valid URL or empty
+    if (!data.image.trim()) {
+      newErrors.image = 'Product image URL is required.';
+    } else if (!/^https?:\/\/\S+\.\S+$/.test(data.image.trim())) { // Basic URL regex
+      newErrors.image = 'Please provide a valid image URL.';
     }
     return newErrors;
-  }, [imageFile]);
+  }, []);
 
   // Use the custom validation hook
   const { errors, validate, resetErrors } = useFormValidation(product, productValidationLogic);
@@ -71,14 +75,14 @@ const ProductForm = ({ onSubmit, initialData = null }) => {
         description: initialData.description || '',
         image: initialData.image || '', // Keep existing image URL
       });
-      setImageFile(null); // Clear any pending file upload when editing existing product
+      // Removed setImageFile(null);
     } else {
       // Reset form for new product
       setProduct({
         name: '', price: '', originalPrice: '', stock: '',
         category: '', description: '', image: '',
       });
-      setImageFile(null);
+      // Removed setImageFile(null);
     }
     resetErrors(); // Clear errors on initialData change
   }, [initialData, resetErrors]);
@@ -88,45 +92,21 @@ const ProductForm = ({ onSubmit, initialData = null }) => {
     setProduct(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleImageFileChange = (e) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      setImageFile(file);
-      // Also update the product state with a temporary URL for preview
-      setProduct(prev => ({ ...prev, image: URL.createObjectURL(file) }));
-      // Clear any previous image errors related to URL format
-      resetErrors();
-    }
-  };
+  // Removed handleImageFileChange
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
-    // Validate with current product state (which includes temp image URL if new file selected)
+    // Validate with current product state
     if (validate(product)) {
-      let imageUrl = product.image; // Start with existing or temporary URL
-
-      if (imageFile) { // If a new file is selected, upload it
-        const formData = new FormData();
-        formData.append('image', imageFile); // 'image' must match the field name in uploadMiddleware
-
-        try {
-          const uploadResponse = await api.upload.uploadImage(formData);
-          imageUrl = uploadResponse.filePath; // Get the actual URL from the backend
-          toast.success('Image uploaded successfully!');
-        } catch (uploadError) {
-          toast.error(`Image upload failed: ${uploadError.message}`);
-          return; // Stop submission if image upload fails
-        }
-      }
-
+      // No image upload logic needed here, as we're directly using the URL from the input
       const submittedProduct = {
         ...product,
-        id: initialData?.id || Date.now(), // For mock data, generate ID
+        // Removed id: initialData?.id || Date.now(), as backend generates _id
         price: parseFloat(product.price),
         originalPrice: product.originalPrice ? parseFloat(product.originalPrice) : null,
         stock: parseInt(product.stock),
-        image: imageUrl, // Use the uploaded image URL
+        image: product.image.trim(), // Use the URL directly
       };
       onSubmit(submittedProduct);
     } else {
@@ -172,36 +152,26 @@ const ProductForm = ({ onSubmit, initialData = null }) => {
         </div>
       </div>
       
-      {/* Image Upload Section */}
+      {/* Image URL Input Section */}
       <div>
-        <label htmlFor="productImageUpload" className="block text-sm font-medium mb-1">Product Image</label>
+        <label htmlFor="productImage" className="block text-sm font-medium mb-1">Product Image URL</label>
         <input 
-          type="file" 
-          id="productImageUpload"
-          ref={fileInputRef}
-          onChange={handleImageFileChange} 
-          accept="image/*"
-          className="hidden" // Hide the default file input
+          type="text" // Changed to text input for URL
+          id="productImage"
+          name="image" 
+          value={product.image} 
+          onChange={handleChange} 
+          placeholder="e.g., https://example.com/image.jpg"
+          className={inputClasses} 
           aria-invalid={!!errors.image}
           aria-describedby={errors.image ? "productImage-error" : undefined}
         />
-        <div 
-          className="w-full h-32 border-2 border-dashed border-white/30 rounded-lg flex items-center justify-center cursor-pointer hover:border-[var(--accent)] transition-colors"
-          onClick={() => fileInputRef.current.click()}
-          role="button"
-          tabIndex="0"
-          aria-label="Upload product image"
-        >
-          {product.image ? (
-            <img src={product.image} alt="Product Preview" className="max-h-full max-w-full object-contain rounded-lg" />
-          ) : (
-            <div className="flex flex-col items-center text-white/70">
-              <UploadCloud size={32} />
-              <p className="text-sm mt-2">Click to upload image</p>
-            </div>
-          )}
-        </div>
         {errors.image && <p id="productImage-error" className="text-red-400 text-xs mt-1">{errors.image}</p>}
+        {product.image && (
+          <div className="mt-2 w-32 h-32 border border-white/30 rounded-lg overflow-hidden flex items-center justify-center">
+            <img src={product.image} alt="Image Preview" className="max-w-full max-h-full object-contain" />
+          </div>
+        )}
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">

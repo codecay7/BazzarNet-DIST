@@ -65,7 +65,7 @@ export const AppProvider = ({ children }) => {
   }, []);
 
   const fetchCart = useCallback(async () => {
-    if (!isLoggedIn || !user?._id) return;
+    if (!isLoggedIn || !user?._id || isVendor || isAdmin) return; // Only fetch for customers
     try {
       const userCart = await api.customer.getCart();
       setCart(userCart.items); // Assuming API returns { items: [...] }
@@ -73,10 +73,10 @@ export const AppProvider = ({ children }) => {
       toast.error(`Failed to load cart: ${error.message}`);
       setCart([]); // Clear cart on error
     }
-  }, [isLoggedIn, user?._id]);
+  }, [isLoggedIn, user?._id, isVendor, isAdmin]);
 
   const fetchWishlist = useCallback(async () => {
-    if (!isLoggedIn || !user?._id) return;
+    if (!isLoggedIn || !user?._id || isVendor || isAdmin) return; // Only fetch for customers
     try {
       const userWishlist = await api.customer.getWishlist();
       setWishlist(userWishlist); // Assuming API returns array of items
@@ -84,7 +84,7 @@ export const AppProvider = ({ children }) => {
       toast.error(`Failed to load wishlist: ${error.message}`);
       setWishlist([]); // Clear wishlist on error
     }
-  }, [isLoggedIn, user?._id]);
+  }, [isLoggedIn, user?._id, isVendor, isAdmin]);
 
   const fetchOrders = useCallback(async (params = {}) => {
     if (!isLoggedIn || !user?._id) return;
