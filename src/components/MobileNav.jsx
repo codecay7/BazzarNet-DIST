@@ -74,10 +74,10 @@ const MobileNav = () => {
                   className="flex items-center text-[var(--text)] w-full justify-center my-2 p-3 no-underline text-lg font-medium hover:bg-white/10 rounded-lg transition-colors duration-200"
                   aria-label={link.name}
                 >
-                  {typeof link.icon === 'string' ? (
-                    <FontAwesomeIcon icon={link.icon} className="mr-3 w-5 text-center" aria-hidden="true" />
-                  ) : (
+                  {typeof link.icon === 'function' ? ( // Check if it's a function (Lucide component)
                     React.createElement(link.icon, { size: 20, className: "mr-3 w-5 text-center", "aria-hidden": "true" })
+                  ) : ( // Otherwise, assume it's a FontAwesome icon object
+                    <FontAwesomeIcon icon={link.icon} className="mr-3 w-5 text-center" aria-hidden="true" />
                   )}
                   {link.name}
                 </Link>
