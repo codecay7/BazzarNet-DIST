@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import toast from 'react-hot-toast';
-import * as api from '../services/api';
+import * => from '../services/api';
 
 const useVendorProducts = (isLoggedIn, isVendor, user) => {
   const [vendorProducts, setVendorProducts] = useState([]);
@@ -79,7 +79,8 @@ const useVendorProducts = (isLoggedIn, isVendor, user) => {
     addVendorProduct,
     editVendorProduct,
     deleteVendorProduct,
-    setVendorProducts, // Explicitly return the setter
+    setVendorProducts,
+    setVendorProductsMeta, // Explicitly return the setter for meta data
   };
 };
 

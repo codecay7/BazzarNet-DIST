@@ -100,7 +100,8 @@ export const AppProvider = ({ children }) => {
     addVendorProduct,
     editVendorProduct,
     deleteVendorProduct,
-    setVendorProducts, // Destructure setVendorProducts here
+    setVendorProducts,
+    setVendorProductsMeta, // Destructure setVendorProductsMeta here
   } = useVendorProducts(isLoggedIn, isVendor, user);
 
   const {
