@@ -12,29 +12,22 @@ const Login = () => {
   const [activeTab, setActiveTab] = useState('user');
 
   // User Login State
-  const [userName, setUserName] = useState(''); // Not used in backend login, but kept for form consistency
   const [userEmail, setUserEmail] = useState('');
   const [userPassword, setUserPassword] = useState('');
   const [userErrors, setUserErrors] = useState({});
 
   // Vendor Login State
-  const [vendorName, setVendorName] = useState(''); // Not used in backend login, but kept for form consistency
-  const [vendorStore, setVendorStore] = useState(''); // Not used in backend login, but kept for form consistency
   const [vendorEmail, setVendorEmail] = useState('');
   const [vendorPassword, setVendorPassword] = useState('');
   const [vendorErrors, setVendorErrors] = useState({});
 
   // Admin Login State
-  const [adminUsername, setAdminUsername] = useState(''); // Not used in backend login, but kept for form consistency
   const [adminEmail, setAdminEmail] = useState(''); // Using email for admin login
   const [adminPassword, setAdminPassword] = useState('');
   const [adminErrors, setAdminErrors] = useState({});
 
   const validateUserLogin = () => {
     let newErrors = {};
-    if (!userName.trim()) {
-      newErrors.name = 'Name is required.';
-    }
     if (!userEmail.trim()) {
       newErrors.email = 'Email is required.';
     } else if (!/\S+@\S+\.\S+/.test(userEmail)) {
@@ -51,12 +44,6 @@ const Login = () => {
 
   const validateVendorLogin = () => {
     let newErrors = {};
-    if (!vendorName.trim()) {
-      newErrors.name = 'Vendor Name is required.';
-    }
-    if (!vendorStore.trim()) {
-      newErrors.store = 'Store Name is required.';
-    }
     if (!vendorEmail.trim()) {
       newErrors.email = 'Email is required.';
     } else if (!/\S+@\S+\.\S+/.test(vendorEmail)) {
@@ -178,19 +165,6 @@ const Login = () => {
               id="user-login-panel"
               aria-labelledby="user-login-tab"
             >
-              <label htmlFor="userName" className="sr-only">User Name</label>
-              <input
-                type="text"
-                id="userName"
-                value={userName}
-                onChange={(e) => setUserName(e.target.value)}
-                placeholder="Name"
-                className={inputClasses}
-                aria-invalid={!!userErrors.name}
-                aria-describedby={userErrors.name ? "userName-error" : undefined}
-              />
-              {userErrors.name && <p id="userName-error" className="text-red-400 text-xs text-left -mt-1 mb-2">{userErrors.name}</p>}
-              
               <label htmlFor="userEmail" className="sr-only">Email</label>
               <input
                 type="email"
@@ -238,32 +212,6 @@ const Login = () => {
               id="vendor-login-panel"
               aria-labelledby="vendor-login-tab"
             >
-              <label htmlFor="vendorName" className="sr-only">Vendor Name</label>
-              <input
-                type="text"
-                id="vendorName"
-                value={vendorName}
-                onChange={(e) => setVendorName(e.target.value)}
-                placeholder="Vendor Name"
-                className={inputClasses}
-                aria-invalid={!!vendorErrors.name}
-                aria-describedby={vendorErrors.name ? "vendorName-error" : undefined}
-              />
-              {vendorErrors.name && <p id="vendorName-error" className="text-red-400 text-xs text-left -mt-1 mb-2">{vendorErrors.name}</p>}
-              
-              <label htmlFor="vendorStore" className="sr-only">Store Name</label>
-              <input
-                type="text"
-                id="vendorStore"
-                value={vendorStore}
-                onChange={(e) => setVendorStore(e.target.value)}
-                placeholder="Store Name"
-                className={inputClasses}
-                aria-invalid={!!vendorErrors.store}
-                aria-describedby={vendorErrors.store ? "vendorStore-error" : undefined}
-              />
-              {vendorErrors.store && <p id="vendorStore-error" className="text-red-400 text-xs text-left -mt-1 mb-2">{vendorErrors.store}</p>}
-
               <label htmlFor="vendorEmail" className="sr-only">Email</label>
               <input
                 type="email"
