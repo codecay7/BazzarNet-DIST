@@ -8,6 +8,7 @@ import SkeletonCard from '../components/SkeletonCard';
 import * as api from '../services/api'; // Import API service
 import placeholderImage from '../assets/placeholder.png'; // Import placeholder image
 import { getFullImageUrl } from '../utils/imageUtils'; // Import utility
+import { ChevronDown } from 'lucide-react'; // Import ChevronDown for select
 
 const CustomerDashboard = () => {
   const { user, cart, wishlist, orders, addToCart, addToWishlist } = useContext(AppContext);
@@ -15,6 +16,12 @@ const CustomerDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [recommendedProducts, setRecommendedProducts] = useState([]);
   const [recommendedLoading, setRecommendedLoading] = useState(true);
+  const [selectedCategory, setSelectedCategory] = useState('all'); // New state for category filter
+
+  const categories = [ // Define categories for the filter
+    'all', 'Groceries', 'Bakery', 'Butcher', 'Cafe', 'Electronics', 
+    'Furniture', 'Decor', 'Clothing', 'Other'
+  ];
 
   useEffect(() => {
     const loadDashboardData = async () => {
@@ -77,6 +84,14 @@ const CustomerDashboard = () => {
     return stars;
   };
 
+  // Filtered recommended products based on selected category
+  const filteredRecommendedProducts = useMemo(() => {
+    if (selectedCategory === 'all') {
+      return recommendedProducts;
+    }
+    return recommendedProducts.filter(product => product.category === selectedCategory);
+  }, [recommendedProducts, selectedCategory]);
+
   return (
     <div className="w-full max-w-[1200px] mx-auto my-10">
       <div className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-8 mx-4">
@@ -98,7 +113,7 @@ const CustomerDashboard = () => {
             {/* Recommended Products Skeleton */}
             <div className="bg-black/10 p-6 rounded-xl animate-pulse">
               <SkeletonText width="60%" height="1.5rem" className="mb-4" />
-              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4"> {/* Adjusted for mobile */}
                 {[...Array(6)].map((_, index) => (
                   <SkeletonCard key={index} />
                 ))}
@@ -126,15 +141,33 @@ const CustomerDashboard = () => {
             {/* Recommended Products Section */}
             <div className="bg-black/10 p-6 rounded-xl">
               <h2 className="text-2xl font-bold mb-4">Recommended Products</h2>
+              
+              {/* Category Filter Section */}
+              <div className="mb-6 relative max-w-xs">
+                <label htmlFor="categoryFilter" className="sr-only">Filter by Category</label>
+                <select
+                  id="categoryFilter"
+                  value={selectedCategory}
+                  onChange={(e) => setSelectedCategory(e.target.value)}
+                  className="w-full appearance-none p-3 rounded-lg bg-white/10 border border-black/30 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] text-[var(--text)] pr-8"
+                  aria-label="Filter recommended products by category"
+                >
+                  {categories.map(cat => (
+                    <option key={cat} value={cat} className="capitalize">{cat === 'all' ? 'All Categories' : cat}</option>
+                  ))}
+                </select>
+                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-[var(--text)]" aria-hidden="true"><ChevronDown size={20} /></div>
+              </div>
+
               {recommendedLoading ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4"> {/* Adjusted for mobile */}
                   {[...Array(6)].map((_, index) => (
                     <SkeletonCard key={index} />
                   ))}
                 </div>
-              ) : recommendedProducts.length > 0 ? (
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {recommendedProducts.map(product => {
+              ) : filteredRecommendedProducts.length > 0 ? (
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4"> {/* Adjusted for mobile */}
+                  {filteredRecommendedProducts.map(product => {
                     const isOutOfStock = product.stock === 0;
                     const discount = calculateDiscount(product.price, product.originalPrice);
                     return (
@@ -199,7 +232,7 @@ const CustomerDashboard = () => {
                   })}
                 </div>
               ) : (
-                <p className="text-center text-lg opacity-80 py-10">No recommended products available.</p>
+                <p className="text-center text-lg opacity-80 py-10">No recommended products available for this category.</p>
               )}
             </div>
           </>
