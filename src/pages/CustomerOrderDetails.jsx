@@ -81,7 +81,7 @@ const CustomerOrderDetails = () => {
         <div className="bg-black/10 p-6 rounded-xl">
           <h3 className="text-xl font-semibold mb-4">Items in Your Order</h3>
           <div className="space-y-4" role="list">
-            {(order.items || []).map(item => ( {/* Added || [] for safety */}
+            {(order.items || []).map(item => ( /* Added || [] for safety */
               <div key={item.product} className="flex items-center gap-4 bg-black/10 p-3 rounded-lg" role="listitem" aria-label={`Item: ${item.name}, Quantity: ${item.quantity}, Price: ₹{(item.price * item.quantity).toFixed(2)}`}>
                 <img 
                   src={getFullImageUrl(item.image)} 
