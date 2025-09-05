@@ -39,13 +39,14 @@ const placeOrderSchema = Joi.object({
     'number.positive': 'Total price must be a positive number.',
     'any.required': 'Total price is required.',
   }),
-  // New: Add validation for the appliedCoupon object
   appliedCoupon: Joi.object({
-    _id: Joi.string().hex().length(24).required(), // Assuming _id is passed for coupon
+    _id: Joi.string().hex().length(24).required(),
     code: Joi.string().required(),
     discountAmount: Joi.number().min(0).required(),
-    isNewUserOnly: Joi.boolean().optional(), // Optional, as it's not always present in the final stored coupon
-  }).optional().allow(null), // Allow appliedCoupon to be optional and null
+    discountType: Joi.string().valid('percentage', 'fixed').optional(), // Added
+    discountValue: Joi.number().min(0).optional(), // Added
+    isNewUserOnly: Joi.boolean().optional(),
+  }).optional().allow(null),
 });
 
 const updateOrderStatusSchema = Joi.object({
