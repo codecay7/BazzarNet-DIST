@@ -102,6 +102,8 @@ const placeOrder = asyncHandler(async (req, res) => {
       coupon: appliedCoupon ? {
         code: appliedCoupon.code,
         discountAmount: appliedCoupon.discountAmount,
+        discountType: appliedCoupon.discountType, // NEW: Added discountType
+        discountValue: appliedCoupon.discountValue, // NEW: Added discountValue
       } : undefined,
     });
 
