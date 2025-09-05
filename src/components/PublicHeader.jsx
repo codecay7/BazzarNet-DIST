@@ -8,7 +8,9 @@ const PublicHeader = () => {
   return (
     <header className="py-4 bg-[var(--bg)] sticky top-0 z-[1000] rounded-b-2xl shadow-[0_4px_20px_var(--shadow)]">
       <div className="container mx-auto px-5 flex items-center justify-between">
-        <span className="text-2xl font-bold text-[var(--accent)] md:text-3xl" aria-label="BazzarNet Home">BazzarNet</span>
+        <div className="bg-[var(--accent)] text-white rounded-md px-2 py-1 shadow-md"> {/* Added div for card styling */}
+          <span className="text-2xl font-bold md:text-3xl" aria-label="BazzarNet Home">BazzarNet</span>
+        </div>
         <button
           onClick={() => navigate('/login')}
           className="bg-[var(--accent)] text-white py-2 px-6 rounded-lg font-medium hover:bg-[var(--accent-dark)] transition-all duration-300"

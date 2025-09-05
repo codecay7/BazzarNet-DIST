@@ -67,7 +67,9 @@ const Header = () => {
       <div className="container mx-auto px-5 flex items-center justify-between">
         <div className="flex items-center gap-6">
           <div className="flex-shrink-0">
-            <span className="text-2xl font-bold text-[var(--accent)] md:text-3xl" aria-label="BazzarNet Home">BazzarNet</span>
+            <div className="bg-[var(--accent)] text-white rounded-md px-2 py-1 shadow-md"> {/* Added div for card styling */}
+              <span className="text-2xl font-bold md:text-3xl" aria-label="BazzarNet Home">BazzarNet</span>
+            </div>
           </div>
           <nav className="hidden md:flex items-center gap-2">
             {links.map((link) => (
