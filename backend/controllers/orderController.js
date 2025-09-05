@@ -3,6 +3,7 @@ import Order from '../models/Order.js';
 import Product from '../models/Product.js'; // Import Product model
 import Store from '../models/Store.js'; // Import Store model
 import Coupon from '../models/Coupon.js'; // New: Import Coupon model
+import Payment from '../models/Payment.js'; // NEW: Import Payment model
 import { generateOtp } from '../utils/helpers.js'; // Assuming a helper for OTP generation
 import { sendEmail } from '../services/emailService.js';
 import env from '../config/env.js'; // Import env to use FRONTEND_URL
@@ -110,6 +111,19 @@ const placeOrder = asyncHandler(async (req, res) => {
     });
 
     createdOrder = await order.save({ session }); // Save with session
+
+    // NEW: Create a Payment record
+    const paymentStatus = (paymentMethod === 'Credit Card' || paymentMethod === 'UPI QR Payment') ? 'Paid' : 'Pending';
+    const payment = new Payment({
+      order: createdOrder._id,
+      vendor: store.owner, // Link to the store owner (vendor)
+      amount: totalPrice,
+      paymentMethod: paymentMethod,
+      transactionId: transactionId || `COD-${createdOrder._id}`, // Use transactionId or generate one for COD
+      status: paymentStatus,
+      customer: req.user._id,
+    });
+    await payment.save({ session }); // Save payment within the transaction
 
     // New: Mark coupon as used if one was applied
     if (appliedCoupon) {
