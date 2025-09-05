@@ -13,7 +13,8 @@ const useCoupons = ({ isLoggedIn = false, orders = [], user = null } = {}) => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState(null);
 
-  const fetchAvailableCoupons = useCallback(async () => {
+  // Define refetch directly as a useCallback function
+  const refetch = useCallback(async () => {
     if (!isLoggedIn) {
       setAvailableCoupons([]);
       return;
@@ -48,7 +49,7 @@ const useCoupons = ({ isLoggedIn = false, orders = [], user = null } = {}) => {
     } finally {
       setLoading(false);
     }
-  }, [isLoggedIn]);
+  }, [isLoggedIn]); // Dependency array for useCallback
 
   const applyCoupon = useCallback(
     async (code, cartTotal) => {
@@ -91,8 +92,8 @@ const useCoupons = ({ isLoggedIn = false, orders = [], user = null } = {}) => {
   }, []);
 
   useEffect(() => {
-    fetchAvailableCoupons();
-  }, [fetchAvailableCoupons]);
+    refetch(); // Call refetch directly here
+  }, [refetch]); // Dependency array for useEffect
 
   return {
     availableCoupons,
@@ -100,7 +101,7 @@ const useCoupons = ({ isLoggedIn = false, orders = [], user = null } = {}) => {
     discountAmount,
     loading,
     error,
-    fetchAvailableCoupons, // Corrected: returning directly as fetchAvailableCoupons
+    refetch, // Return refetch directly
     applyCoupon,
     removeCoupon,
     setAppliedCoupon, // Expose setter
