@@ -70,6 +70,8 @@ const orderSchema = new mongoose.Schema({
   coupon: { // New: Store applied coupon details
     code: { type: String, trim: true },
     discountAmount: { type: Number, min: 0 },
+    discountType: { type: String, enum: ['percentage', 'fixed'] }, // Added discountType
+    discountValue: { type: Number, min: 0 }, // Added discountValue
   },
 }, {
   timestamps: true,
