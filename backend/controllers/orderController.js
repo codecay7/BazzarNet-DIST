@@ -14,6 +14,7 @@ import mongoose from 'mongoose'; // Import mongoose for transactions
 const placeOrder = asyncHandler(async (req, res) => {
   console.log('Backend: placeOrder controller reached.'); // NEW LOG
   const { items, shippingAddress, paymentMethod, totalPrice, appliedCoupon } = req.body; // New: Get appliedCoupon
+  console.log('Backend: Received items in req.body:', items); // ADDED LOG
 
   if (!items || items.length === 0) {
     res.status(400);
