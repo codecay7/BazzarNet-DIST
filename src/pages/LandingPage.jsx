@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faShoppingBag, faStore, faCartPlus, faTruck, faUser, faQuoteLeft, faArrowRight, faShieldAlt, faTags } from '@fortawesome/free-solid-svg-icons'; // Added faShieldAlt, faTags
+import { faShoppingBag, faStore, faCartPlus, faTruck, faUser, faQuoteLeft, faArrowRight, faShieldAlt, faTags, faCheckCircle } from '@fortawesome/free-solid-svg-icons'; // Added faCheckCircle
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
