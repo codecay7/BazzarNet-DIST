@@ -65,9 +65,9 @@ const useWishlist = (isLoggedIn, user, isVendor, isAdmin, addToCart, fetchCart) 
     if (!isLoggedIn || !user?._id) return;
     try {
       await addToWishlist(product);
-      // Assuming product has _id, remove from cart
-      if (product._id) {
-        await api.customer.removeFromCart(product._id);
+      // When moving from cart, 'product' is a cart item object which has a nested 'product' object
+      if (product.product?._id) { // Ensure we're using the actual product ID
+        await api.customer.removeFromCart(product.product._id);
         fetchCart(); // Re-fetch cart to ensure UI is updated
       }
     } catch (error) {

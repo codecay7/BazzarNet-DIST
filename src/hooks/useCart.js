@@ -48,6 +48,7 @@ const useCart = (isLoggedIn, user, isVendor, isAdmin) => {
 
   const removeFromCart = useCallback(async (productId) => {
     if (!isLoggedIn || !user?._id) return;
+    console.log('useCart: removeFromCart called with productId:', productId); // NEW LOG
     try {
       const response = await api.customer.removeFromCart(productId);
       setCart(response.items);

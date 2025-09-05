@@ -118,6 +118,7 @@ const updateCartItemQuantity = asyncHandler(async (req, res) => {
 // @access  Private
 const removeItemFromCart = asyncHandler(async (req, res) => {
   const { productId } = req.params;
+  console.log('Backend: removeItemFromCart - Received productId:', productId); // NEW LOG
 
   let cart = await Cart.findOne({ user: req.user._id });
 
