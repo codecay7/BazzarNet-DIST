@@ -13,6 +13,7 @@ const userSchema = new mongoose.Schema({
     unique: true,
     trim: true,
     lowercase: true,
+    index: true, // Added index
   },
   password: {
     type: String,
@@ -23,10 +24,12 @@ const userSchema = new mongoose.Schema({
     type: String,
     enum: ['customer', 'vendor', 'admin'],
     default: 'customer',
+    index: true, // Added index
   },
   isActive: {
     type: Boolean,
     default: true,
+    index: true, // Added index
   },
   // Customer-specific fields
   address: {
@@ -34,7 +37,7 @@ const userSchema = new mongoose.Schema({
     landmark: { type: String, trim: true },
     city: { type: String, trim: true },
     state: { type: String, trim: true },
-    pinCode: { type: String, trim: true },
+    pinCode: { type: String, trim: true, index: true }, // Added index
   },
   phone: {
     type: String,
@@ -54,6 +57,7 @@ const userSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Store',
     sparse: true, // Allows multiple null values, useful if not all users are vendors
+    index: true, // Added index
   },
   store: { // Store name for quick reference
     type: String,

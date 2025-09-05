@@ -6,6 +6,7 @@ const storeSchema = new mongoose.Schema({
     required: true,
     unique: true,
     trim: true,
+    index: true, // Added index
   },
   description: {
     type: String,
@@ -17,18 +18,20 @@ const storeSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
     unique: true, // Each store has one unique owner
+    index: true, // Added index
   },
   category: {
     type: String,
     enum: ['Groceries', 'Bakery', 'Butcher', 'Cafe', 'Electronics', 'Furniture', 'Decor', 'Clothing', 'Other'],
     required: true,
+    index: true, // Added index
   },
   address: {
     houseNo: { type: String, trim: true },
     landmark: { type: String, trim: true },
     city: { type: String, trim: true },
     state: { type: String, trim: true },
-    pinCode: { type: String, trim: true },
+    pinCode: { type: String, trim: true, index: true }, // Added index
   },
   phone: {
     type: String,
@@ -47,6 +50,7 @@ const storeSchema = new mongoose.Schema({
   isActive: {
     type: Boolean,
     default: true,
+    index: true, // Added index
   },
 }, {
   timestamps: true,

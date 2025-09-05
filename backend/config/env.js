@@ -13,10 +13,13 @@ const env = {
   EMAIL_PASS: process.env.EMAIL_PASS,
   FRONTEND_URL: process.env.FRONTEND_URL || 'http://localhost:5173',
   ADMIN_EMAIL: process.env.ADMIN_EMAIL, // New: Admin email for support requests
+  CLOUDINARY_CLOUD_NAME: process.env.CLOUDINARY_CLOUD_NAME, // New
+  CLOUDINARY_API_KEY: process.env.CLOUDINARY_API_KEY,       // New
+  CLOUDINARY_API_SECRET: process.env.CLOUDINARY_API_SECRET, // New
 };
 
 // Basic validation to ensure critical variables are set
-const requiredEnvVars = ['MONGO_URI', 'JWT_SECRET', 'EMAIL_HOST', 'EMAIL_USER', 'EMAIL_PASS', 'FRONTEND_URL', 'ADMIN_EMAIL']; // Added ADMIN_EMAIL
+const requiredEnvVars = ['MONGO_URI', 'JWT_SECRET', 'EMAIL_HOST', 'EMAIL_USER', 'EMAIL_PASS', 'FRONTEND_URL', 'ADMIN_EMAIL', 'CLOUDINARY_CLOUD_NAME', 'CLOUDINARY_API_KEY', 'CLOUDINARY_API_SECRET']; // Added Cloudinary vars
 for (const key of requiredEnvVars) {
   if (!env[key]) {
     console.error(`Error: Environment variable ${key} is not set.`);

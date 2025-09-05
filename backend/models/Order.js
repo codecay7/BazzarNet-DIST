@@ -22,6 +22,7 @@ const orderSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'User',
     required: true,
+    index: true, // Added index
   },
   customerName: { type: String, required: true },
   customerEmail: { type: String, required: true },
@@ -29,6 +30,7 @@ const orderSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Store',
     required: true, // Assuming orders are placed from a single store for simplicity
+    index: true, // Added index
   },
   storeName: { type: String, required: true },
   items: [orderItemSchema], // Array of products in the order
@@ -57,6 +59,7 @@ const orderSchema = new mongoose.Schema({
     type: String,
     enum: ['Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled', 'Refunded'], // Added Refunded
     default: 'Pending',
+    index: true, // Added index
   },
   deliveryOtp: { // OTP for delivery confirmation
     type: String,
@@ -75,6 +78,7 @@ const orderSchema = new mongoose.Schema({
   },
 }, {
   timestamps: true,
+  indexes: [{ createdAt: -1 }], // Added index for sorting by creation date
 });
 
 const Order = mongoose.model('Order', orderSchema);

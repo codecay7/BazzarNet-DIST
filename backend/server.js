@@ -3,6 +3,8 @@ import cors from "cors";
 import morgan from "morgan";
 import path from "path";
 import { fileURLToPath } from "url";
+import mongoSanitize from 'express-mongo-sanitize'; // New: Import mongoSanitize
+import xss from 'xss-clean'; // New: Import xss-clean
 
 import env from "./config/env.js";
 import connectDB from "./config/db.js";
@@ -23,6 +25,7 @@ import supportRoutes from "./routes/supportRoutes.js";
 import couponRoutes from "./routes/couponRoutes.js";
 
 import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
+import { authLimiter, passwordResetLimiter } from "./middleware/rateLimitMiddleware.js"; // New: Import rate limiters
 
 // Fix __dirname for ES Modules
 const __filename = fileURLToPath(import.meta.url);
@@ -38,6 +41,12 @@ connectDB();
 app.use(express.json()); 
 app.use(cors());
 
+// New: Data sanitization against NoSQL query injection
+app.use(mongoSanitize());
+
+// New: Data sanitization against XSS
+app.use(xss());
+
 if (env.NODE_ENV === "development") {
   app.use(morgan("dev"));
 }
@@ -48,7 +57,7 @@ app.get("/", (req, res) => {
 });
 
 // Routes
-app.use("/api/auth", authRoutes);
+app.use("/api/auth", authLimiter, authRoutes); // Apply authLimiter
 app.use("/api/users", userRoutes);
 app.use("/api/admin", adminRoutes);
 app.use("/api/products", productRoutes);
@@ -59,11 +68,11 @@ app.use("/api/payments", paymentRoutes);
 app.use("/api/vendors", vendorRoutes);
 app.use("/api/orders", orderRoutes);
 app.use("/api/upload", uploadRoutes);
-app.use("/api/password-reset", passwordResetRoutes);
+app.use("/api/password-reset", passwordResetLimiter, passwordResetRoutes); // Apply passwordResetLimiter
 app.use("/api/support", supportRoutes);
 app.use("/api/coupons", couponRoutes);
 
-// Serve static uploads
+// Serve static uploads (no longer needed if using Cloudinary, but kept for local fallback)
 app.use("/uploads", express.static(path.join(__dirname, "uploads")));
 
 // Error Middleware

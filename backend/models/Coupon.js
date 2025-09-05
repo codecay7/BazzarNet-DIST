@@ -7,6 +7,7 @@ const couponSchema = new mongoose.Schema({
     unique: true,
     uppercase: true,
     trim: true,
+    index: true, // Added index
   },
   discountType: {
     type: String,
@@ -31,6 +32,7 @@ const couponSchema = new mongoose.Schema({
   expiryDate: {
     type: Date,
     required: true,
+    index: true, // Added index
   },
   usageLimit: { // Total number of times this coupon can be used
     type: Number,
@@ -46,15 +48,13 @@ const couponSchema = new mongoose.Schema({
     {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'User',
+      index: true, // Added index for users who used the coupon
     },
   ],
   isActive: {
     type: Boolean,
     default: true,
-  },
-  isNewUserOnly: {
-    type: Boolean,
-    default: false,
+    index: true, // Added index
   },
 }, {
   timestamps: true,

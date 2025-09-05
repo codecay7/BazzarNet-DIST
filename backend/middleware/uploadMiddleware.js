@@ -1,33 +1,33 @@
 import multer from 'multer';
-import path from 'path';
-import fs from 'fs';
+import { CloudinaryStorage } from 'multer-storage-cloudinary';
+import { v2 as cloudinary } from 'cloudinary';
+import env from '../config/env.js'; // Import env for Cloudinary credentials
 
-// Ensure the uploads directory exists
-const uploadsDir = path.resolve(process.cwd(), 'backend', 'uploads');
-if (!fs.existsSync(uploadsDir)) {
-  fs.mkdirSync(uploadsDir, { recursive: true });
-}
+// Configure Cloudinary
+cloudinary.config({
+  cloud_name: env.CLOUDINARY_CLOUD_NAME,
+  api_key: env.CLOUDINARY_API_KEY,
+  api_secret: env.CLOUDINARY_API_SECRET,
+});
 
-const storage = multer.diskStorage({
-  destination(req, file, cb) {
-    cb(null, uploadsDir); // Store files in the 'backend/uploads' directory
-  },
-  filename(req, file, cb) {
-    // Create a unique filename: fieldname-timestamp.ext
-    cb(
-      null,
-      `${file.fieldname}-${Date.now()}${path.extname(file.originalname)}`
-    );
+// Configure Cloudinary storage for Multer
+const storage = new CloudinaryStorage({
+  cloudinary: cloudinary,
+  params: {
+    folder: 'bazzarnet_uploads', // Folder name in Cloudinary
+    format: async (req, file) => 'png', // supports promises as well
+    public_id: (req, file) => `${file.fieldname}-${Date.now()}`,
+    allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'svg'], // Allowed image formats
+    transformation: [{ width: 500, height: 500, crop: 'limit' }], // Optional: resize images
   },
 });
 
-// Check file type to allow only images
+// Check file type to allow only images (Multer's fileFilter)
 function checkFileType(file, cb) {
   const filetypes = /jpeg|jpg|png|gif|svg/;
-  const extname = filetypes.test(path.extname(file.originalname).toLowerCase());
   const mimetype = filetypes.test(file.mimetype);
 
-  if (extname && mimetype) {
+  if (mimetype) {
     return cb(null, true);
   } else {
     cb('Images only!');
@@ -35,7 +35,7 @@ function checkFileType(file, cb) {
 }
 
 const upload = multer({
-  storage,
+  storage: storage,
   fileFilter: function (req, file, cb) {
     checkFileType(file, cb);
   },

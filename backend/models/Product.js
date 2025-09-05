@@ -5,6 +5,7 @@ const productSchema = new mongoose.Schema({
     type: String,
     required: true,
     trim: true,
+    index: true, // Added index
   },
   description: {
     type: String,
@@ -37,6 +38,7 @@ const productSchema = new mongoose.Schema({
     type: String,
     enum: ['Groceries', 'Bakery', 'Butcher', 'Cafe', 'Electronics', 'Furniture', 'Decor', 'Clothing', 'Other'],
     required: true,
+    index: true, // Added index
   },
   image: { // URL to product image
     type: String,
@@ -47,6 +49,7 @@ const productSchema = new mongoose.Schema({
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Store',
     required: true,
+    index: true, // Added index
   },
   rating: {
     type: Number,
@@ -62,6 +65,7 @@ const productSchema = new mongoose.Schema({
   isActive: {
     type: Boolean,
     default: true,
+    index: true, // Added index
   },
 }, {
   timestamps: true,

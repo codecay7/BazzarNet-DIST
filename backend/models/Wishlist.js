@@ -6,6 +6,7 @@ const wishlistSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
     unique: true, // Each user has one wishlist
+    index: true, // Added index
   },
   items: [
     {
@@ -13,6 +14,7 @@ const wishlistSchema = new mongoose.Schema({
         type: mongoose.Schema.Types.ObjectId,
         ref: 'Product',
         required: true,
+        index: true, // Added index for product within items array
       },
       name: { type: String, required: true },
       image: { type: String, required: true },

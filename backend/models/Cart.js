@@ -23,6 +23,7 @@ const cartSchema = new mongoose.Schema({
     ref: 'User',
     required: true,
     unique: true, // Each user has one cart
+    index: true, // Added index
   },
   items: [cartItemSchema],
 }, {
