@@ -3,14 +3,14 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStore } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 import { AppContext } from '../context/AppContext';
-import SkeletonStoreCard from '../components/SkeletonStoreCard'; // Changed import to SkeletonStoreCard
+import SkeletonStoreCard from '../components/SkeletonStoreCard';
 import Pagination from '../components/Pagination';
 
 const VALID_PINCODE = '825301'; // Define the valid pincode
 
 const Stores = () => {
   const navigate = useNavigate();
-  const { simulateLoading, appStores, appStoresMeta, fetchAppStores, user } = useContext(AppContext);
+  const { appStores, appStoresMeta, fetchAppStores, user } = useContext(AppContext); // Removed simulateLoading
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -71,7 +71,7 @@ const Stores = () => {
         ) : loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {[...Array(itemsPerPage)].map((_, index) => (
-              <SkeletonStoreCard key={index} /> {/* Using SkeletonStoreCard */}
+              <SkeletonStoreCard key={index} />
             ))}
           </div>
         ) : appStores.length > 0 ? (
