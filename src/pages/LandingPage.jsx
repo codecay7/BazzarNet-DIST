@@ -56,104 +56,60 @@ const LandingPage = () => {
       ) : (
         <motion.section
           key="landing-content"
-          className="w-full max-w-[1200px] mx-auto my-10 relative overflow-hidden"
+          className="w-full min-h-screen bg-gray-900 text-white flex flex-col"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
           exit="hidden"
         >
+          {/* Header */}
+          <div className="flex justify-between items-center p-4">
+            <h1 className="text-xl font-bold">BazzarNet</h1>
+            <Link to="/login" className="bg-cyan-500 text-white py-2 px-4 rounded">Login</Link>
+          </div>
+
           {/* Hero Section */}
           <motion.div
-            className="text-center py-20 px-5 text-[var(--text)] rounded-2xl md:py-24 md:px-10 relative z-10"
+            className="text-center py-8 px-4 flex-1 flex flex-col justify-center"
             variants={textContainerVariants}
             initial="hidden"
             animate="visible"
           >
             <motion.h1
-              className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black leading-tight md:leading-snug mb-4 tracking-tight break-words"
+              className="text-3xl sm:text-4xl md:text-5xl font-bold leading-tight mb-4 break-words"
             >
               <motion.span variants={textChildVariants} className="inline-block">Shop Locally, Delivered Fast with</motion.span>
-              <motion.span variants={textChildVariants} className="inline-block ml-2 px-2 py-1 bg-[var(--accent)] text-white rounded-md shadow-md text-[1.8em] font-black">
+              <motion.span variants={textChildVariants} className="inline-block ml-2 px-2 py-1 bg-cyan-500 text-white rounded-md text-xl sm:text-2xl font-bold">
                 BazzarNet
               </motion.span>
             </motion.h1>
-            <motion.p className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-medium mb-5" variants={textChildVariants}>
+            <motion.p className="text-base sm:text-lg md:text-xl font-medium mb-5" variants={textChildVariants}>
               Support your favorite local stores with quick doorstep delivery.
             </motion.p>
           </motion.div>
 
           {/* How It Works Section */}
-          <div className="container mx-auto px-5 py-20 relative z-10">
-            <h2 className="text-3xl font-bold mb-10 md:text-4xl text-center">How It Works</h2>
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 justify-items-center">
+          <div className="container mx-auto px-4 py-10 relative z-10">
+            <h2 className="text-2xl sm:text-3xl font-bold mb-8 text-center text-cyan-500">How It Works</h2>
+            <div className="grid grid-cols-1 gap-6">
               <motion.div
-                className="bg-[var(--card-bg)] backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-[0_8px_40px_var(--shadow)] hover:-translate-y-1 transition-transform duration-300 flex flex-col items-center text-center"
+                className="bg-gray-800 backdrop-blur-md border border-white/20 rounded-2xl p-6 shadow-md hover:-translate-y-1 transition-transform duration-300 flex flex-col items-center text-center"
                 variants={cardVariants}
                 whileInView="visible"
                 initial="hidden"
                 viewport={{ once: true, amount: 0.5 }}
               >
                 <motion.div 
-                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  whileHover={{ scale: 1.1 }}
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
                   className="mb-4"
                 >
-                  <FontAwesomeIcon icon={faStore} className="text-5xl text-[var(--accent)]" />
+                  <FontAwesomeIcon icon={faStore} className="text-4xl text-cyan-500" />
                 </motion.div>
-                <h3 className="text-2xl font-bold text-[var(--accent)] mb-2">Browse Stores</h3>
-                <p className="text-[var(--text)] text-lg">Discover local shops and their products.</p>
+                <h3 className="text-xl font-bold text-cyan-500 mb-2">Browse Stores</h3>
+                <p className="text-gray-300 text-base">Discover local shops and their products.</p>
               </motion.div>
-              <motion.div
-                className="bg-[var(--card-bg)] backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-[0_8px_40px_var(--shadow)] hover:-translate-y-1 transition-transform duration-300 flex flex-col items-center text-center"
-                variants={cardVariants}
-                whileInView="visible"
-                initial="hidden"
-                viewport={{ once: true, amount: 0.5 }}
-              >
-                <motion.div 
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                  className="mb-4"
-                >
-                  <FontAwesomeIcon icon={faCartPlus} className="text-5xl text-[var(--accent)]" />
-                </motion.div>
-                <h3 className="text-2xl font-bold text-[var(--accent)] mb-2">Add to Cart</h3>
-                <p className="text-[var(--text)] text-lg">Select items and place your order easily.</p>
-              </motion.div>
-              <motion.div
-                className="bg-[var(--card-bg)] backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-[0_8px_40px_var(--shadow)] hover:-translate-y-1 transition-transform duration-300 flex flex-col items-center text-center"
-                variants={cardVariants}
-                whileInView="visible"
-                initial="hidden"
-                viewport={{ once: true, amount: 0.5 }}
-              >
-                <motion.div 
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                  className="mb-4"
-                >
-                  <FontAwesomeIcon icon={faTruck} className="text-5xl text-[var(--accent)]" />
-                </motion.div>
-                <h3 className="text-2xl font-bold text-[var(--accent)] mb-2">Fast Delivery</h3>
-                <p className="text-[var(--text)] text-lg">Get your order delivered in under an hour.</p>
-              </motion.div>
-              <motion.div
-                className="bg-[var(--card-bg)] backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-[0_8px_40px_var(--shadow)] hover:-translate-y-1 transition-transform duration-300 flex flex-col items-center text-center"
-                variants={cardVariants}
-                whileInView="visible"
-                initial="hidden"
-                viewport={{ once: true, amount: 0.5 }}
-              >
-                <motion.div 
-                  whileHover={{ scale: 1.1, rotate: 5 }}
-                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
-                  className="mb-4"
-                >
-                  <FontAwesomeIcon icon={faCheckCircle} className="text-5xl text-[var(--accent)]" />
-                </motion.div>
-                <h3 className="text-2xl font-bold text-[var(--accent)] mb-2">Enjoy & Review</h3>
-                <p className className="text-[var(--text)] text-lg">Receive your order and share your feedback.</p>
-              </motion.div>
+              {/* Add more cards as needed */}
             </div>
           </div>
 
@@ -265,25 +221,40 @@ const LandingPage = () => {
 
           {/* Call to Action Section */}
           <motion.div
-            className="bg-black/10 text-white rounded-3xl p-20 text-center mx-4 shadow-[0_8px_40px_var(--shadow)] relative z-10"
+            className="bg-gray-800 text-white rounded-2xl p-6 text-center mx-4 shadow-md relative z-10 mb-6"
             variants={cardVariants}
             whileInView="visible"
             initial="hidden"
             viewport={{ once: true, amount: 0.5 }}
           >
-            <h2 className="text-4xl md:text-5xl font-extrabold mb-4 leading-tight">Join the BazzarNet Community!</h2>
-            <p className="text-xl md:text-2xl mb-8 opacity-90">Whether you're a customer looking for convenience or a business ready to grow, BazzarNet is for you.</p>
+            <h2 className="text-2xl sm:text-3xl font-extrabold mb-4 leading-tight">Join the BazzarNet Community!</h2>
+            <p className="text-base sm:text-lg mb-6 opacity-90">Whether you're a customer looking for convenience or a business ready to grow, BazzarNet is for you.</p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <LoginButton />
+              <Link
+                to="/login"
+                className="bg-cyan-500 text-white py-2 px-6 rounded-full font-bold text-base hover:bg-cyan-600 transition-colors duration-300 shadow-md"
+              >
+                Log In
+              </Link>
               <Link
                 to="/products"
-                className="bg-transparent border-2 border-white text-white py-3 px-8 rounded-full font-bold text-lg hover:bg-white/20 transition-colors duration-300 shadow-lg flex items-center justify-center gap-2"
+                className="bg-transparent border-2 border-cyan-500 text-cyan-500 py-2 px-6 rounded-full font-bold text-base hover:bg-cyan-500 hover:text-white transition-colors duration-300 shadow-md flex items-center justify-center gap-2"
                 aria-label="Explore products"
               >
                 Explore Products <FontAwesomeIcon icon={faShoppingBag} />
               </Link>
             </div>
           </motion.div>
+
+          {/* Footer */}
+          <footer className="bg-cyan-500 text-white p-4 text-center">
+            <p className="text-sm">BazzarNet</p>
+            <p className="text-sm">Your one-stop solution for shopping from local stores with fast doorstep delivery.</p>
+            <div className="flex justify-center gap-4 mt-2">
+              <Link to="/company" className="text-sm hover:underline">Company</Link>
+              <Link to="/support" className="text-sm hover:underline">Support</Link>
+            </div>
+          </footer>
         </motion.section>
       )}
     </AnimatePresence>
