@@ -72,6 +72,7 @@ export const userProfile = {
 
 // --- Products ---
 export const products = {
+  getAll: (params = {}) => apiRequest(`/products${buildQuery(params)}`), // Added this method
   getById: (productId) => apiRequest(`/products/${productId}`),
   getStoreProducts: (storeId, params = {}) => apiRequest(`/stores/${storeId}/products${buildQuery(params)}`),
   getRecommended: (params = {}) => apiRequest(`/products/recommended${buildQuery(params)}`),
