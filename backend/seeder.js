@@ -317,6 +317,20 @@ const productsData = {
   ],
 };
 
+// Helper function to ensure image URLs are absolute
+const ensureAbsoluteImageUrl = (url) => {
+  if (!url) return 'https://via.placeholder.com/200?text=Product+Image'; // Default if no URL
+  if (url.startsWith('http://') || url.startsWith('https://') || url.startsWith('/uploads/')) {
+    return url; // Already absolute or relative to server root
+  }
+  // If it's a partial placeholder, prepend the base
+  if (url.startsWith('200?text=') || url.startsWith('150?text=')) { // Heuristic for placeholder
+    return `https://via.placeholder.com/${url}`;
+  }
+  return url; // Return as is if not recognized, might be a different type of relative path
+};
+
+
 const importData = async () => {
   try {
     await User.deleteMany();
@@ -343,7 +357,7 @@ const importData = async () => {
         gst: vendorData.gst,
         description: vendorData.businessDescription,
         category: vendorData.category,
-        profileImage: vendorData.profileImage,
+        profileImage: ensureAbsoluteImageUrl(vendorData.profileImage), // Apply helper to vendor profile image
       });
 
       const store = await Store.create({
@@ -354,7 +368,7 @@ const importData = async () => {
         address: vendorData.address,
         phone: vendorData.phone,
         email: vendorData.email,
-        logo: vendorData.profileImage,
+        logo: ensureAbsoluteImageUrl(vendorData.profileImage), // Apply helper to store logo
       });
 
       user.storeId = store._id;
@@ -365,7 +379,11 @@ const importData = async () => {
       // Add products for this store
       const storeProducts = productsData[vendorData.storeName];
       if (storeProducts) {
-        const productsWithStore = storeProducts.map(p => ({ ...p, store: store._id }));
+        const productsWithStore = storeProducts.map(p => ({ 
+          ...p, 
+          store: store._id,
+          image: ensureAbsoluteImageUrl(p.image), // Apply helper to product images
+        }));
         await Product.insertMany(productsWithStore);
         console.log(`  ${productsWithStore.length} products added for ${store.name}.`);
       }
