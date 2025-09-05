@@ -1,20 +1,19 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faShoppingBag, faStore, faCartPlus, faTruck, faUser, faQuoteLeft, faArrowRight, faTags, faCheckCircle, faLock } from '@fortawesome/free-solid-svg-icons'; // Added faLock
+import { faShoppingBag, faStore, faCartPlus, faTruck, faUser, faQuoteLeft, faArrowRight, faTags, faCheckCircle, faLock } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import Loader from '../components/Loader'; // Import the new Loader component
-import LoginButton from '../components/LoginButton'; // Import the new LoginButton
+import Loader from '../components/Loader';
+import LoginButton from '../components/LoginButton';
 
 const LandingPage = () => {
-  const [isLoading, setIsLoading] = useState(true); // New state for loading screen
+  const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Simulate a loading delay for the 3D spinner
     const loaderTimer = setTimeout(() => {
       setIsLoading(false);
-    }, 2000); // Show loader for 2 seconds
+    }, 2000);
 
     return () => clearTimeout(loaderTimer);
   }, []);
@@ -29,14 +28,13 @@ const LandingPage = () => {
     },
   };
 
-  // Variants for the hero section text animation
   const textContainerVariants = {
     hidden: { opacity: 0 },
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.1, // Stagger animation for children
-        delayChildren: 0.5, // Delay before children start animating
+        staggerChildren: 0.1,
+        delayChildren: 0.5,
       },
     },
   };
@@ -62,14 +60,12 @@ const LandingPage = () => {
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          exit="hidden" // Animate out when navigating away
+          exit="hidden"
         >
-          {/* Removed BubbleBackground component */}
-
           {/* Hero Section */}
           <motion.div
             className="text-center py-20 px-5 text-[var(--text)] rounded-2xl mx-4 md:py-24 md:px-10 relative z-10"
-            variants={textContainerVariants} // Apply container variants here
+            variants={textContainerVariants}
             initial="hidden"
             animate="visible"
           >
@@ -156,7 +152,7 @@ const LandingPage = () => {
                   <FontAwesomeIcon icon={faCheckCircle} className="text-5xl text-[var(--accent)]" />
                 </motion.div>
                 <h3 className="text-2xl font-bold text-[var(--accent)] mb-2">Enjoy & Review</h3>
-                <p className="text-[var(--text)] text-lg">Receive your order and share your feedback.</p>
+                <p className className="text-[var(--text)] text-lg">Receive your order and share your feedback.</p>
               </motion.div>
             </div>
           </div>
@@ -278,13 +274,13 @@ const LandingPage = () => {
             <h2 className="text-4xl md:text-5xl font-extrabold mb-4 leading-tight">Join the BazzarNet Community!</h2>
             <p className="text-xl md:text-2xl mb-8 opacity-90">Whether you're a customer looking for convenience or a business ready to grow, BazzarNet is for you.</p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <LoginButton /> {/* Replaced "Get Started" Link with LoginButton */}
+              <LoginButton />
               <Link
                 to="/products"
                 className="bg-transparent border-2 border-white text-white py-3 px-8 rounded-full font-bold text-lg hover:bg-white/20 transition-colors duration-300 shadow-lg flex items-center justify-center gap-2"
                 aria-label="Explore products"
               >
-                Explore Products <FontAwesomeIcon icon={faLock} />
+                Explore Products <FontAwesomeIcon icon={faShoppingBag} />
               </Link>
             </div>
           </motion.div>
