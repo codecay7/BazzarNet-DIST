@@ -47,9 +47,9 @@ const MobileNav = () => {
   const links = isAdmin ? adminLinks : (isVendor ? vendorLinks : userLinks);
 
   const menuVariants = {
-    hidden: { opacity: 0, y: -50 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.3, ease: 'easeInOut' } },
-    exit: { opacity: 0, y: -50, transition: { duration: 0.2, ease: 'easeInOut' } }
+    hidden: { opacity: 0, x: '100%' }, // Slide from right (hidden)
+    visible: { opacity: 1, x: 0, transition: { duration: 0.3, ease: 'easeInOut' } }, // Slide to visible
+    exit: { opacity: 0, x: '100%', transition: { duration: 0.2, ease: 'easeInOut' } } // Slide back to right (exit)
   };
 
   return (
@@ -61,18 +61,18 @@ const MobileNav = () => {
             animate="visible"
             exit="exit"
             variants={menuVariants}
-            className="absolute top-full left-0 w-full bg-[var(--card-bg)] backdrop-blur-[5px] shadow-lg z-[999] p-5 border-t border-white/10"
+            className="fixed top-0 right-0 h-full w-64 bg-[var(--bg)] shadow-lg z-[999] p-5" // Fixed to top-right, full height, plain background
             role="dialog"
             aria-modal="true"
             aria-label="Mobile Navigation Menu"
           >
-            <nav className="flex flex-col items-center">
+            <nav className="flex flex-col"> {/* Removed items-center and justify-center */}
               {links.map((link) => (
                 <Link
                   key={link.name}
                   to={link.path}
                   onClick={toggleSidebar}
-                  className="flex items-center text-[var(--text)] w-full justify-center my-2 p-3 no-underline text-lg font-medium hover:bg-white/10 rounded-lg transition-colors duration-200"
+                  className="flex items-center text-[var(--text)] w-full justify-start my-2 p-3 no-underline text-lg font-medium hover:bg-white/10 rounded-lg transition-colors duration-200" // Left-aligned text
                   aria-label={link.name}
                 >
                   {typeof link.icon === 'function' ? ( // Check if it's a function (Lucide component)
@@ -86,7 +86,7 @@ const MobileNav = () => {
               <Link
                 to="/help"
                 onClick={toggleSidebar}
-                className="flex items-center text-[var(--text)] w-full justify-center my-2 p-3 no-underline text-lg font-medium hover:bg-white/10 rounded-lg transition-colors duration-200"
+                className="flex items-center text-[var(--text)] w-full justify-start my-2 p-3 no-underline text-lg font-medium hover:bg-white/10 rounded-lg transition-colors duration-200"
                 aria-label="Help and Support"
               >
                 <FontAwesomeIcon icon={faQuestionCircle} className="mr-3 w-5 text-center" aria-hidden="true" />
@@ -94,7 +94,7 @@ const MobileNav = () => {
               </Link>
               <a
                 href="#"
-                className="flex items-center text-[var(--text)] w-full justify-center my-2 p-3 no-underline text-lg font-medium hover:bg-white/10 rounded-lg transition-colors duration-200"
+                className="flex items-center text-[var(--text)] w-full justify-start my-2 p-3 no-underline text-lg font-medium hover:bg-white/10 rounded-lg transition-colors duration-200"
                 onClick={(e) => { e.preventDefault(); handleLogout(); }}
                 aria-label="Logout"
               >
@@ -104,7 +104,7 @@ const MobileNav = () => {
             </nav>
           </motion.div>
           <div
-            className="fixed inset-0 bg-black/50 z-[998] mt-[72px]"
+            className="fixed inset-0 bg-black/50 z-[998]" // Overlay covers entire screen
             onClick={toggleSidebar}
             aria-hidden="true"
           ></div>
