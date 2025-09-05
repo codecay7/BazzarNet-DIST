@@ -39,7 +39,7 @@ const QrPaymentForm = ({ formData, errors, handleChange, onPreviousStep, onPlace
         <p className="text-sm opacity-80">Open your UPI app (Paytm, GPay, PhonePe, etc.) and pay to this ID.</p>
         <a 
           href={UPI_PAYMENT_LINK} 
-          className="inline-block mt-4 bg-[var(--accent)] text-white py-2 px-4 rounded-lg font-medium hover:bg-[var(--accent-dark)] transition-colors"
+          className="inline-block mt-4 bg-[var(--accent)] text-white py-2 px-4 rounded-lg font-medium hover:bg-[var(--accent-dark)] transition-colors md:hidden"
           target="_blank"
           rel="noopener noreferrer"
           aria-label="Open UPI app to pay"
