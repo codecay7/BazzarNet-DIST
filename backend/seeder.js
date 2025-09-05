@@ -117,7 +117,7 @@ const sampleVendors = [
     address: {
       houseNo: '1, Market Road',
       landmark: 'Opposite Bus Stand',
-      city: 'Bengaluru',
+      city: 'Bengaluru', // Changed state to match pincode region
       state: 'Jharkhand', // Changed state to match pincode region
       pinCode: '825301', // Updated pincode
     },
@@ -162,7 +162,7 @@ const sampleVendors = [
       pinCode: '825301', // Updated pincode
     },
     profileImage: 'https://images.unsplash.com/photo-1517336714730-49689c8a9680?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
-  },
+    },
   {
     name: 'Vendor D (Clothing)',
     email: 'vendorD@example.com',
@@ -347,14 +347,17 @@ export const importData = async () => { // Exported
 
     console.log('Existing data cleared!');
 
-    // Separate customers and admin for insertion
-    const customersAndAdmin = sampleCustomers.filter(user => user.role !== 'vendor');
-    const createdCustomersAndAdmin = await User.insertMany(customersAndAdmin);
+    // Iterate and create each customer and admin user individually
+    const createdCustomersAndAdmin = [];
+    for (const userData of sampleCustomers) {
+      const user = await User.create(userData); // User.create triggers pre-save hook for hashing
+      createdCustomersAndAdmin.push(user);
+    }
     console.log(`${createdCustomersAndAdmin.length} customer and admin users created.`);
 
     const createdVendors = [];
     for (const vendorData of sampleVendors) {
-      const user = await User.create({
+      const user = await User.create({ // User.create triggers pre-save hook for hashing
         name: vendorData.name,
         email: vendorData.email,
         password: vendorData.password, // Password will be hashed by pre-save hook
