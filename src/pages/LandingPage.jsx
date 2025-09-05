@@ -59,7 +59,7 @@ const LandingPage = () => {
           variants={itemVariants}
         >
           Shop Locally, Delivered Fast with
-          <span className="inline-block ml-2 px-2 py-1 bg-[var(--accent)] text-white rounded-md shadow-md text-[1.2em]">
+          <span className="inline-block ml-2 px-2 py-1 bg-[var(--accent)] text-white rounded-md shadow-md text-[1.2em] font-black"> {/* Changed font-bold to font-black */}
             BazzarNet
           </span>
         </motion.h1>
