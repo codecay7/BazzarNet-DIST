@@ -14,8 +14,8 @@ const LandingPage = () => {
   return (
     <section className="w-full max-w-[1200px] my-10">
       {/* Hero Section */}
-      <div className="text-center py-16 px-5 bg-gradient-to-br from-[var(--accent)] to-[var(--accent-dark)] text-white rounded-2xl mx-4 md:py-20 md:px-10">
-        <h1 className="text-5xl md:text-6xl font-extrabold leading-tight md:leading-snug mb-4 text-gray-900 tracking-tight">
+      <div className="text-center py-16 px-5 text-[var(--text)] rounded-2xl mx-4 md:py-20 md:px-10"> {/* Removed background gradient and changed text color */}
+        <h1 className="text-5xl md:text-6xl font-extrabold leading-tight md:leading-snug mb-4 tracking-tight">
           Shop Locally, Delivered Fast with
           <span className="inline-block ml-2 px-2 py-1 bg-black text-[#4CAF50] rounded-md shadow-md text-[1.2em]">
             BazzarNet
