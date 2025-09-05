@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShoppingBag, faStore, faCartPlus, faTruck, faUser, faQuoteLeft, faArrowRight, faTags, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
-import LoadingSpinner3D from '../components/LoadingSpinner3D'; // Import the new 3D loader
+import Loader from '../components/Loader'; // Import the new Loader component
 import { BubbleBackground } from '../components/BubbleBackground'; // Import the new BubbleBackground
 
 const LandingPage = () => {
@@ -54,7 +54,7 @@ const LandingPage = () => {
   return (
     <AnimatePresence mode="wait">
       {isLoading ? (
-        <LoadingSpinner3D key="loader" />
+        <Loader key="loader" />
       ) : (
         <motion.section
           key="landing-content"
@@ -200,7 +200,7 @@ const LandingPage = () => {
                 <p className="text-[var(--text)] text-lg">Get your goods delivered quickly.</p>
               </motion.div>
               <motion.div
-                className="bg-[var(--card-bg)] backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-[0_8px_40px_var(--shadow)] hover:-translate-y-1 transition-transform duration-300"
+                className="bg-[var(--card-bg)] backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-[0_8px_40px_var(--shadow)] hover:-translate-y-1 transition-transform duration-300 flex flex-col items-center text-center"
                 variants={cardVariants}
                 whileInView="visible"
                 initial="hidden"
