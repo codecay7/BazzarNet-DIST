@@ -5,7 +5,6 @@ import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 const LandingPage = () => {
-  // Removed deliveryTime state as the component is being removed
   const [pageLoaded, setPageLoaded] = useState(false);
   const navigate = useNavigate();
 
@@ -16,8 +15,6 @@ const LandingPage = () => {
     }, 300); // Adjust delay as needed
     return () => clearTimeout(timer);
   }, []);
-
-  // Removed updateDeliveryTime function
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -47,9 +44,10 @@ const LandingPage = () => {
       animate={pageLoaded ? "visible" : "hidden"}
     >
       {/* Background Blobs / Premium Look */}
-      <div className="absolute top-0 left-0 w-64 h-64 bg-[var(--accent)] rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob z-0"></div>
-      <div className="absolute top-0 right-0 w-64 h-64 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-2000 z-0"></div>
-      <div className="absolute bottom-0 left-1/4 w-64 h-64 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-20 animate-blob animation-delay-4000 z-0"></div>
+      <div className="absolute top-10 left-10 w-72 h-72 bg-[var(--accent)] rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob z-0"></div>
+      <div className="absolute top-10 right-10 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000 z-0"></div>
+      <div className="absolute bottom-10 left-10 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000 z-0"></div>
+      <div className="absolute top-1/2 right-10 -translate-y-1/2 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-1000 z-0"></div>
 
       {/* Hero Section */}
       <motion.div
