@@ -73,14 +73,14 @@ const LandingPage = () => {
             animate="visible"
           >
             <motion.h1
-              className="text-7xl sm:text-8xl lg:text-9xl font-black leading-tight md:leading-snug mb-4 tracking-tight"
+              className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black leading-tight md:leading-snug mb-4 tracking-tight"
             >
               <motion.span variants={textChildVariants} className="inline-block">Shop Locally, Delivered Fast with</motion.span>
               <motion.span variants={textChildVariants} className="inline-block ml-2 px-2 py-1 bg-[var(--accent)] text-white rounded-md shadow-md text-[1.2em] font-black">
                 BazzarNet
               </motion.span>
             </motion.h1>
-            <motion.p className="text-2xl md:text-3xl lg:text-4xl font-medium mb-5" variants={textChildVariants}>
+            <motion.p className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-medium mb-5" variants={textChildVariants}>
               Support your favorite local stores with quick doorstep delivery.
             </motion.p>
           </motion.div>
