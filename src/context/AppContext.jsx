@@ -123,7 +123,7 @@ export const AppProvider = ({ children }) => {
     availableCoupons,
     appliedCoupon,
     discountAmount,
-    refetch: fetchAvailableCoupons, // Corrected: Destructure as refetch and alias to fetchAvailableCoupons
+    refetch, // Corrected: Destructure as refetch directly
     applyCoupon,
     removeCoupon,
     setAppliedCoupon,
@@ -190,7 +190,7 @@ export const AppProvider = ({ children }) => {
       fetchCart();
       fetchWishlist();
       fetchOrders();
-      fetchAvailableCoupons(); // Corrected: Now calls the aliased refetch function
+      refetch(); // Corrected: Now calls the refetch function directly
       if (isAdmin) {
         fetchAllUsers();
       }
@@ -214,7 +214,7 @@ export const AppProvider = ({ children }) => {
       setAppliedCoupon(null); // New: Clear applied coupon
       setDiscountAmount(0); // New: Clear discount amount
     }
-  }, [isLoggedIn, user, isAdmin, isVendor, fetchAllProducts, fetchAppStores, fetchCart, fetchWishlist, fetchOrders, fetchAllUsers, fetchVendorProducts, fetchAvailableCoupons, setCart, setWishlist, setAllAppProducts, setAllAppProductsMeta, setAppStores, setAppStoresMeta, setOrders, setOrdersMeta, setAllAppUsers, setAllAppUsersMeta, setVendorProducts, setVendorProductsMeta, setAppliedCoupon, setDiscountAmount]);
+  }, [isLoggedIn, user, isAdmin, isVendor, fetchAllProducts, fetchAppStores, fetchCart, fetchWishlist, fetchOrders, fetchAllUsers, fetchVendorProducts, refetch, setCart, setWishlist, setAllAppProducts, setAllAppProductsMeta, setAppStores, setAppStoresMeta, setOrders, setOrdersMeta, setAllAppUsers, setAllAppUsersMeta, setVendorProducts, setVendorProductsMeta, setAppliedCoupon, setDiscountAmount]);
 
 
   const value = {
@@ -276,7 +276,7 @@ export const AppProvider = ({ children }) => {
     availableCoupons,
     appliedCoupon,
     discountAmount,
-    fetchAvailableCoupons, // Corrected: Now refers to the aliased refetch function
+    fetchAvailableCoupons: refetch, // Expose refetch as fetchAvailableCoupons for consistency
     applyCoupon,
     removeCoupon,
   };
