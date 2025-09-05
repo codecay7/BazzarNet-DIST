@@ -4,6 +4,7 @@ import { faShoppingBag, faStore, faCartPlus, faTruck, faUser, faQuoteLeft, faArr
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Loader from '../components/Loader'; // Import the new Loader component
+import LoginButton from '../components/LoginButton'; // Import the new LoginButton
 
 const LandingPage = () => {
   const [isLoading, setIsLoading] = useState(true); // New state for loading screen
@@ -277,13 +278,7 @@ const LandingPage = () => {
             <h2 className="text-4xl md:text-5xl font-extrabold mb-4 leading-tight">Join the BazzarNet Community!</h2>
             <p className="text-xl md:text-2xl mb-8 opacity-90">Whether you're a customer looking for convenience or a business ready to grow, BazzarNet is for you.</p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Link
-                to="/register"
-                className="bg-white text-[var(--accent)] py-3 px-8 rounded-full font-bold text-lg hover:bg-gray-100 transition-colors duration-300 shadow-lg flex items-center justify-center gap-2"
-                aria-label="Sign up as a customer or vendor"
-              >
-                Get Started <FontAwesomeIcon icon={faArrowRight} />
-              </Link>
+              <LoginButton /> {/* Replaced "Get Started" Link with LoginButton */}
               <Link
                 to="/products"
                 className="bg-transparent border-2 border-white text-white py-3 px-8 rounded-full font-bold text-lg hover:bg-white/20 transition-colors duration-300 shadow-lg flex items-center justify-center gap-2"
