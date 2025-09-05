@@ -67,6 +67,15 @@ const useCart = (isLoggedIn, user, isVendor, isAdmin) => {
       toast.error('Please log in to place an order.');
       return null;
     }
+
+    // Client-side stock validation before proceeding to backend
+    for (const item of cart) {
+      if (item.product.stock < item.quantity) {
+        toast.error(`"${item.name}" is out of stock or does not have enough quantity available. Please adjust your cart.`);
+        return null; // Prevent checkout
+      }
+    }
+
     try {
       const newOrder = await api.customer.placeOrder(orderDetails);
       setCart([]); // Clear cart after successful order
@@ -76,7 +85,7 @@ const useCart = (isLoggedIn, user, isVendor, isAdmin) => {
       toast.error(`Error placing order: ${error.message}`);
       return null;
     }
-  }, [isLoggedIn, user?._id]);
+  }, [isLoggedIn, user?._id, cart]); // Added cart to dependencies
 
   return {
     cart,
