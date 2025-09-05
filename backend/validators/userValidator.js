@@ -28,7 +28,7 @@ const updateCustomerProfileSchema = Joi.object({
   address: addressSchema,
   upiId: Joi.string().trim().allow(''),
   cardDetails: cardDetailsSchema,
-  profileImage: Joi.string().uri().allow(''), // Allow empty string or valid URL
+  profileImage: Joi.string().uri().allow(null, ''), // Allow empty string or valid URL, or null
 });
 
 // Schema for updating vendor profile
@@ -56,7 +56,7 @@ const updateVendorProfileSchema = Joi.object({
   bankName: Joi.string().trim().allow(''),
   ifsc: Joi.string().trim().uppercase().allow(''),
   upiId: Joi.string().trim().allow(''),
-  profileImage: Joi.string().uri().allow(''), // Allow empty string or valid URL
+  profileImage: Joi.string().uri().allow(null, ''), // Allow empty string or valid URL, or null
 });
 
 export { updateCustomerProfileSchema, updateVendorProfileSchema };
