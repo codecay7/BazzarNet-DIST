@@ -100,7 +100,7 @@ const useCoupons = ({ isLoggedIn = false, orders = [], user = null } = {}) => {
     discountAmount,
     loading,
     error,
-    refetch: fetchAvailableCoupons,
+    fetchAvailableCoupons, // Corrected: returning directly as fetchAvailableCoupons
     applyCoupon,
     removeCoupon,
     setAppliedCoupon, // Expose setter
