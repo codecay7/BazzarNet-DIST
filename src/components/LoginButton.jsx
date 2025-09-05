@@ -11,107 +11,62 @@ const LoginButton = () => {
 
   return (
     <StyledWrapper>
-      <button className="button" onClick={handleClick} aria-label="Login to your account">
-        <div className="bgContainer">
-          <span>Login</span>
-          <span>Login</span>
-        </div>
-        <div className="arrowContainer">
-          <svg width={25} height={25} viewBox="0 0 45 38" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M43.7678 20.7678C44.7441 19.7915 44.7441 18.2085 43.7678 17.2322L27.8579 1.32233C26.8816 0.34602 25.2986 0.34602 24.3223 1.32233C23.346 2.29864 23.346 3.88155 24.3223 4.85786L38.4645 19L24.3223 33.1421C23.346 34.1184 23.346 35.7014 24.3223 36.6777C25.2986 37.654 26.8816 37.654 27.8579 36.6777L43.7678 20.7678ZM0 21.5L42 21.5V16.5L0 16.5L0 21.5Z" fill="var(--text)" />
+      <div aria-label="User Login Button" tabIndex={0} role="button" className="user-profile" onClick={handleClick}>
+        <div className="user-profile-inner">
+          <svg aria-hidden="true" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24">
+            <g data-name="Layer 2" id="Layer_2">
+              <path d="m15.626 11.769a6 6 0 1 0 -7.252 0 9.008 9.008 0 0 0 -5.374 8.231 3 3 0 0 0 3 3h12a3 3 0 0 0 3-3 9.008 9.008 0 0 0 -5.374-8.231zm-7.626-4.769a4 4 0 1 1 4 4 4 4 0 0 1 -4-4zm10 14h-12a1 1 0 0 1 -1-1 7 7 0 0 1 14 0 1 1 0 0 1 -1 1z" fill="var(--text)" />
+            </g>
           </svg>
+          <p>Log In</p>
         </div>
-      </button>
+      </div>
     </StyledWrapper>
   );
 }
 
 const StyledWrapper = styled.div`
-  button {
-    display: flex;
-    justify-content: space-around;
-    align-items: center;
-    padding: 1em 0em 1em 1em;
-    background-color: var(--accent); /* Changed from yellow */
-    cursor: pointer;
-    box-shadow: 4px 6px 0px black;
-    border: 4px solid;
+  .user-profile {
+    width: 131px;
+    height: 51px;
     border-radius: 15px;
-    position: relative;
-    overflow: hidden;
-    z-index: 100;
-    transition: box-shadow 250ms, transform 250ms, filter 50ms;
-  }
-  button:hover {
-    transform: translate(2px, 2px);
-    box-shadow: 2px 3px 0px black;
-  }
-  button:active {
-    filter: saturate(0.75);
-  }
-  button::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    background-color: var(--accent-dark); /* Changed from pink */
-    z-index: -1;
-    transform: translateX(-100%);
-    transition: transform 250ms;
-  }
-  button:hover::after {
-    transform: translateX(0);
-  }
-  .bgContainer {
-    position: relative;
+    cursor: pointer;
+    transition: 0.3s ease;
+    background: linear-gradient(
+      to bottom right,
+      #2e8eff 0%,
+      rgba(46, 142, 255, 0) 30%
+    );
+    background-color: rgba(46, 142, 255, 0.2);
     display: flex;
-    justify-content: start;
     align-items: center;
-    overflow: hidden;
-    max-width: 35%; /* adjust this if the button text is not proper */
-    font-size: 2em;
+    justify-content: center;
+  }
+
+  .user-profile:hover,
+  .user-profile:focus {
+    background-color: rgba(46, 142, 255, 0.7);
+    box-shadow: 0 0 10px rgba(46, 142, 255, 0.5);
+    outline: none;
+  }
+
+  .user-profile-inner {
+    width: 127px;
+    height: 47px;
+    border-radius: 13px;
+    background-color: #1a1a1a; /* Keeping this dark gray as per design */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 15px;
+    color: var(--text); /* Using theme text color */
     font-weight: 600;
-    color: var(--text); /* Ensure text color is visible */
   }
-  .bgContainer span {
-    position: relative;
-    transform: translateX(-100%);
-    transition: all 250ms;
-  }
-  .button:hover .bgContainer > span {
-    transform: translateX(0);
-  }
-  .arrowContainer {
-    padding: 1em;
-    margin-inline-end: 1em;
-    border: 4px solid;
-    border-radius: 50%;
-    background-color: var(--accent-dark); /* Changed from pink */
-    position: relative;
-    overflow: hidden;
-    transition: transform 250ms, background-color 250ms;
-    z-index: 100;
-  }
-  .arrowContainer::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: inherit;
-    background-color: var(--accent); /* Changed from yellow */
-    transform: translateX(-100%);
-    z-index: -1;
-    transition: transform 250ms ease-in-out;
-  }
-  button:hover .arrowContainer::after {
-    transform: translateX(0);
-  }
-  button:hover .arrowContainer {
-    transform: translateX(5px);
-  }
-  button:active .arrowContainer {
-    transform: translateX(8px);
-  }
-  .arrowContainer svg {
-    vertical-align: middle;
+
+  .user-profile-inner svg {
+    width: 27px;
+    height: 27px;
+    fill: var(--text); /* Using theme text color for SVG fill */
   }
 `;
 
