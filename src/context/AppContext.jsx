@@ -11,9 +11,9 @@ import useUsers from '../hooks/useUsers';
 import useVendorProducts from '../hooks/useVendorProducts';
 import useAdminProducts from '../hooks/useAdminProducts';
 import useAdminStores from '../hooks/useAdminStores';
-import useCoupons from '../hooks/useCoupons'; // New: Import useCoupons hook
-import * as api from '../services/api'; // Still needed for direct API calls in some places
-import toast from 'react-hot-toast'; // NEW: Import toast for notifications
+import useCoupons from '../hooks/useCoupons';
+import * as api from '../services/api';
+import toast from 'react-hot-toast';
 
 export const AppContext = createContext();
 
@@ -32,7 +32,7 @@ export const AppProvider = ({ children }) => {
   } = useAuth();
 
   const { theme, toggleTheme } = useTheme();
-  const { /* simulateLoading, */ generateOtp } = useUtils(); // Removed simulateLoading
+  const { generateOtp } = useUtils();
 
   // Sidebar state is still local to AppContext as it's a global UI state
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
@@ -46,16 +46,16 @@ export const AppProvider = ({ children }) => {
     recommendedProducts,
     recommendedLoading,
     fetchRecommendedProducts,
-    setAllAppProducts, // Expose for admin/vendor product updates
-    setAllAppProductsMeta // Destructure setAllAppProductsMeta here
+    setAllAppProducts,
+    setAllAppProductsMeta
   } = useProducts();
 
   const {
     appStores,
     appStoresMeta,
     fetchAppStores,
-    setAppStores, // Expose for admin store updates
-    setAppStoresMeta, // Destructure setAppStoresMeta here
+    setAppStores,
+    setAppStoresMeta,
   } = useStores();
 
   const {
@@ -85,7 +85,7 @@ export const AppProvider = ({ children }) => {
     updateOrderStatus,
     confirmDeliveryWithOtp,
     setOrders,
-    setOrdersMeta, // Destructure setOrdersMeta here
+    setOrdersMeta,
   } = useOrders(isLoggedIn, user, isVendor, isAdmin);
 
   const {
@@ -94,8 +94,8 @@ export const AppProvider = ({ children }) => {
     fetchAllUsers,
     deleteUser,
     updateUserStatus,
-    setAllAppUsers, // Destructure setAllAppUsers here
-    setAllAppUsersMeta, // Destructure setAllAppUsersMeta here
+    setAllAppUsers,
+    setAllAppUsersMeta,
   } = useUsers(isLoggedIn, isAdmin, fetchAllProducts, fetchAppStores);
 
   const {
@@ -106,7 +106,7 @@ export const AppProvider = ({ children }) => {
     editVendorProduct,
     deleteVendorProduct,
     setVendorProducts,
-    setVendorProductsMeta, // Destructure setVendorProductsMeta here
+    setVendorProductsMeta,
   } = useVendorProducts(isLoggedIn, isVendor, user);
 
   const {
@@ -119,17 +119,16 @@ export const AppProvider = ({ children }) => {
     adminDeleteStore,
   } = useAdminStores(isLoggedIn, isAdmin, fetchAppStores, appStoresMeta, fetchAllProducts);
 
-  // New: Coupon Hook - now receives user, isLoggedIn, and orders as arguments
   const {
     availableCoupons,
     appliedCoupon,
     discountAmount,
-    refetch, // Corrected: Destructure as refetch directly
+    refetch,
     applyCoupon,
     removeCoupon,
     setAppliedCoupon,
     setDiscountAmount,
-  } = useCoupons({ user, isLoggedIn, orders }); // Pass the necessary values here
+  } = useCoupons({ user, isLoggedIn, orders });
 
   // --- User Profile Update in Context ---
   const updateUserInContext = useCallback((updatedUserData) => {
@@ -159,10 +158,10 @@ export const AppProvider = ({ children }) => {
   const registerVendor = useCallback(async (vendorData) => {
     try {
       const response = await api.auth.registerVendor({
-        name: vendorData.fullName, // Use fullName from form
+        name: vendorData.fullName,
         email: vendorData.email,
         password: vendorData.password,
-        storeName: vendorData.businessName, // Use businessName from form
+        storeName: vendorData.businessName,
         businessDescription: vendorData.description,
         category: vendorData.category,
         phone: vendorData.phone,
@@ -192,7 +191,7 @@ export const AppProvider = ({ children }) => {
           fetchCart(),
           fetchWishlist(),
           fetchOrders(),
-          refetch(), // Fetch coupons
+          refetch(),
         ];
 
         if (isAdmin) {
@@ -206,7 +205,6 @@ export const AppProvider = ({ children }) => {
           await Promise.all(promises);
         } catch (error) {
           console.error("Error loading initial data:", error);
-          // Optionally, show a generic error toast here if multiple fetches fail
         }
       } else {
         // Clear all data if logged out
@@ -269,7 +267,6 @@ export const AppProvider = ({ children }) => {
     fetchOrders,
     updateOrderStatus,
     confirmDeliveryWithOtp,
-    // simulateLoading, // Removed
     generateOtp,
     appStores,
     appStoresMeta,
@@ -286,11 +283,10 @@ export const AppProvider = ({ children }) => {
     registerUser,
     registerVendor,
     updateUserInContext,
-    // New: Coupon related values
     availableCoupons,
     appliedCoupon,
     discountAmount,
-    fetchAvailableCoupons: refetch, // Expose refetch as fetchAvailableCoupons for consistency
+    fetchAvailableCoupons: refetch,
     applyCoupon,
     removeCoupon,
   };
