@@ -3,7 +3,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faStore } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate } from 'react-router-dom';
 import { AppContext } from '../context/AppContext';
-import SkeletonCard from '../components/SkeletonCard';
+import SkeletonStoreCard from '../components/SkeletonStoreCard'; // Changed import to SkeletonStoreCard
 import Pagination from '../components/Pagination';
 
 const VALID_PINCODE = '825301'; // Define the valid pincode
@@ -71,7 +71,7 @@ const Stores = () => {
         ) : loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {[...Array(itemsPerPage)].map((_, index) => (
-              <SkeletonCard key={index} />
+              <SkeletonStoreCard key={index} /> {/* Using SkeletonStoreCard */}
             ))}
           </div>
         ) : appStores.length > 0 ? (
