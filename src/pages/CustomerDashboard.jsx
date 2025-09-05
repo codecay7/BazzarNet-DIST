@@ -10,7 +10,7 @@ import placeholderImage from '../assets/placeholder.png'; // Import placeholder 
 import { getFullImageUrl } from '../utils/imageUtils'; // Import utility
 
 const CustomerDashboard = () => {
-  const { user, cart, wishlist, orders, addToCart } = useContext(AppContext); // Removed simulateLoading
+  const { user, cart, wishlist, orders, addToCart } = useContext(AppContext);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [recommendedProducts, setRecommendedProducts] = useState([]);
@@ -118,7 +118,7 @@ const CustomerDashboard = () => {
                   {recommendedProducts.map(product => {
                     const isOutOfStock = product.stock === 0;
                     return (
-                      <div key={product._id} className={`flex flex-col bg-black/10 p-3 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 ${isOutOfStock ? 'grayscale' : ''}`}>
+                      <div key={product._id} className={`relative flex flex-col bg-black/10 p-4 rounded-xl border border-white/10 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${isOutOfStock ? 'grayscale' : ''}`}>
                         <img 
                           src={getFullImageUrl(product.image)} 
                           alt={product.name} 
@@ -128,7 +128,7 @@ const CustomerDashboard = () => {
                         <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
                         <p className="text-sm opacity-70 mb-2">₹{product.price.toFixed(2)} / {product.unit}</p> {/* Display unit */}
                         {isOutOfStock && (
-                          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                          <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-xl">
                             <span className="text-white text-xl font-bold">OUT OF STOCK</span>
                           </div>
                         )}
