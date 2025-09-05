@@ -118,7 +118,7 @@ const sampleVendors = [
       state: 'Jharkhand', // Changed state to match pincode region
       pinCode: '825301', // Updated pincode
     },
-    profileImage: 'https://via.placeholder.com/150?text=FreshMart',
+    profileImage: 'https://images.unsplash.com/photo-1542838132-925602678290?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   },
   {
     name: 'Vendor B (Bakery)',
@@ -138,7 +138,7 @@ const sampleVendors = [
       state: 'Jharkhand', // Changed state to match pincode region
       pinCode: '825301', // Updated pincode
     },
-    profileImage: 'https://via.placeholder.com/150?text=SweetDelights',
+    profileImage: 'https://images.unsplash.com/photo-1587334175721-ad1e1071317e?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   },
   {
     name: 'Vendor C (Electronics)',
@@ -158,7 +158,7 @@ const sampleVendors = [
       state: 'Jharkhand', // Changed state to match pincode region
       pinCode: '825301', // Updated pincode
     },
-    profileImage: 'https://via.placeholder.com/150?text=TechGadget',
+    profileImage: 'https://images.unsplash.com/photo-1517336714730-49689c8a9680?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   },
   {
     name: 'Vendor D (Clothing)',
@@ -178,7 +178,7 @@ const sampleVendors = [
       state: 'Jharkhand', // Changed state to match pincode region
       pinCode: '825301', // Updated pincode
     },
-    profileImage: 'https://via.placeholder.com/150?text=FashionTrends',
+    profileImage: 'https://images.unsplash.com/photo-1523381294911-8d3cead1858b?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   },
   {
     name: 'Vendor E (Decor)',
@@ -198,7 +198,7 @@ const sampleVendors = [
       state: 'Jharkhand', // Changed state to match pincode region
       pinCode: '825301', // Updated pincode
     },
-    profileImage: 'https://via.placeholder.com/150?text=HomeDecor',
+    profileImage: 'https://images.unsplash.com/photo-1563298723-dcfc10990f36?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
   },
 ];
 
@@ -212,7 +212,7 @@ const productsData = {
       stock: 100,
       unit: 'kg',
       category: 'Groceries',
-      image: 'https://via.placeholder.com/200?text=Organic+Apples',
+      image: 'https://images.unsplash.com/photo-1579613832107-c3018366a156?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     },
     {
       name: 'Farm Fresh Milk',
@@ -221,7 +221,7 @@ const productsData = {
       stock: 50,
       unit: 'L',
       category: 'Groceries',
-      image: 'https://via.placeholder.com/200?text=Farm+Milk',
+      image: 'https://images.unsplash.com/photo-1628088999033-211112111111?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     },
     {
       name: 'Brown Bread',
@@ -230,7 +230,7 @@ const productsData = {
       stock: 70,
       unit: 'pc',
       category: 'Groceries',
-      image: 'https://via.placeholder.com/200?text=Brown+Bread',
+      image: 'https://images.unsplash.com/photo-1598373182133-52452f7691ef?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     },
   ],
   'Sweet Delights Bakery': [
@@ -241,7 +241,7 @@ const productsData = {
       stock: 40,
       unit: 'pc',
       category: 'Bakery',
-      image: 'https://via.placeholder.com/200?text=Chocolate+Croissant',
+      image: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     },
     {
       name: 'Sourdough Loaf',
@@ -250,7 +250,7 @@ const productsData = {
       stock: 20,
       unit: 'pc',
       category: 'Bakery',
-      image: 'https://via.placeholder.com/200?text=Sourdough+Loaf',
+      image: 'https://images.unsplash.com/photo-1583339752135-c172740306f7?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     },
   ],
   'TechGadget Hub': [
@@ -262,7 +262,7 @@ const productsData = {
       stock: 30,
       unit: 'set',
       category: 'Electronics',
-      image: 'https://via.placeholder.com/200?text=Earbuds',
+      image: 'https://images.unsplash.com/photo-1607863680198-a4319de6207e?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     },
     {
       name: 'Smartwatch',
@@ -271,7 +271,7 @@ const productsData = {
       stock: 15,
       unit: 'pc',
       category: 'Electronics',
-      image: 'https://via.placeholder.com/200?text=Smartwatch',
+      image: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     },
   ],
   'Fashion Trends Boutique': [
@@ -283,7 +283,7 @@ const productsData = {
       stock: 80,
       unit: 'pc',
       category: 'Clothing',
-      image: 'https://via.placeholder.com/200?text=Denim+Jeans',
+      image: 'https://images.unsplash.com/photo-1541099649105-f69dbd582eed?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     },
     {
       name: 'Cotton T-Shirt',
@@ -292,7 +292,7 @@ const productsData = {
       stock: 150,
       unit: 'pc',
       category: 'Clothing',
-      image: 'https://via.placeholder.com/200?text=T-Shirt',
+      image: 'https://images.unsplash.com/photo-1576566588028-cdfd73055780?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     },
   ],
   'Home Decor Haven': [
@@ -303,7 +303,7 @@ const productsData = {
       stock: 25,
       unit: 'pc',
       category: 'Decor',
-      image: 'https://via.placeholder.com/200?text=Ceramic+Vase',
+      image: 'https://images.unsplash.com/photo-1587334175721-ad1e1071317e?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     },
     {
       name: 'Scented Candles',
@@ -312,7 +312,7 @@ const productsData = {
       stock: 60,
       unit: 'set',
       category: 'Decor',
-      image: 'https://via.placeholder.com/200?text=Scented+Candles',
+      image: 'https://images.unsplash.com/photo-1582794543139-c317030b6731?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     },
   ],
 };
