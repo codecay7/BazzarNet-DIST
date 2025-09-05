@@ -2,13 +2,26 @@ import asyncHandler from '../middleware/asyncHandler.js';
 import Store from '../models/Store.js';
 import Product from '../models/Product.js';
 
+const VALID_PINCODE = '825301'; // Define the valid pincode
+
 // @desc    Fetch all stores (public)
 // @route   GET /api/stores
 // @access  Public
 const getAllStores = asyncHandler(async (req, res) => {
-  console.log('Backend: Received request for all stores.'); // Added log
   const pageSize = Number(req.query.limit) || 10;
   const page = Number(req.query.page) || 1;
+
+  let query = { isActive: true }; // Only active stores
+
+  // Filter by pincode if provided
+  if (req.query.pincode) {
+    if (req.query.pincode !== VALID_PINCODE) {
+      // If an invalid pincode is provided, return no stores
+      return res.json({ stores: [], page: 1, pages: 0, count: 0 });
+    }
+    // If valid pincode, filter stores by that pincode in their address
+    query['address.pinCode'] = VALID_PINCODE;
+  }
 
   const keyword = req.query.search
     ? {
@@ -19,8 +32,10 @@ const getAllStores = asyncHandler(async (req, res) => {
       }
     : {};
 
-  const count = await Store.countDocuments({ ...keyword, isActive: true });
-  const stores = await Store.find({ ...keyword, isActive: true })
+  const finalQuery = { ...query, ...keyword };
+
+  const count = await Store.countDocuments(finalQuery);
+  const stores = await Store.find(finalQuery)
     .populate('owner', 'name')
     .limit(pageSize)
     .skip(pageSize * (page - 1));

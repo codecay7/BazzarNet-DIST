@@ -1,10 +1,11 @@
-import React, { useContext, useState } from 'react';
+import React, { useContext, useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShoppingCart } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import toast from 'react-hot-toast';
+import * as api from '../services/api'; // Import API service
 
 // Import modular components
 import CheckoutSteps from '../components/checkout/CheckoutSteps';
@@ -13,26 +14,30 @@ import OrderSummary from '../components/checkout/OrderSummary';
 import PaymentMethodSelector from '../components/checkout/PaymentMethodSelector';
 import CardPaymentForm from '../components/checkout/CardPaymentForm';
 import UpiPaymentForm from '../components/checkout/UpiPaymentForm';
-import CouponSection from '../components/checkout/CouponSection'; // New: Import CouponSection
+import CouponSection from '../components/checkout/CouponSection';
+
+const VALID_PINCODE = '825301'; // Define the valid pincode
 
 const Checkout = () => {
-  const { cart, checkout, user, appliedCoupon, discountAmount } = useContext(AppContext); // New: Get appliedCoupon and discountAmount
+  const { cart, checkout, user, appliedCoupon, discountAmount, updateUserInContext } = useContext(AppContext);
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState('address'); // 'address', 'coupon', 'summary', 'payment'
+  const [currentStep, setCurrentStep] = useState('address');
   const [paymentMethod, setPaymentMethod] = useState('card');
 
-  // NEW LOG: Log cart content on component render
-  console.log('Checkout component rendering. Current cart:', cart);
+  // Initialize shippingAddress from user profile, ensuring a deep copy
+  const [shippingAddress, setShippingAddress] = useState(() => {
+    if (user?.address) {
+      return { ...user.address }; // Deep copy to avoid direct mutation of user object
+    }
+    return {
+      houseNo: '',
+      landmark: '',
+      city: '',
+      state: '',
+      pinCode: ''
+    };
+  });
 
-  const initialAddress = user?.address || {
-    houseNo: '',
-    landmark: '',
-    city: '',
-    state: '',
-    pinCode: ''
-  };
-
-  const [shippingAddress, setShippingAddress] = useState(initialAddress);
   const [addressErrors, setAddressErrors] = useState({});
 
   const [cardFormData, setCardFormData] = useState({
@@ -48,7 +53,17 @@ const Checkout = () => {
   const [upiErrors, setUpiErrors] = useState({});
 
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
-  const finalTotal = subtotal - discountAmount; // New: Apply discount
+  const finalTotal = subtotal - discountAmount;
+
+  // Effect to update shippingAddress if user.address in context changes
+  useEffect(() => {
+    if (user?.address) {
+      // Only update if the address from context is different from current state
+      if (JSON.stringify(user.address) !== JSON.stringify(shippingAddress)) {
+        setShippingAddress({ ...user.address });
+      }
+    }
+  }, [user?.address]); // Depend on user.address
 
   // Handlers for form changes
   const handleShippingAddressChange = (e) => {
@@ -82,6 +97,8 @@ const Checkout = () => {
       newErrors.pinCode = 'Pin Code is required.';
     } else if (!/^\d{6}$/.test(shippingAddress.pinCode)) {
       newErrors.pinCode = 'Pin Code must be 6 digits.';
+    } else if (shippingAddress.pinCode !== VALID_PINCODE) { // Pincode restriction
+      newErrors.pinCode = `Currently, shops are only available for pincode ${VALID_PINCODE}.`;
     }
     setAddressErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -118,14 +135,26 @@ const Checkout = () => {
     }
   };
 
-  const handleNextStep = () => {
+  const handleNextStep = async () => {
     if (currentStep === 'address') {
       if (validateAddress()) {
-        setCurrentStep('coupon'); // New step
+        // Save address to user profile if it's new or changed
+        if (JSON.stringify(user?.address) !== JSON.stringify(shippingAddress)) {
+          try {
+            const updatedUser = await api.userProfile.updateProfile({ address: shippingAddress });
+            updateUserInContext(updatedUser); // Update user in context
+            toast.success('Shipping address saved to profile!');
+          } catch (error) {
+            toast.error(`Failed to save address to profile: ${error.message}`);
+            // Optionally, prevent proceeding if saving fails
+            return;
+          }
+        }
+        setCurrentStep('coupon');
       } else {
         toast.error('Please enter a valid shipping address.');
       }
-    } else if (currentStep === 'coupon') { // New step logic
+    } else if (currentStep === 'coupon') {
       setCurrentStep('summary');
     } else if (currentStep === 'summary') {
       setCurrentStep('payment');
@@ -133,31 +162,30 @@ const Checkout = () => {
   };
 
   const handlePreviousStep = () => {
-    if (currentStep === 'coupon') { // New step logic
+    if (currentStep === 'coupon') {
       setCurrentStep('address');
     } else if (currentStep === 'summary') {
-      setCurrentStep('coupon'); // Go back to coupon step
+      setCurrentStep('coupon');
     } else if (currentStep === 'payment') {
       setCurrentStep('summary');
     }
   };
 
   const handlePlaceOrder = async () => {
-    console.log('Attempting to place order. Current cart (inside handlePlaceOrder):', cart); // ADDED LOG
     if (validatePaymentForm()) {
       const orderDetails = {
-          totalPrice: finalTotal, // New: Use finalTotal
+          totalPrice: finalTotal,
           items: cart.map(item => ({
             product: item.product._id,
             name: item.name,
             image: item.image,
             price: item.price,
             quantity: item.quantity,
-            unit: item.unit, // Include the unit here
+            unit: item.unit,
           })),
           shippingAddress: shippingAddress,
           paymentMethod: paymentMethod === 'card' ? 'Credit Card' : 'UPI',
-          appliedCoupon: appliedCoupon, // New: Pass applied coupon details
+          appliedCoupon: appliedCoupon,
       };
       
       const newOrder = await checkout(orderDetails);
@@ -209,7 +237,7 @@ const Checkout = () => {
             </motion.div>
           )}
 
-          {currentStep === 'coupon' && ( // New: Coupon step
+          {currentStep === 'coupon' && (
             <motion.div
               key="coupon-step"
               initial={{ opacity: 0, y: 20 }}
@@ -218,7 +246,7 @@ const Checkout = () => {
               transition={{ duration: 0.3 }}
             >
               <CouponSection
-                currentTotalPrice={subtotal} // Pass subtotal for coupon validation
+                currentTotalPrice={subtotal}
                 onNextStep={handleNextStep}
                 onPreviousStep={handlePreviousStep}
               />
@@ -235,12 +263,12 @@ const Checkout = () => {
             >
               <OrderSummary
                 cart={cart}
-                subtotal={subtotal} // New: Pass subtotal
-                total={finalTotal} // New: Pass finalTotal
-                appliedCoupon={appliedCoupon} // New: Pass applied coupon
-                discountAmount={discountAmount} // New: Pass discount amount
+                subtotal={subtotal}
+                total={finalTotal}
+                appliedCoupon={appliedCoupon}
+                discountAmount={discountAmount}
                 shippingAddress={shippingAddress}
-                onEditAddress={() => setCurrentStep('address')} // Can go back to address
+                onEditAddress={() => setCurrentStep('address')}
                 onNextStep={handleNextStep}
                 onPreviousStep={handlePreviousStep}
               />

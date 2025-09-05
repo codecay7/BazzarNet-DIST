@@ -6,29 +6,34 @@ import { AppContext } from '../context/AppContext';
 import SkeletonCard from '../components/SkeletonCard';
 import Pagination from '../components/Pagination';
 
+const VALID_PINCODE = '825301'; // Define the valid pincode
+
 const Stores = () => {
   const navigate = useNavigate();
-  const { simulateLoading, appStores, appStoresMeta, fetchAppStores } = useContext(AppContext);
+  const { simulateLoading, appStores, appStoresMeta, fetchAppStores, user } = useContext(AppContext);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 4; // Number of stores per page
 
+  const userPincode = user?.address?.pinCode;
+  const isPincodeValid = userPincode === VALID_PINCODE;
+
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      // Removed await simulateLoading(800); // Removed this line
       
       const params = {
         page: currentPage,
         limit: itemsPerPage,
         search: searchTerm,
+        pincode: userPincode, // Pass user's pincode to the API
       };
       await fetchAppStores(params);
       setLoading(false);
     };
     loadData();
-  }, [searchTerm, currentPage, fetchAppStores]); // Removed simulateLoading from dependencies
+  }, [searchTerm, currentPage, fetchAppStores, userPincode]);
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);
@@ -55,7 +60,15 @@ const Stores = () => {
           />
         </div>
 
-        {loading ? (
+        {!userPincode ? (
+          <p className="text-center text-lg opacity-80 py-10">
+            Please update your profile with a shipping address to see available stores.
+          </p>
+        ) : !isPincodeValid ? (
+          <p className="text-center text-lg opacity-80 py-10 text-red-400">
+            Currently, shops are only available for pincode {VALID_PINCODE}. Please update your address.
+          </p>
+        ) : loading ? (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
             {[...Array(itemsPerPage)].map((_, index) => (
               <SkeletonCard key={index} />
@@ -80,7 +93,7 @@ const Stores = () => {
             ))}
           </div>
         ) : (
-          <p className="text-center text-lg opacity-80 py-10">No stores found matching your search.</p>
+          <p className="text-center text-lg opacity-80 py-10">No stores found matching your search for pincode {userPincode}.</p>
         )}
 
         {!loading && appStores.length > 0 && (
