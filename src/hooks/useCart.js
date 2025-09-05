@@ -76,6 +76,8 @@ const useCart = (isLoggedIn, user, isVendor, isAdmin) => {
       }
     }
 
+    console.log('useCart: Sending orderDetails to API:', orderDetails); // NEW LOG
+
     try {
       const newOrder = await api.customer.placeOrder(orderDetails);
       setCart([]); // Clear cart after successful order
