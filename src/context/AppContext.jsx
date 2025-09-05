@@ -123,7 +123,7 @@ export const AppProvider = ({ children }) => {
     availableCoupons,
     appliedCoupon,
     discountAmount,
-    fetchAvailableCoupons,
+    refetch: fetchAvailableCoupons, // Corrected: Destructure as refetch and alias to fetchAvailableCoupons
     applyCoupon,
     removeCoupon,
     setAppliedCoupon,
@@ -190,7 +190,7 @@ export const AppProvider = ({ children }) => {
       fetchCart();
       fetchWishlist();
       fetchOrders();
-      fetchAvailableCoupons(); // New: Fetch coupons on login
+      fetchAvailableCoupons(); // Corrected: Now calls the aliased refetch function
       if (isAdmin) {
         fetchAllUsers();
       }
@@ -276,7 +276,7 @@ export const AppProvider = ({ children }) => {
     availableCoupons,
     appliedCoupon,
     discountAmount,
-    fetchAvailableCoupons,
+    fetchAvailableCoupons, // Corrected: Now refers to the aliased refetch function
     applyCoupon,
     removeCoupon,
   };
