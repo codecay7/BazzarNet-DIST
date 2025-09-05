@@ -158,6 +158,7 @@ const CustomerDashboard = () => {
                           </div>
                           <div className="p-4 flex-grow flex-col">
                             <h3 className="text-xl font-semibold mb-2">{product.name}</h3>
+                            <p className="text-sm opacity-80 mb-1">Category: {product.category}</p> {/* Display Category */}
                             <div className="flex items-baseline gap-2 mb-2">
                               <p className="text-lg font-bold text-[var(--accent)]">₹{product.price.toFixed(2)} / {product.unit}</p>
                               {product.originalPrice && discount > 0 && (
