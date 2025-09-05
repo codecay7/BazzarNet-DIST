@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShoppingBag, faStore, faCartPlus, faTruck, faUser, faQuoteLeft, faArrowRight, faTags, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate, Link } from 'react-router-dom';
@@ -8,6 +8,31 @@ import LoadingSpinner3D from '../components/LoadingSpinner3D'; // Import the new
 const LandingPage = () => {
   const [isLoading, setIsLoading] = useState(true); // New state for loading screen
   const navigate = useNavigate();
+  const [currentGradientClass, setCurrentGradientClass] = useState('from-violet-900 to-blue-900');
+
+  const gradientClasses = [
+    'from-violet-900 to-blue-900',
+    'from-emerald-700 to-cyan-800',
+    'from-rose-700 to-purple-800',
+    'from-amber-700 to-orange-800',
+  ];
+
+  const handleScroll = useCallback(() => {
+    const scrollY = window.scrollY;
+    const pageHeight = document.documentElement.scrollHeight - window.innerHeight;
+    const scrollProgress = scrollY / pageHeight;
+
+    // Define thresholds for changing gradients
+    if (scrollProgress < 0.25) {
+      setCurrentGradientClass(gradientClasses[0]);
+    } else if (scrollProgress < 0.5) {
+      setCurrentGradientClass(gradientClasses[1]);
+    } else if (scrollProgress < 0.75) {
+      setCurrentGradientClass(gradientClasses[2]);
+    } else {
+      setCurrentGradientClass(gradientClasses[3]);
+    }
+  }, []);
 
   useEffect(() => {
     // Simulate a loading delay for the 3D spinner
@@ -15,8 +40,13 @@ const LandingPage = () => {
       setIsLoading(false);
     }, 2000); // Show loader for 2 seconds
 
-    return () => clearTimeout(loaderTimer);
-  }, []);
+    window.addEventListener('scroll', handleScroll);
+
+    return () => {
+      clearTimeout(loaderTimer);
+      window.removeEventListener('scroll', handleScroll);
+    };
+  }, [handleScroll]);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -57,7 +87,7 @@ const LandingPage = () => {
       ) : (
         <motion.section
           key="landing-content"
-          className="w-full max-w-[1200px] mx-auto my-10 relative overflow-hidden"
+          className={`w-full max-w-[1200px] mx-auto my-10 relative overflow-hidden bg-gradient-to-br ${currentGradientClass} transition-colors duration-1000`}
           variants={containerVariants}
           initial="hidden"
           animate="visible"
