@@ -83,6 +83,20 @@ const sampleCustomers = [
       pinCode: '700001',
     },
   },
+  {
+    name: 'Admin User',
+    email: 'admin@example.com',
+    password: 'password123',
+    role: 'admin',
+    phone: '9998887770',
+    address: {
+      houseNo: '999, Admin Tower',
+      landmark: 'Central Office',
+      city: 'Bengaluru',
+      state: 'Karnataka',
+      pinCode: '560001',
+    },
+  },
 ];
 
 const sampleVendors = [
@@ -311,8 +325,10 @@ const importData = async () => {
 
     console.log('Existing data cleared!');
 
-    const createdCustomers = await User.insertMany(sampleCustomers);
-    console.log(`${createdCustomers.length} customer users created.`);
+    // Separate customers and admin for insertion
+    const customersAndAdmin = sampleCustomers.filter(user => user.role !== 'vendor');
+    const createdCustomersAndAdmin = await User.insertMany(customersAndAdmin);
+    console.log(`${createdCustomersAndAdmin.length} customer and admin users created.`);
 
     const createdVendors = [];
     for (const vendorData of sampleVendors) {
