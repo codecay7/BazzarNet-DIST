@@ -2,7 +2,7 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 
-const OrderSummary = ({ cart, total, shippingAddress, onEditAddress, onNextStep, onPreviousStep }) => {
+const OrderSummary = ({ cart, subtotal, total, shippingAddress, appliedCoupon, discountAmount, onEditAddress, onNextStep, onPreviousStep }) => {
   const displayAddress = (address) => {
     if (!address) return 'N/A';
     const parts = [address.houseNo];
@@ -32,9 +32,21 @@ const OrderSummary = ({ cart, total, shippingAddress, onEditAddress, onNextStep,
             </li>
           ))}
         </ul>
-        <div className="border-t border-white/20 pt-4 mt-4 flex justify-between items-center">
-          <p className="text-xl font-bold">Total:</p>
-          <p className="text-xl font-bold text-[var(--accent)]">₹{total.toFixed(2)}</p>
+        <div className="border-t border-white/20 pt-4 mt-4 flex flex-col gap-2">
+          <div className="flex justify-between items-center">
+            <p className="text-base font-medium">Subtotal:</p>
+            <p className="text-base font-medium">₹{subtotal.toFixed(2)}</p>
+          </div>
+          {appliedCoupon && (
+            <div className="flex justify-between items-center text-green-400">
+              <p className="text-base font-medium">Coupon ({appliedCoupon.code}):</p>
+              <p className="text-base font-medium">- ₹{discountAmount.toFixed(2)}</p>
+            </div>
+          )}
+          <div className="flex justify-between items-center pt-2 border-t border-white/10">
+            <p className="text-xl font-bold">Total:</p>
+            <p className="text-xl font-bold text-[var(--accent)]">₹{total.toFixed(2)}</p>
+          </div>
         </div>
       </div>
 

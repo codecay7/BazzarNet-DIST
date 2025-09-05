@@ -13,11 +13,12 @@ import OrderSummary from '../components/checkout/OrderSummary';
 import PaymentMethodSelector from '../components/checkout/PaymentMethodSelector';
 import CardPaymentForm from '../components/checkout/CardPaymentForm';
 import UpiPaymentForm from '../components/checkout/UpiPaymentForm';
+import CouponSection from '../components/checkout/CouponSection'; // New: Import CouponSection
 
 const Checkout = () => {
-  const { cart, checkout, user } = useContext(AppContext);
+  const { cart, checkout, user, appliedCoupon, discountAmount } = useContext(AppContext); // New: Get appliedCoupon and discountAmount
   const navigate = useNavigate();
-  const [currentStep, setCurrentStep] = useState('address'); // 'address', 'summary', 'payment'
+  const [currentStep, setCurrentStep] = useState('address'); // 'address', 'coupon', 'summary', 'payment'
   const [paymentMethod, setPaymentMethod] = useState('card');
 
   const initialAddress = user?.address || {
@@ -43,7 +44,8 @@ const Checkout = () => {
   });
   const [upiErrors, setUpiErrors] = useState({});
 
-  const total = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
+  const finalTotal = subtotal - discountAmount; // New: Apply discount
 
   // Handlers for form changes
   const handleShippingAddressChange = (e) => {
@@ -116,18 +118,22 @@ const Checkout = () => {
   const handleNextStep = () => {
     if (currentStep === 'address') {
       if (validateAddress()) {
-        setCurrentStep('summary');
+        setCurrentStep('coupon'); // New step
       } else {
         toast.error('Please enter a valid shipping address.');
       }
+    } else if (currentStep === 'coupon') { // New step logic
+      setCurrentStep('summary');
     } else if (currentStep === 'summary') {
       setCurrentStep('payment');
     }
   };
 
   const handlePreviousStep = () => {
-    if (currentStep === 'summary') {
+    if (currentStep === 'coupon') { // New step logic
       setCurrentStep('address');
+    } else if (currentStep === 'summary') {
+      setCurrentStep('coupon'); // Go back to coupon step
     } else if (currentStep === 'payment') {
       setCurrentStep('summary');
     }
@@ -136,7 +142,7 @@ const Checkout = () => {
   const handlePlaceOrder = async () => {
     if (validatePaymentForm()) {
       const orderDetails = {
-          totalPrice: total,
+          totalPrice: finalTotal, // New: Use finalTotal
           items: cart.map(item => ({
             product: item.product._id,
             name: item.name,
@@ -147,6 +153,7 @@ const Checkout = () => {
           })),
           shippingAddress: shippingAddress,
           paymentMethod: paymentMethod === 'card' ? 'Credit Card' : 'UPI',
+          appliedCoupon: appliedCoupon, // New: Pass applied coupon details
       };
       
       const newOrder = await checkout(orderDetails);
@@ -198,6 +205,22 @@ const Checkout = () => {
             </motion.div>
           )}
 
+          {currentStep === 'coupon' && ( // New: Coupon step
+            <motion.div
+              key="coupon-step"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -20 }}
+              transition={{ duration: 0.3 }}
+            >
+              <CouponSection
+                currentTotalPrice={subtotal} // Pass subtotal for coupon validation
+                onNextStep={handleNextStep}
+                onPreviousStep={handlePreviousStep}
+              />
+            </motion.div>
+          )}
+
           {currentStep === 'summary' && (
             <motion.div
               key="summary-step"
@@ -208,9 +231,12 @@ const Checkout = () => {
             >
               <OrderSummary
                 cart={cart}
-                total={total}
+                subtotal={subtotal} // New: Pass subtotal
+                total={finalTotal} // New: Pass finalTotal
+                appliedCoupon={appliedCoupon} // New: Pass applied coupon
+                discountAmount={discountAmount} // New: Pass discount amount
                 shippingAddress={shippingAddress}
-                onEditAddress={() => setCurrentStep('address')}
+                onEditAddress={() => setCurrentStep('address')} // Can go back to address
                 onNextStep={handleNextStep}
                 onPreviousStep={handlePreviousStep}
               />

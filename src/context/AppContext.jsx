@@ -11,6 +11,7 @@ import useUsers from '../hooks/useUsers';
 import useVendorProducts from '../hooks/useVendorProducts';
 import useAdminProducts from '../hooks/useAdminProducts';
 import useAdminStores from '../hooks/useAdminStores';
+import useCoupons from '../hooks/useCoupons'; // New: Import useCoupons hook
 import * as api from '../services/api'; // Still needed for direct API calls in some places
 
 export const AppContext = createContext();
@@ -117,6 +118,18 @@ export const AppProvider = ({ children }) => {
     adminDeleteStore,
   } = useAdminStores(isLoggedIn, isAdmin, fetchAppStores, appStoresMeta, fetchAllProducts);
 
+  // New: Coupon Hook
+  const {
+    availableCoupons,
+    appliedCoupon,
+    discountAmount,
+    fetchAvailableCoupons,
+    applyCoupon,
+    removeCoupon,
+    setAppliedCoupon,
+    setDiscountAmount,
+  } = useCoupons(); // Pass orders to useCoupons
+
   // --- User Profile Update in Context ---
   const updateUserInContext = useCallback((updatedUserData) => {
     setAuthUser(prevUser => ({ ...prevUser, ...updatedUserData }));
@@ -177,6 +190,7 @@ export const AppProvider = ({ children }) => {
       fetchCart();
       fetchWishlist();
       fetchOrders();
+      fetchAvailableCoupons(); // New: Fetch coupons on login
       if (isAdmin) {
         fetchAllUsers();
       }
@@ -197,8 +211,11 @@ export const AppProvider = ({ children }) => {
       setAppStoresMeta({ page: 1, pages: 1, count: 0 });
       setAllAppUsers([]); // This line should now work correctly
       setAllAppUsersMeta({ page: 1, pages: 1, count: 0 });
+      setAppliedCoupon(null); // New: Clear applied coupon
+      setDiscountAmount(0); // New: Clear discount amount
+      setAvailableCoupons([]); // New: Clear available coupons
     }
-  }, [isLoggedIn, user, isAdmin, isVendor, fetchAllProducts, fetchAppStores, fetchCart, fetchWishlist, fetchOrders, fetchAllUsers, fetchVendorProducts, setCart, setWishlist, setAllAppProducts, setAllAppProductsMeta, setAppStores, setAppStoresMeta, setOrders, setOrdersMeta, setAllAppUsers, setAllAppUsersMeta, setVendorProducts, setVendorProductsMeta]);
+  }, [isLoggedIn, user, isAdmin, isVendor, fetchAllProducts, fetchAppStores, fetchCart, fetchWishlist, fetchOrders, fetchAllUsers, fetchVendorProducts, fetchAvailableCoupons, setCart, setWishlist, setAllAppProducts, setAllAppProductsMeta, setAppStores, setAppStoresMeta, setOrders, setOrdersMeta, setAllAppUsers, setAllAppUsersMeta, setVendorProducts, setVendorProductsMeta, setAppliedCoupon, setDiscountAmount, setAvailableCoupons]);
 
 
   const value = {
@@ -256,6 +273,13 @@ export const AppProvider = ({ children }) => {
     registerUser,
     registerVendor,
     updateUserInContext,
+    // New: Coupon related values
+    availableCoupons,
+    appliedCoupon,
+    discountAmount,
+    fetchAvailableCoupons,
+    applyCoupon,
+    removeCoupon,
   };
 
   return <AppContext.Provider value={value}>{children}</AppContext.Provider>;

@@ -186,3 +186,9 @@ export const passwordReset = {
   forgotPassword: (email) => apiRequest('/password-reset/forgot', { method: 'POST', body: JSON.stringify({ email }) }),
   resetPassword: (token, password) => apiRequest(`/password-reset/reset/${token}`, { method: 'POST', body: JSON.stringify({ password }) }),
 };
+
+// --- Coupon Endpoints ---
+export const coupon = {
+  getAll: () => apiRequest('/coupons'),
+  validate: (code, totalPrice) => apiRequest('/coupons/validate', { method: 'POST', body: JSON.stringify({ code, totalPrice }) }),
+};

@@ -67,6 +67,10 @@ const orderSchema = new mongoose.Schema({
   deliveredAt: {
     type: Date,
   },
+  coupon: { // New: Store applied coupon details
+    code: { type: String, trim: true },
+    discountAmount: { type: Number, min: 0 },
+  },
 }, {
   timestamps: true,
 });

@@ -31,7 +31,7 @@ const OrderConfirmation = () => {
     );
   }
 
-  const { _id: orderId, totalPrice, items, deliveryOtp, createdAt, paymentMethod, transactionId } = orderDetails;
+  const { _id: orderId, totalPrice, items, deliveryOtp, createdAt, paymentMethod, transactionId, coupon } = orderDetails; // New: Get coupon details
 
   // Data to encode in QR code (e.g., order ID and OTP)
   const qrCodeValue = JSON.stringify({ orderId, deliveryOtp });
@@ -49,7 +49,6 @@ const OrderConfirmation = () => {
             <p className="mb-2"><strong>Order Date:</strong> {formatTimestamp(createdAt)}</p>
             <p className="mb-2"><strong>Payment Method:</strong> {paymentMethod}</p>
             <p className="mb-4"><strong>Transaction ID:</strong> {transactionId || 'N/A'}</p>
-            <p className="mb-4"><strong>Total:</strong> ₹{totalPrice.toFixed(2)}</p>
             <div className="mb-4">
                 <h4 className="font-semibold">Items:</h4>
                 <ul role="list">
@@ -61,6 +60,13 @@ const OrderConfirmation = () => {
                     ))}
                 </ul>
             </div>
+            {coupon && ( // New: Display coupon details if available
+              <div className="flex justify-between py-1 text-green-400">
+                <span>Coupon ({coupon.code}):</span>
+                <span>- ₹{coupon.discountAmount.toFixed(2)}</span>
+              </div>
+            )}
+            <p className="mb-4"><strong>Total:</strong> ₹{totalPrice.toFixed(2)}</p>
             <p className="text-sm opacity-80">You will receive an email confirmation shortly.</p>
         </div>
 

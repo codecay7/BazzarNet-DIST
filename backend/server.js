@@ -15,6 +15,7 @@ import orderRoutes from './routes/orderRoutes.js';
 import uploadRoutes from './routes/uploadRoutes.js';
 import passwordResetRoutes from './routes/passwordResetRoutes.js';
 import supportRoutes from './routes/supportRoutes.js';
+import couponRoutes from './routes/couponRoutes.js'; // New: Import coupon routes
 import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 import path from 'path';
 
@@ -47,6 +48,7 @@ app.use('/api/orders', orderRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api/password-reset', passwordResetRoutes);
 app.use('/api/support', supportRoutes);
+app.use('/api/coupons', couponRoutes); // New: Mount coupon routes
 
 
 // Serve static files from the 'uploads' directory

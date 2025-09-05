@@ -2,6 +2,7 @@ import asyncHandler from '../middleware/asyncHandler.js';
 import Order from '../models/Order.js';
 import Product from '../models/Product.js'; // Import Product model
 import Store from '../models/Store.js'; // Import Store model
+import Coupon from '../models/Coupon.js'; // New: Import Coupon model
 import { generateOtp } from '../utils/helpers.js'; // Assuming a helper for OTP generation
 import { sendEmail } from '../services/emailService.js';
 import env from '../config/env.js'; // Import env to use FRONTEND_URL
@@ -10,7 +11,7 @@ import env from '../config/env.js'; // Import env to use FRONTEND_URL
 // @route   POST /api/orders
 // @access  Private/Customer
 const placeOrder = asyncHandler(async (req, res) => {
-  const { items, shippingAddress, paymentMethod, totalPrice } = req.body;
+  const { items, shippingAddress, paymentMethod, totalPrice, appliedCoupon } = req.body; // New: Get appliedCoupon
 
   // In a real app, you'd validate items, check stock, process payment, etc.
   // For now, we'll create a simplified order.
@@ -79,9 +80,24 @@ const placeOrder = asyncHandler(async (req, res) => {
     totalPrice,
     deliveryOtp: generateOtp(), // Generate OTP for delivery confirmation
     transactionId: paymentMethod !== 'Cash on Delivery' ? `TXN-${Date.now()}` : undefined, // Mock transaction ID
+    // New: Store coupon details if applied
+    coupon: appliedCoupon ? {
+      code: appliedCoupon.code,
+      discountAmount: appliedCoupon.discountAmount,
+    } : undefined,
   });
 
   const createdOrder = await order.save();
+
+  // New: Mark coupon as used if one was applied
+  if (appliedCoupon) {
+    const coupon = await Coupon.findById(appliedCoupon._id);
+    if (coupon) {
+      coupon.usedCount += 1;
+      coupon.usedBy.push(req.user._id);
+      await coupon.save();
+    }
+  }
 
   // Send order confirmation email to customer
   const orderItemsHtml = createdOrder.items.map(item => `
@@ -98,6 +114,7 @@ const placeOrder = asyncHandler(async (req, res) => {
       ${orderItemsHtml}
     </ul>
     <p><strong>Total Price:</strong> ₹${createdOrder.totalPrice.toFixed(2)}</p>
+    ${createdOrder.coupon ? `<p><strong>Coupon Applied:</strong> ${createdOrder.coupon.code} (Discount: ₹${createdOrder.coupon.discountAmount.toFixed(2)})</p>` : ''}
     <p><strong>Payment Method:</strong> ${createdOrder.paymentMethod}</p>
     <p><strong>Shipping Address:</strong></p>
     <p>
