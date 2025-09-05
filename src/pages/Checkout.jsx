@@ -21,6 +21,9 @@ const Checkout = () => {
   const [currentStep, setCurrentStep] = useState('address'); // 'address', 'coupon', 'summary', 'payment'
   const [paymentMethod, setPaymentMethod] = useState('card');
 
+  // NEW LOG: Log cart content on component render
+  console.log('Checkout component rendering. Current cart:', cart);
+
   const initialAddress = user?.address || {
     houseNo: '',
     landmark: '',
@@ -140,7 +143,7 @@ const Checkout = () => {
   };
 
   const handlePlaceOrder = async () => {
-    console.log('Attempting to place order. Current cart:', cart); // ADDED LOG
+    console.log('Attempting to place order. Current cart (inside handlePlaceOrder):', cart); // ADDED LOG
     if (validatePaymentForm()) {
       const orderDetails = {
           totalPrice: finalTotal, // New: Use finalTotal
