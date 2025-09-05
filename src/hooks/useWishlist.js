@@ -52,7 +52,9 @@ const useWishlist = (isLoggedIn, user, isVendor, isAdmin, addToCart, fetchCart) 
     if (!isLoggedIn || !user?._id) return;
     try {
       await addToCart(product);
-      await removeFromWishlist(product._id);
+      // When moving from wishlist, 'product' is actually the wishlist 'item' object
+      // So, we need to access the nested product._id for removal
+      await removeFromWishlist(product.product._id); 
       fetchWishlist(); // Re-fetch wishlist to ensure UI is updated
     } catch (error) {
       toast.error(`Error moving to cart: ${error.message}`);

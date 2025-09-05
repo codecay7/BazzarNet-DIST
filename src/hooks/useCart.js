@@ -7,16 +7,16 @@ const useCart = (isLoggedIn, user, isVendor, isAdmin) => {
 
   const fetchCart = useCallback(async () => {
     if (!isLoggedIn || !user?._id || isVendor || isAdmin) {
-      console.log('fetchCart: Clearing cart due to user status (not logged in, or is vendor/admin).'); // ADDED LOG
+      console.log('fetchCart: Clearing cart due to user status (not logged in, or is vendor/admin).');
       setCart([]); // Clear cart if not logged in or not a customer
       return;
     }
     try {
       const userCart = await api.customer.getCart();
-      console.log('fetchCart: Successfully fetched cart:', userCart.items); // ADDED LOG
+      console.log('fetchCart: Successfully fetched cart:', userCart.items);
       setCart(userCart.items);
     } catch (error) {
-      console.error('fetchCart: Failed to load cart:', error); // ADDED LOG
+      console.error('fetchCart: Failed to load cart:', error);
       toast.error(`Failed to load cart: ${error.message}`);
       setCart([]); // Clear cart on error
     }
@@ -32,7 +32,13 @@ const useCart = (isLoggedIn, user, isVendor, isAdmin) => {
       return;
     }
     try {
-      const response = await api.customer.addToCart(product._id, 1, product.unit); // NEW: Pass product.unit
+      // Determine the actual product ID and unit.
+      // If 'product' is a wishlist item (which has a nested 'product' object), use item.product._id and item.product.unit
+      // Otherwise, assume 'product' is a direct product object.
+      const actualProductId = product.product?._id || product._id;
+      const actualUnit = product.product?.unit || product.unit;
+
+      const response = await api.customer.addToCart(actualProductId, 1, actualUnit);
       setCart(response.items);
       toast.success(`${product.name} added to cart!`);
     } catch (error) {
@@ -80,7 +86,7 @@ const useCart = (isLoggedIn, user, isVendor, isAdmin) => {
     }
 
     console.log('useCart: Sending orderDetails to API:', orderDetails);
-    console.log('useCart: Items in orderDetails:', orderDetails.items); // ADDED LOG
+    console.log('useCart: Items in orderDetails:', orderDetails.items);
 
     try {
       const newOrder = await api.customer.placeOrder(orderDetails);
