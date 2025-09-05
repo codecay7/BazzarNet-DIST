@@ -144,7 +144,7 @@ const CustomerDashboard = () => {
               
               {/* Category Filter Section */}
               <div className="mb-6 relative max-w-xs">
-                <label htmlFor="categoryFilter" className="sr-only">Filter by Category</label>
+                <label htmlFor="categoryFilter" className="block text-sm font-medium mb-1">Filter by Category</label>
                 <select
                   id="categoryFilter"
                   value={selectedCategory}
@@ -156,7 +156,7 @@ const CustomerDashboard = () => {
                     <option key={cat} value={cat} className="capitalize">{cat === 'all' ? 'All Categories' : cat}</option>
                   ))}
                 </select>
-                <div className="pointer-events-none absolute inset-y-0 right-0 flex items-center px-2 text-[var(--text)]" aria-hidden="true"><ChevronDown size={20} /></div>
+                <div className="pointer-events-none absolute inset-y-0 right-0 top-8 flex items-center px-2 text-[var(--text)]" aria-hidden="true"><ChevronDown size={20} /></div>
               </div>
 
               {recommendedLoading ? (
@@ -171,8 +171,8 @@ const CustomerDashboard = () => {
                     const isOutOfStock = product.stock === 0;
                     const discount = calculateDiscount(product.price, product.originalPrice);
                     return (
-                      <div key={product._id} className={`bg-black/10 border border-white/10 rounded-2xl overflow-hidden shadow-lg flex flex-col ${isOutOfStock ? 'grayscale' : ''}`} role="listitem" aria-label={`Product: ${product.name}`}>
-                        <Link to={`/products/${product._id}`} className="flex-grow" aria-label={`View details for ${product.name}`}>
+                      <div key={product._id} className={`bg-black/10 border border-white/10 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col ${isOutOfStock ? 'grayscale' : ''}`} role="listitem" aria-label={`Product: ${product.name}`}>
+                        <Link to={`/products/${product._id}`} className="flex-grow flex flex-col" aria-label={`View details for ${product.name}`}>
                           <div className="relative">
                             <img
                               src={getFullImageUrl(product.image)}
