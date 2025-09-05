@@ -1,18 +1,4 @@
 {
-  "type": "module",
-  "name": "bazzarnet-backend",
-  "version": "1.0.0",
-  "description": "BazzarNet Backend API",
-  "main": "server.js",
-  "scripts": {
-    "start": "node server.js",
-    "dev": "NODE_ENV=development node -r dotenv/config server.js",
-    "seed": "node seeder.js",
-    "destroy": "node seeder.js -d"
-  },
-  "keywords": [],
-  "author": "",
-  "license": "ISC",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
@@ -30,5 +16,10 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
+  },
+  "scripts": {
+    "dev": "NODE_ENV=development node -r dotenv/config server.js",
+    "start": "NODE_ENV=production node server.js",
+    "destroy": "node -r dotenv/config seeder.js -d"
   }
 }
