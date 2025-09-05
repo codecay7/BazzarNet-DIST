@@ -143,6 +143,7 @@ const Checkout = () => {
             image: item.image,
             price: item.price,
             quantity: item.quantity,
+            unit: item.unit, // Include the unit here
           })),
           shippingAddress: shippingAddress,
           paymentMethod: paymentMethod === 'card' ? 'Credit Card' : 'UPI',
