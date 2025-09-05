@@ -268,7 +268,7 @@ const LandingPage = () => {
 
           {/* Call to Action Section */}
           <motion.div
-            className="bg-[var(--accent)] text-white rounded-3xl p-20 text-center mx-4 shadow-[0_8px_40px_var(--shadow)] relative z-10"
+            className="bg-black/10 text-white rounded-3xl p-20 text-center mx-4 shadow-[0_8px_40px_var(--shadow)] relative z-10"
             variants={cardVariants}
             whileInView="visible"
             initial="hidden"
