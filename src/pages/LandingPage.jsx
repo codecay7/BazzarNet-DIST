@@ -94,64 +94,72 @@ const LandingPage = () => {
             <h2 className="text-3xl font-bold mb-10 md:text-4xl text-center">How It Works</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 justify-items-center">
               <motion.div
-                className="bg-[var(--card-bg)] backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-[0_8px_40px_var(--shadow)] hover:-translate-y-1 transition-transform duration-300"
+                className="bg-[var(--card-bg)] backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-[0_8px_40px_var(--shadow)] hover:-translate-y-1 transition-transform duration-300 flex flex-col items-center text-center"
                 variants={cardVariants}
                 whileInView="visible"
                 initial="hidden"
                 viewport={{ once: true, amount: 0.5 }}
               >
-                <div className="flex items-start gap-4">
-                  <FontAwesomeIcon icon={faStore} className="text-3xl text-[var(--accent)]" />
-                  <div>
-                    <h3 className="text-xl font-bold text-[var(--accent)] mb-1">Browse Stores</h3>
-                    <p className="text-[var(--text)] text-base">Discover local shops and their products.</p>
-                  </div>
-                </div >
+                <motion.div 
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                  className="mb-4"
+                >
+                  <FontAwesomeIcon icon={faStore} className="text-5xl text-[var(--accent)]" />
+                </motion.div>
+                <h3 className="text-2xl font-bold text-[var(--accent)] mb-2">Browse Stores</h3>
+                <p className="text-[var(--text)] text-lg">Discover local shops and their products.</p>
               </motion.div>
               <motion.div
-                className="bg-[var(--card-bg)] backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-[0_8px_40px_var(--shadow)] hover:-translate-y-1 transition-transform duration-300"
+                className="bg-[var(--card-bg)] backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-[0_8px_40px_var(--shadow)] hover:-translate-y-1 transition-transform duration-300 flex flex-col items-center text-center"
                 variants={cardVariants}
                 whileInView="visible"
                 initial="hidden"
                 viewport={{ once: true, amount: 0.5 }}
               >
-                <div className="flex items-start gap-4">
-                  <FontAwesomeIcon icon={faCartPlus} className="text-3xl text-[var(--accent)]" />
-                  <div>
-                    <h3 className="text-xl font-bold text-[var(--accent)] mb-1">Add to Cart</h3>
-                    <p className="text-[var(--text)] text-base">Select items and place your order easily.</p>
-                  </div>
-                </div >
+                <motion.div 
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                  className="mb-4"
+                >
+                  <FontAwesomeIcon icon={faCartPlus} className="text-5xl text-[var(--accent)]" />
+                </motion.div>
+                <h3 className="text-2xl font-bold text-[var(--accent)] mb-2">Add to Cart</h3>
+                <p className="text-[var(--text)] text-lg">Select items and place your order easily.</p>
               </motion.div>
               <motion.div
-                className="bg-[var(--card-bg)] backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-[0_8px_40px_var(--shadow)] hover:-translate-y-1 transition-transform duration-300"
+                className="bg-[var(--card-bg)] backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-[0_8px_40px_var(--shadow)] hover:-translate-y-1 transition-transform duration-300 flex flex-col items-center text-center"
                 variants={cardVariants}
                 whileInView="visible"
                 initial="hidden"
                 viewport={{ once: true, amount: 0.5 }}
               >
-                <div className="flex items-start gap-4">
-                  <FontAwesomeIcon icon={faTruck} className="text-3xl text-[var(--accent)]" />
-                  <div>
-                    <h3 className="text-xl font-bold text-[var(--accent)] mb-1">Fast Delivery</h3>
-                    <p className="text-[var(--text)] text-base">Get your order delivered in under an hour.</p>
-                  </div>
-                </div >
+                <motion.div 
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                  className="mb-4"
+                >
+                  <FontAwesomeIcon icon={faTruck} className="text-5xl text-[var(--accent)]" />
+                </motion.div>
+                <h3 className="text-2xl font-bold text-[var(--accent)] mb-2">Fast Delivery</h3>
+                <p className="text-[var(--text)] text-lg">Get your order delivered in under an hour.</p>
               </motion.div>
               <motion.div
-                className="bg-[var(--card-bg)] backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-[0_8px_40px_var(--shadow)] hover:-translate-y-1 transition-transform duration-300"
+                className="bg-[var(--card-bg)] backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-[0_8px_40px_var(--shadow)] hover:-translate-y-1 transition-transform duration-300 flex flex-col items-center text-center"
                 variants={cardVariants}
                 whileInView="visible"
                 initial="hidden"
                 viewport={{ once: true, amount: 0.5 }}
               >
-                <div className="flex items-start gap-4">
-                  <FontAwesomeIcon icon={faCheckCircle} className="text-3xl text-[var(--accent)]" />
-                  <div>
-                    <h3 className="text-xl font-bold text-[var(--accent)] mb-1">Enjoy & Review</h3>
-                    <p className="text-[var(--text)] text-base">Receive your order and share your feedback.</p>
-                  </div>
-                </div >
+                <motion.div 
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                  className="mb-4"
+                >
+                  <FontAwesomeIcon icon={faCheckCircle} className="text-5xl text-[var(--accent)]" />
+                </motion.div>
+                <h3 className="text-2xl font-bold text-[var(--accent)] mb-2">Enjoy & Review</h3>
+                <p className="text-[var(--text)] text-lg">Receive your order and share your feedback.</p>
               </motion.div>
             </div>
           </div>
@@ -161,64 +169,72 @@ const LandingPage = () => {
             <h2 className="text-3xl font-bold mb-10 md:text-4xl text-center">Why BazzarNet?</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 justify-items-center">
               <motion.div
-                className="bg-[var(--card-bg)] backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-[0_8px_40px_var(--shadow)] hover:-translate-y-1 transition-transform duration-300"
+                className="bg-[var(--card-bg)] backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-[0_8px_40px_var(--shadow)] hover:-translate-y-1 transition-transform duration-300 flex flex-col items-center text-center"
                 variants={cardVariants}
                 whileInView="visible"
                 initial="hidden"
                 viewport={{ once: true, amount: 0.5 }}
               >
-                <div className="flex items-start gap-4">
-                  <FontAwesomeIcon icon={faStore} className="text-3xl text-[var(--accent)]" />
-                  <div>
-                    <h3 className="text-xl font-bold text-[var(--accent)] mb-1">Digitize Your Store</h3>
-                    <p className="text-[var(--text)] text-base">Bring your local store online with ease.</p>
-                  </div>
-                </div >
+                <motion.div 
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                  className="mb-4"
+                >
+                  <FontAwesomeIcon icon={faStore} className="text-5xl text-[var(--accent)]" />
+                </motion.div>
+                <h3 className="text-2xl font-bold text-[var(--accent)] mb-2">Digitize Your Store</h3>
+                <p className="text-[var(--text)] text-lg">Bring your local store online with ease.</p>
               </motion.div>
               <motion.div
-                className="bg-[var(--card-bg)] backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-[0_8px_40px_var(--shadow)] hover:-translate-y-1 transition-transform duration-300"
+                className="bg-[var(--card-bg)] backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-[0_8px_40px_var(--shadow)] hover:-translate-y-1 transition-transform duration-300 flex flex-col items-center text-center"
                 variants={cardVariants}
                 whileInView="visible"
                 initial="hidden"
                 viewport={{ once: true, amount: 0.5 }}
               >
-                <div className="flex items-start gap-4">
-                  <FontAwesomeIcon icon={faTruck} className="text-3xl text-[var(--accent)]" />
-                  <div>
-                    <h3 className="text-xl font-bold text-[var(--accent)] mb-1">Fast Local Delivery</h3>
-                    <p className="text-[var(--text)] text-base">Get your goods delivered quickly.</p>
-                  </div>
-                </div >
+                <motion.div 
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                  className="mb-4"
+                >
+                  <FontAwesomeIcon icon={faTruck} className="text-5xl text-[var(--accent)]" />
+                </motion.div>
+                <h3 className="text-2xl font-bold text-[var(--accent)] mb-2">Fast Local Delivery</h3>
+                <p className="text-[var(--text)] text-lg">Get your goods delivered quickly.</p>
               </motion.div>
               <motion.div
-                className="bg-[var(--card-bg)] backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-[0_8px_40px_var(--shadow)] hover:-translate-y-1 transition-transform duration-300"
+                className="bg-[var(--card-bg)] backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-[0_8px_40px_var(--shadow)] hover:-translate-y-1 transition-transform duration-300 flex flex-col items-center text-center"
                 variants={cardVariants}
                 whileInView="visible"
                 initial="hidden"
                 viewport={{ once: true, amount: 0.5 }}
               >
-                <div className="flex items-start gap-4">
-                  <FontAwesomeIcon icon={faUser} className="text-3xl text-[var(--accent)]" />
-                  <div>
-                    <h3 className="text-xl font-bold text-[var(--accent)] mb-1">Trusted & Secure</h3>
-                    <p className="text-[var(--text)] text-base">Shop with confidence and security.</p>
-                  </div>
-                </div >
+                <motion.div 
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                  className="mb-4"
+                >
+                  <FontAwesomeIcon icon={faUser} className="text-5xl text-[var(--accent)]" />
+                </motion.div>
+                <h3 className="text-2xl font-bold text-[var(--accent)] mb-2">Trusted & Secure</h3>
+                <p className="text-[var(--text)] text-lg">Shop with confidence and security.</p>
               </motion.div>
               <motion.div
-                className="bg-[var(--card-bg)] backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-[0_8px_40px_var(--shadow)] hover:-translate-y-1 transition-transform duration-300"
+                className="bg-[var(--card-bg)] backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-[0_8px_40px_var(--shadow)] hover:-translate-y-1 transition-transform duration-300 flex flex-col items-center text-center"
                 variants={cardVariants}
                 whileInView="visible"
                 initial="hidden"
                 viewport={{ once: true, amount: 0.5 }}
               >
-                <div className="flex items-start gap-4">
-                  <FontAwesomeIcon icon={faTags} className="text-3xl text-[var(--accent)]" />
-                  <div>
-                    <h3 className="text-xl font-bold text-[var(--accent)] mb-1">Exclusive Deals</h3>
-                    <p className="text-[var(--text)] text-base">Access special offers and discounts.</p>
-                  </div>
-                </div >
+                <motion.div 
+                  whileHover={{ scale: 1.1, rotate: 5 }}
+                  transition={{ type: "spring", stiffness: 400, damping: 10 }}
+                  className="mb-4"
+                >
+                  <FontAwesomeIcon icon={faTags} className="text-5xl text-[var(--accent)]" />
+                </motion.div>
+                <h3 className="text-2xl font-bold text-[var(--accent)] mb-2">Exclusive Deals</h3>
+                <p className="text-[var(--text)] text-lg">Access special offers and discounts.</p>
               </motion.div>
             </div>
           </div>
