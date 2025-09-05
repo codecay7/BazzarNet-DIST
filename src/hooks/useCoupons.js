@@ -1,81 +1,110 @@
-import { useState, useEffect, useCallback } from 'react';
-import toast from 'react-hot-toast';
-import * as api from '../services/api';
+import { useState, useEffect, useCallback } from "react";
+import toast from 'react-hot-toast'; // Import toast
+import * as api from "/src/services/api.js";
 
-// The hook now accepts user, isLoggedIn, and orders as arguments
-const useCoupons = (user, isLoggedIn, orders) => {
+/**
+ * Custom hook to fetch and manage coupons.
+ * Handles filtering, validation, and error fallback.
+ */
+const useCoupons = ({ isLoggedIn = false, orders = [], user = null } = {}) => {
   const [availableCoupons, setAvailableCoupons] = useState([]);
-  const [appliedCoupon, setAppliedCoupon] = useState(null); // Stores the validated coupon object
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [discountAmount, setDiscountAmount] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
 
   const fetchAvailableCoupons = useCallback(async () => {
     if (!isLoggedIn) {
       setAvailableCoupons([]);
       return;
     }
+
+    setLoading(true);
+    setError(null);
+
     try {
-      // Fetch all active coupons. The backend controller will filter for non-admin users.
+      // Fetch all active coupons. Backend will handle isActive filtering.
       const coupons = await api.coupon.getAll();
-      
-      // Client-side filter for new user coupons if user has orders
-      const filteredCoupons = coupons.filter(coupon => {
-        // Check if orders array is available and has items
-        if (coupon.isNewUserOnly && orders && orders.length > 0) {
-          return false; // Hide new user coupon if user has existing orders
-        }
+
+      if (!Array.isArray(coupons)) {
+        throw new Error("Invalid coupons response: expected an array");
+      }
+
+      // Basic client-side filtering for valid structure
+      const filteredCoupons = coupons.filter((c) => {
+        if (!c || typeof c !== "object") return false;
+        if (!c.code || typeof c.code !== "string") return false;
+        // Ensure discountValue exists and is a number for display purposes
+        if (typeof c.discountValue !== "number") return false;
         return true;
       });
 
       setAvailableCoupons(filteredCoupons);
-    } catch (error) {
-      console.error('Failed to fetch available coupons:', error);
-      // toast.error(`Failed to load coupons: ${error.message}`); // Don't spam toast for this
+    } catch (err) {
+      console.error("❌ Failed to fetch coupons:", err);
+      setError(err.message || "Failed to load coupons");
+      toast.error(err.message || "Failed to load coupons"); // Show toast for error
       setAvailableCoupons([]);
+    } finally {
+      setLoading(false);
     }
-  }, [isLoggedIn, user, orders]); // Depend on user and orders to re-fetch if status changes
+  }, [isLoggedIn]);
+
+  const applyCoupon = useCallback(
+    async (code, cartTotal) => {
+      if (!isLoggedIn || !user?._id) {
+        toast.error('Please log in to apply coupons.');
+        return false;
+      }
+      if (cartTotal <= 0) {
+        toast.error('Cannot apply coupon to an empty or zero-value cart.');
+        return false;
+      }
+
+      setLoading(true);
+      setError(null);
+
+      try {
+        const response = await api.coupon.validate(code, cartTotal);
+        // The backend's validate endpoint returns the coupon object with discountAmount
+        setAppliedCoupon(response.coupon);
+        setDiscountAmount(response.coupon.discountAmount);
+        toast.success(response.message);
+        return true;
+      } catch (err) {
+        console.error("❌ Failed to apply coupon:", err);
+        setError(err.message || "Failed to apply coupon");
+        toast.error(err.message || "Failed to apply coupon");
+        setAppliedCoupon(null);
+        setDiscountAmount(0);
+        return false;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [isLoggedIn, user?._id]
+  );
+
+  const removeCoupon = useCallback(() => {
+    setAppliedCoupon(null);
+    setDiscountAmount(0);
+  }, []);
 
   useEffect(() => {
     fetchAvailableCoupons();
   }, [fetchAvailableCoupons]);
 
-  const applyCoupon = useCallback(async (code, totalPrice) => {
-    if (!isLoggedIn) {
-      toast.error('Please log in to apply coupons.');
-      return false;
-    }
-    if (!code) {
-      toast.error('Please enter a coupon code.');
-      return false;
-    }
-    try {
-      const response = await api.coupon.validate(code, totalPrice);
-      setAppliedCoupon(response.coupon);
-      setDiscountAmount(response.coupon.discountAmount);
-      toast.success(response.message);
-      return true;
-    } catch (error) {
-      setAppliedCoupon(null);
-      setDiscountAmount(0);
-      toast.error(error.message || 'Failed to apply coupon.');
-      return false;
-    }
-  }, [isLoggedIn]);
-
-  const removeCoupon = useCallback(() => {
-    setAppliedCoupon(null);
-    setDiscountAmount(0);
-    toast.info('Coupon removed.');
-  }, []);
-
   return {
     availableCoupons,
     appliedCoupon,
     discountAmount,
-    fetchAvailableCoupons,
+    loading,
+    error,
+    refetch: fetchAvailableCoupons,
     applyCoupon,
     removeCoupon,
-    setAppliedCoupon, // Expose setter for initial load if needed
-    setDiscountAmount, // Expose setter for initial load if needed
+    setAppliedCoupon, // Expose setter
+    setDiscountAmount, // Expose setter
   };
 };
 
