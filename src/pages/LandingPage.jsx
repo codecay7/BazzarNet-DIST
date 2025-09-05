@@ -2,13 +2,14 @@ import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShoppingBag, faStore, faCartPlus, faTruck, faUser, faQuoteLeft, faArrowRight, faTags, faCheckCircle, faLock } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate, Link } from 'react-router-dom';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion, AnimatePresence, useAnimation } from 'framer-motion'; // Import useAnimation
 import Loader from '../components/Loader';
 import LoginButton from '../components/LoginButton';
 
 const LandingPage = () => {
   const [isLoading, setIsLoading] = useState(true);
   const navigate = useNavigate();
+  const glitchControls = useAnimation(); // Initialize controls for glitch animation
 
   useEffect(() => {
     const loaderTimer = setTimeout(() => {
@@ -17,6 +18,17 @@ const LandingPage = () => {
 
     return () => clearTimeout(loaderTimer);
   }, []);
+
+  // Effect to start glitch animation after initial load
+  useEffect(() => {
+    if (!isLoading) {
+      const glitchStartDelay = 0.5; // Delay glitch start slightly after loader disappears
+      const timer = setTimeout(() => {
+        glitchControls.start("glitch");
+      }, (2000 + glitchStartDelay * 1000)); // Total delay: loader duration + glitchStartDelay
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading, glitchControls]); // Depend on isLoading and glitchControls
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -49,6 +61,54 @@ const LandingPage = () => {
     visible: { opacity: 1, y: 0, transition: { duration: 0.7, ease: "easeOut" } },
   };
 
+  // Glitch animation variants
+  const glitchVariants = {
+    initial: {
+      x: 0,
+      textShadow: "0px 0px 0px rgba(255,0,0,0), 0px 0px 0px rgba(0,0,255,0)",
+      filter: "hue-rotate(0deg)",
+    },
+    glitch: {
+      x: [0, -2, 2, -2, 2, 0], // Small horizontal shifts
+      textShadow: [
+        "1px 0px 0px rgba(255,0,0,0.7), -1px 0px 0px rgba(0,0,255,0.7)", // Shift 1
+        "-1px 0px 0px rgba(255,0,0,0.7), 1px 0px 0px rgba(0,0,255,0.7)", // Shift 2
+        "0px 0px 0px rgba(255,0,0,0), 0px 0px 0px rgba(0,0,255,0)",     // Reset
+        "2px 0px 0px rgba(255,0,0,0.7), -2px 0px 0px rgba(0,0,255,0.7)", // Shift 3
+        "-2px 0px 0px rgba(255,0,0,0.7), 2px 0px 0px rgba(0,0,255,0.7)", // Shift 4
+        "0px 0px 0px rgba(255,0,0,0), 0px 0px 0px rgba(0,0,255,0)",     // Reset
+      ],
+      filter: [
+        "hue-rotate(0deg)",
+        "hue-rotate(10deg)",
+        "hue-rotate(0deg)",
+        "hue-rotate(-10deg)",
+        "hue-rotate(0deg)",
+        "hue-rotate(0deg)",
+      ],
+      transition: {
+        x: {
+          duration: 0.05, // Faster shifts
+          repeat: Infinity,
+          repeatType: "mirror",
+          ease: "easeInOut",
+        },
+        textShadow: {
+          duration: 0.05, // Faster shifts
+          repeat: Infinity,
+          repeatType: "mirror",
+          ease: "easeInOut",
+        },
+        filter: {
+          duration: 0.05, // Faster shifts
+          repeat: Infinity,
+          repeatType: "mirror",
+          ease: "easeInOut",
+        },
+      },
+    },
+  };
+
   return (
     <AnimatePresence mode="wait">
       {isLoading ? (
@@ -73,8 +133,17 @@ const LandingPage = () => {
               className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black leading-tight md:leading-snug mb-4 tracking-tight break-words"
             >
               <motion.span variants={textChildVariants} className="inline-block">Shop Locally, Delivered Fast with</motion.span>
-              <motion.span variants={textChildVariants} className="inline-block ml-2 px-2 py-1 bg-[var(--accent)] text-white rounded-md shadow-md text-[1.8em] font-black">
-                BazzarNet
+              <motion.span 
+                variants={textChildVariants} 
+                className="inline-block ml-2 px-2 py-1 bg-[var(--accent)] text-white rounded-md shadow-md text-[1.8em] font-black"
+              >
+                <motion.span
+                  variants={glitchVariants}
+                  initial="initial"
+                  animate={glitchControls} // Use controls here
+                >
+                  BazzarNet
+                </motion.span>
               </motion.span>
             </motion.h1>
             <motion.p className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-medium mb-5" variants={textChildVariants}>
