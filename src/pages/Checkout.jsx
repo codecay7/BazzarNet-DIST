@@ -172,6 +172,13 @@ const Checkout = () => {
   };
 
   const handlePlaceOrder = async () => {
+    console.log('Attempting to place order. Current cart:', cart); // ADDED LOG
+    if (cart.length === 0) {
+      console.error('Cart is empty when trying to place order!');
+      toast.error('Your cart is empty. Please add items before checking out.');
+      return;
+    }
+
     if (validatePaymentForm()) {
       const orderDetails = {
           totalPrice: finalTotal,
@@ -188,6 +195,7 @@ const Checkout = () => {
           appliedCoupon: appliedCoupon,
       };
       
+      console.log('Order details prepared for API call:', orderDetails); // ADDED LOG
       const newOrder = await checkout(orderDetails);
       if (newOrder) {
         navigate('/confirmation', { state: { orderDetails: newOrder } });

@@ -7,15 +7,18 @@ const useCart = (isLoggedIn, user, isVendor, isAdmin) => {
 
   const fetchCart = useCallback(async () => {
     if (!isLoggedIn || !user?._id || isVendor || isAdmin) {
+      console.log('fetchCart: Clearing cart due to user status (not logged in, or is vendor/admin).'); // ADDED LOG
       setCart([]); // Clear cart if not logged in or not a customer
       return;
     }
     try {
       const userCart = await api.customer.getCart();
+      console.log('fetchCart: Successfully fetched cart:', userCart.items); // ADDED LOG
       setCart(userCart.items);
     } catch (error) {
+      console.error('fetchCart: Failed to load cart:', error); // ADDED LOG
       toast.error(`Failed to load cart: ${error.message}`);
-      setCart([]);
+      setCart([]); // Clear cart on error
     }
   }, [isLoggedIn, user?._id, isVendor, isAdmin]);
 
@@ -76,7 +79,8 @@ const useCart = (isLoggedIn, user, isVendor, isAdmin) => {
       }
     }
 
-    console.log('useCart: Sending orderDetails to API:', orderDetails); // NEW LOG
+    console.log('useCart: Sending orderDetails to API:', orderDetails);
+    console.log('useCart: Items in orderDetails:', orderDetails.items); // ADDED LOG
 
     try {
       const newOrder = await api.customer.placeOrder(orderDetails);
