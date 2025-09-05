@@ -17,11 +17,15 @@ const useAuth = () => {
     localStorage.setItem('user', JSON.stringify(userData));
   }, []);
 
-  // Login Functions (these will still be called directly by AppContext)
-  const loginAsUser = useCallback(async (email, password) => {
+  // Centralized login handler with role enforcement
+  const handleLogin = useCallback(async (email, password, expectedRole) => {
     try {
       const response = await api.auth.login({ email, password });
       if (response) {
+        if (response.role !== expectedRole) {
+          toast.error(`Login failed: You are not authorized to log in as a ${expectedRole}. Your role is ${response.role}.`);
+          return false;
+        }
         loginUserInState(response);
         toast.success(`Welcome back, ${response.name}!`);
         return true;
@@ -33,35 +37,10 @@ const useAuth = () => {
     }
   }, [loginUserInState]);
 
-  const loginAsVendor = useCallback(async (email, password) => {
-    try {
-      const response = await api.auth.login({ email, password });
-      if (response) {
-        loginUserInState(response);
-        toast.success(`Welcome, ${response.name}! Manage your store now.`);
-        return true;
-      }
-      return false;
-    } catch (error) {
-      toast.error(error.message || 'Login failed.');
-      return false;
-    }
-  }, [loginUserInState]);
-
-  const loginAsAdmin = useCallback(async (email, password) => {
-    try {
-      const response = await api.auth.login({ email, password });
-      if (response) {
-        loginUserInState(response);
-        toast.success('Welcome, Super Admin!');
-        return true;
-      }
-      return false;
-    } catch (error) {
-      toast.error(error.message || 'Login failed.');
-      return false;
-    }
-  }, [loginUserInState]);
+  // Login Functions (these will still be called directly by AppContext)
+  const loginAsUser = useCallback(async (email, password) => handleLogin(email, password, 'customer'), [handleLogin]);
+  const loginAsVendor = useCallback(async (email, password) => handleLogin(email, password, 'vendor'), [handleLogin]);
+  const loginAsAdmin = useCallback(async (email, password) => handleLogin(email, password, 'admin'), [handleLogin]);
 
   const logout = useCallback(async () => {
     try {
