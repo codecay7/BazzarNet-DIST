@@ -29,13 +29,16 @@ const CustomerOrderDetails = () => {
   const currentOrder = localOrder || orders.find(o => o._id === orderId);
 
   useEffect(() => {
+    console.log(`Frontend: CustomerOrderDetails mounted for orderId: ${orderId}`);
     const fetchSpecificOrder = async () => {
       setLoadingLocalOrder(true);
       try {
+        console.log(`Frontend: Attempting to fetch order ${orderId} via API.`);
         const fetchedOrder = await api.customer.getOrderById(orderId);
+        console.log(`Frontend: Successfully fetched order ${orderId}:`, fetchedOrder);
         setLocalOrder(fetchedOrder);
       } catch (error) {
-        console.error('Failed to fetch specific order details:', error);
+        console.error(`Frontend: Failed to fetch specific order details for ${orderId}:`, error);
         toast.error(`Failed to load order details: ${error.message}`);
         setLocalOrder(null); // Ensure localOrder is null on error
       } finally {
@@ -46,11 +49,13 @@ const CustomerOrderDetails = () => {
     // Fetch the specific order if it's not available in the context's orders array
     // or if the context's orders array is empty (e.g., direct navigation)
     if (!currentOrder) {
+      console.log(`Frontend: Order ${orderId} not found in context, fetching directly.`);
       fetchSpecificOrder();
     } else {
+      console.log(`Frontend: Order ${orderId} found in context, using it.`);
       setLoadingLocalOrder(false); // If found in context, no need to fetch, and not loading
     }
-  }, [orderId, orders]); // Depend on orderId and context's orders array
+  }, [orderId, orders, currentOrder]); // Added currentOrder to dependencies to avoid infinite loop if it's null initially
 
   if (loadingLocalOrder) {
     return (

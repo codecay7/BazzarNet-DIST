@@ -226,23 +226,31 @@ const getCustomerOrders = asyncHandler(async (req, res) => {
 // @route   GET /api/orders/:id
 // @access  Private
 const getOrderById = asyncHandler(async (req, res) => {
+  console.log(`Backend: getOrderById called for order ID: ${req.params.id}`);
+  console.log(`Backend: Logged-in user (req.user): ID=${req.user._id}, Role=${req.user.role}, StoreID=${req.user.storeId}`);
+
   const order = await Order.findById(req.params.id)
     .populate('user', 'name email')
     .populate('store', 'name');
 
   if (!order) {
+    console.log(`Backend: Order ${req.params.id} not found.`);
     res.status(404);
     throw new Error('Order not found');
   }
 
+  console.log(`Backend: Found order. Order user ID: ${order.user._id}, Order store ID: ${order.store._id}`);
+
   // Authorization: Only the customer who placed the order, the vendor of the store, or an admin can view
   if (
     req.user._id.toString() === order.user._id.toString() || // Customer
-    (req.user.role === 'vendor' && req.user.storeId.toString() === order.store._id.toString()) || // Vendor
+    (req.user.role === 'vendor' && req.user.storeId && order.store && req.user.storeId.toString() === order.store._id.toString()) || // Vendor
     req.user.role === 'admin' // Admin
   ) {
+    console.log(`Backend: Authorization successful for user ${req.user._id} to view order ${req.params.id}.`);
     res.json(order);
   } else {
+    console.log(`Backend: Authorization failed for user ${req.user._id} (role: ${req.user.role}) to view order ${req.params.id}.`);
     res.status(403);
     throw new Error('Not authorized to view this order.');
   }
