@@ -1,6 +1,6 @@
 import React, { useContext, useState, useRef, useEffect, useCallback } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser, faStore, faPen, faSave } from '@fortawesome/free-solid-svg-icons';
+import { faUser, faStore, faPen, faSave, faSpinner } from '@fortawesome/free-solid-svg-icons'; // Added faSpinner
 import { AppContext } from '../context/AppContext';
 import toast from 'react-hot-toast';
 import * as api from '../services/api';
@@ -14,6 +14,7 @@ const Profile = () => {
   const { user, isVendor, updateUserInContext } = useContext(AppContext); // Use updateUserInContext
   const [isEditing, setIsEditing] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [isSaving, setIsSaving] = useState(false); // New state for saving/loading feedback
 
   const [profileData, setProfileData] = useState({
     name: user?.name || '',
@@ -180,6 +181,7 @@ const Profile = () => {
     }
 
     try {
+      setIsSaving(true); // Start saving
       const dataToUpdate = { ...profileData };
       // profileImage is already updated in profileData by the child form's upload logic
       const updatedUser = await api.userProfile.updateProfile(dataToUpdate);
@@ -189,6 +191,8 @@ const Profile = () => {
       resetErrors(); // Clear errors after successful save
     } catch (error) {
       toast.error(`Failed to update profile: ${error.message}`);
+    } finally {
+      setIsSaving(false); // End saving
     }
   };
 
@@ -223,13 +227,26 @@ const Profile = () => {
     <section className="w-full max-w-[1200px] my-10">
       <div className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-8 mx-4">
         <div className="flex flex-col md:flex-row justify-end items-center mb-8 gap-4">
-          <button
-            className="bg-[var(--accent)] w-full md:w-fit text-white border-none py-2 px-6 rounded-lg flex items-center justify-center gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300"
-            onClick={() => isEditing ? null : setIsEditing(true)} // Button will trigger child form's submit
-            aria-label={isEditing ? 'Save changes to profile' : 'Edit profile'}
-          >
-            <FontAwesomeIcon icon={isEditing ? faSave : faPen} aria-hidden="true" /> {isEditing ? 'Save Changes' : 'Edit Profile'}
-          </button>
+          {!isEditing ? (
+            <button
+              className="bg-[var(--accent)] w-full md:w-fit text-white border-none py-2 px-6 rounded-lg flex items-center justify-center gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300"
+              onClick={() => setIsEditing(true)}
+              aria-label="Edit profile"
+            >
+              <FontAwesomeIcon icon={faPen} aria-hidden="true" /> Edit Profile
+            </button>
+          ) : (
+            <button
+              type="submit" // This button will now submit the form in the child component
+              form={isVendor ? "vendor-profile-form" : "customer-profile-form"} // Link to the form in child component
+              className="bg-[var(--accent)] w-full md:w-fit text-white border-none py-2 px-6 rounded-lg flex items-center justify-center gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300"
+              disabled={isSaving}
+              aria-label="Save changes to profile"
+            >
+              {isSaving ? <FontAwesomeIcon icon={faSpinner} spin className="mr-2" /> : <FontAwesomeIcon icon={faSave} aria-hidden="true" />}
+              {isSaving ? 'Saving...' : 'Save Changes'}
+            </button>
+          )}
         </div>
 
         {isVendor ? (
@@ -240,6 +257,8 @@ const Profile = () => {
             handleSaveChanges={handleSaveChanges} // Pass the wrapper function
             errors={errors}
             handleInputChange={handleInputChange}
+            isSaving={isSaving} // Pass saving state
+            setIsSaving={setIsSaving} // Pass setter
           />
         ) : (
           <CustomerProfileForm
@@ -249,6 +268,8 @@ const Profile = () => {
             handleSaveChanges={handleSaveChanges} // Pass the wrapper function
             errors={errors}
             handleInputChange={handleInputChange}
+            isSaving={isSaving} // Pass saving state
+            setIsSaving={setIsSaving} // Pass setter
           />
         )}
       </div>

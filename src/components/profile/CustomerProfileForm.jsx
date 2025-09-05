@@ -1,12 +1,12 @@
-import React, { useCallback, useRef, useState } from 'react'; // Added useState
+import React, { useCallback, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUser } from '@fortawesome/free-solid-svg-icons'; // Removed faPen
-import { Mail, Phone, CreditCard, Landmark, ChevronDown, UploadCloud } from 'lucide-react'; // Added UploadCloud
+import { faUser, faSpinner } from '@fortawesome/free-solid-svg-icons'; // Added faSpinner
+import { Mail, Phone, CreditCard, Landmark, ChevronDown, UploadCloud } from 'lucide-react';
 import useFormValidation from '../../hooks/useFormValidation';
 import * as api from '../../services/api';
-import placeholderImage from '../../assets/placeholder.png'; // Import placeholder image
-import { getFullImageUrl } from '../../utils/imageUtils'; // Import utility
+import placeholderImage from '../../assets/placeholder.png';
+import { getFullImageUrl } from '../../utils/imageUtils';
 
 const indianStates = [
   "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
@@ -19,14 +19,13 @@ const indianStates = [
 
 const inputClasses = "w-full p-2 rounded-lg bg-white/10 border border-black/30 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] text-[var(--text)]";
 
-const CustomerProfileForm = ({ profileData, setProfileData, isEditing, handleSaveChanges, errors, handleInputChange }) => {
-  const [profileImageFile, setProfileImageFile] = useState(null); // State for profile image file
-  const fileInputRef = useRef(null); // Ref for the hidden file input
+const CustomerProfileForm = ({ profileData, setProfileData, isEditing, handleSaveChanges, errors, handleInputChange, isSaving, setIsSaving }) => {
+  const [profileImageFile, setProfileImageFile] = useState(null);
+  const fileInputRef = useRef(null);
 
   const handleProfileImageFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       setProfileImageFile(e.target.files[0]);
-      // Clear the image URL if a new file is selected
       setProfileData(prev => ({ ...prev, profileImage: '' }));
     } else {
       setProfileImageFile(null);
@@ -34,42 +33,42 @@ const CustomerProfileForm = ({ profileData, setProfileData, isEditing, handleSav
   };
 
   const handleProfileImageUpload = async () => {
-    if (!profileImageFile) return profileData.profileImage; // If no new file, return existing URL
+    if (!profileImageFile) return profileData.profileImage;
 
     const formData = new FormData();
-    formData.append('image', profileImageFile); // Backend expects 'image' field
+    formData.append('image', profileImageFile);
 
     try {
       const response = await api.userProfile.uploadProfileImage(formData);
       toast.success('Profile image uploaded successfully!');
-      return response.profileImage; // Backend returns the updated user object with new profileImage
+      return response.profileImage;
     } catch (error) {
       toast.error(`Profile image upload failed: ${error.message}`);
-      throw error; // Re-throw to stop form submission if upload fails
+      throw error;
     }
   };
 
   const handleSubmitWrapper = async (e) => {
-    e.preventDefault();
+    e.preventDefault(); // Prevent default form submission as we handle it manually
+    setIsSaving(true); // Start saving feedback
     try {
       let imageUrl = profileData.profileImage;
       if (profileImageFile) {
-        imageUrl = await handleProfileImageUpload(); // Upload image if a new file is selected
-        // Update profileData with the new image URL before saving other changes
+        imageUrl = await handleProfileImageUpload();
         setProfileData(prev => ({ ...prev, profileImage: imageUrl }));
       }
-      // Now call the original handleSaveChanges to save other form data
-      handleSaveChanges();
+      await handleSaveChanges(); // Call the parent's save function
     } catch (error) {
-      console.error('Profile form submission error:', error);
-      // Error toast already shown by handleProfileImageUpload
+      console.error('Customer profile form submission error:', error);
+    } finally {
+      setIsSaving(false); // End saving feedback
     }
   };
 
   const previewImageSrc = profileImageFile ? URL.createObjectURL(profileImageFile) : getFullImageUrl(profileData.profileImage);
 
   return (
-    <form onSubmit={handleSubmitWrapper} className="space-y-6">
+    <form id="customer-profile-form" onSubmit={handleSubmitWrapper} className="space-y-6">
       <div className="flex flex-col items-center text-center max-w-lg mx-auto mb-8">
         <div className="relative w-24 h-24 mb-4">
           {(profileImageFile || profileData.profileImage) ? (
@@ -77,7 +76,7 @@ const CustomerProfileForm = ({ profileData, setProfileData, isEditing, handleSav
               src={previewImageSrc} 
               alt="User Profile" 
               className="w-24 h-24 rounded-full object-cover border-4 border-white/30 shadow-lg" 
-              onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }} // Fallback image
+              onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }}
             />
           ) : (
             <div className="w-24 h-24 bg-[var(--accent)] rounded-full flex items-center justify-center border-4 border-white/30 shadow-lg" role="img" aria-label="Default user profile image">
@@ -95,6 +94,7 @@ const CustomerProfileForm = ({ profileData, setProfileData, isEditing, handleSav
                 className="absolute inset-0 opacity-0 cursor-pointer"
                 accept="image/*"
                 aria-label="Upload new profile image"
+                disabled={isSaving}
               />
               <UploadCloud size={16} aria-hidden="true" />
             </div>
@@ -130,6 +130,7 @@ const CustomerProfileForm = ({ profileData, setProfileData, isEditing, handleSav
                     aria-label="Phone Number"
                     aria-invalid={!!errors.phone}
                     aria-describedby={errors.phone ? "phone-error" : undefined}
+                    disabled={isSaving}
                   /> : 
                   <p className="font-medium">{profileData.phone}</p>
                 }
@@ -148,19 +149,19 @@ const CustomerProfileForm = ({ profileData, setProfileData, isEditing, handleSav
               {isEditing ? (
                 <div className="space-y-2">
                   <label htmlFor="addressHouseNo" className="sr-only">House No., Street</label>
-                  <input type="text" name="address.houseNo" id="addressHouseNo" value={profileData.address.houseNo} onChange={handleInputChange} className={inputClasses} placeholder="House No., Street" aria-label="House Number and Street" aria-invalid={!!errors.address?.houseNo} aria-describedby={errors.address?.houseNo ? "addressHouseNo-error" : undefined} />
+                  <input type="text" name="address.houseNo" id="addressHouseNo" value={profileData.address.houseNo} onChange={handleInputChange} className={inputClasses} placeholder="House No., Street" aria-label="House Number and Street" aria-invalid={!!errors.address?.houseNo} aria-describedby={errors.address?.houseNo ? "addressHouseNo-error" : undefined} disabled={isSaving} />
                   {errors.address?.houseNo && <p id="addressHouseNo-error" className="text-red-400 text-xs mt-1">{errors.address.houseNo}</p>}
                   
                   <label htmlFor="addressLandmark" className="sr-only">Landmark (Optional)</label>
-                  <input type="text" name="address.landmark" id="addressLandmark" value={profileData.address.landmark} onChange={handleInputChange} className={inputClasses} placeholder="Landmark (Optional)" aria-label="Landmark" />
+                  <input type="text" name="address.landmark" id="addressLandmark" value={profileData.address.landmark} onChange={handleInputChange} className={inputClasses} placeholder="Landmark (Optional)" aria-label="Landmark" disabled={isSaving} />
                   
                   <label htmlFor="addressCity" className="sr-only">City</label>
-                  <input type="text" name="address.city" id="addressCity" value={profileData.address.city} onChange={handleInputChange} className={inputClasses} placeholder="City" aria-label="City" aria-invalid={!!errors.address?.city} aria-describedby={errors.address?.city ? "addressCity-error" : undefined} />
+                  <input type="text" name="address.city" id="addressCity" value={profileData.address.city} onChange={handleInputChange} className={inputClasses} placeholder="City" aria-label="City" aria-invalid={!!errors.address?.city} aria-describedby={errors.address?.city ? "addressCity-error" : undefined} disabled={isSaving} />
                   {errors.address?.city && <p id="addressCity-error" className="text-red-400 text-xs mt-1">{errors.address.city}</p>}
                   
                   <div className="relative">
                     <label htmlFor="addressState" className="sr-only">State</label>
-                    <select name="address.state" id="addressState" value={profileData.address.state} onChange={handleInputChange} className={`${inputClasses} appearance-none pr-8`} aria-label="State" aria-invalid={!!errors.address?.state} aria-describedby={errors.address?.state ? "addressState-error" : undefined}>
+                    <select name="address.state" id="addressState" value={profileData.address.state} onChange={handleInputChange} className={`${inputClasses} appearance-none pr-8`} aria-label="State" aria-invalid={!!errors.address?.state} aria-describedby={errors.address?.state ? "addressState-error" : undefined} disabled={isSaving}>
                       <option value="" disabled>Select State</option>
                       {indianStates.map(state => <option key={state} value={state}>{state}</option>)}
                     </select>
@@ -169,7 +170,7 @@ const CustomerProfileForm = ({ profileData, setProfileData, isEditing, handleSav
                   {errors.address?.state && <p id="addressState-error" className="text-red-400 text-xs mt-1">{errors.address.state}</p>}
                   
                   <label htmlFor="addressPinCode" className="sr-only">Pin Code</label>
-                  <input type="text" name="address.pinCode" id="addressPinCode" value={profileData.address.pinCode} onChange={handleInputChange} className={inputClasses} placeholder="Pin Code" maxLength="6" aria-label="Pin Code" aria-invalid={!!errors.address?.pinCode} aria-describedby={errors.address?.pinCode ? "addressPinCode-error" : undefined} />
+                  <input type="text" name="address.pinCode" id="addressPinCode" value={profileData.address.pinCode} onChange={handleInputChange} className={inputClasses} placeholder="Pin Code" maxLength="6" aria-label="Pin Code" aria-invalid={!!errors.address?.pinCode} aria-describedby={errors.address?.pinCode ? "addressPinCode-error" : undefined} disabled={isSaving} />
                   {errors.address?.pinCode && <p id="addressPinCode-error" className="text-red-400 text-xs mt-1">{errors.address.pinCode}</p>}
                 </div>
               ) : (
@@ -189,15 +190,15 @@ const CustomerProfileForm = ({ profileData, setProfileData, isEditing, handleSav
                 {isEditing ? (
                   <div className="space-y-2">
                     <label htmlFor="cardNumber" className="sr-only">Card Number</label>
-                    <input type="text" name="cardDetails.cardNumber" id="cardNumber" value={profileData.cardDetails.cardNumber} onChange={handleInputChange} className={inputClasses} placeholder="Card Number" aria-label="Card Number" aria-invalid={!!errors.cardDetails?.cardNumber} aria-describedby={errors.cardDetails?.cardNumber ? "cardNumber-error" : undefined} />
+                    <input type="text" name="cardDetails.cardNumber" id="cardNumber" value={profileData.cardDetails.cardNumber} onChange={handleInputChange} className={inputClasses} placeholder="Card Number" aria-label="Card Number" aria-invalid={!!errors.cardDetails?.cardNumber} aria-describedby={errors.cardDetails?.cardNumber ? "cardNumber-error" : undefined} disabled={isSaving} />
                     {errors.cardDetails?.cardNumber && <p id="cardNumber-error" className="text-red-400 text-xs mt-1">{errors.cardDetails.cardNumber}</p>}
                     
                     <label htmlFor="expiry" className="sr-only">Expiry Date (MM/YY)</label>
-                    <input type="text" name="cardDetails.expiry" id="expiry" value={profileData.cardDetails.expiry} onChange={handleInputChange} className={inputClasses} placeholder="MM/YY" aria-label="Card Expiry Date" aria-invalid={!!errors.cardDetails?.expiry} aria-describedby={errors.cardDetails?.expiry ? "expiry-error" : undefined} />
+                    <input type="text" name="cardDetails.expiry" id="expiry" value={profileData.cardDetails.expiry} onChange={handleInputChange} className={inputClasses} placeholder="MM/YY" aria-label="Card Expiry Date" aria-invalid={!!errors.cardDetails?.expiry} aria-describedby={errors.cardDetails?.expiry ? "expiry-error" : undefined} disabled={isSaving} />
                     {errors.cardDetails?.expiry && <p id="expiry-error" className="text-red-400 text-xs mt-1">{errors.cardDetails.expiry}</p>}
                     
                     <label htmlFor="cardHolder" className="sr-only">Card Holder Name</label>
-                    <input type="text" name="cardDetails.cardHolder" id="cardHolder" value={profileData.cardDetails.cardHolder} onChange={handleInputChange} className={inputClasses} placeholder="Card Holder Name" aria-label="Card Holder Name" />
+                    <input type="text" name="cardDetails.cardHolder" id="cardHolder" value={profileData.cardDetails.cardHolder} onChange={handleInputChange} className={inputClasses} placeholder="Card Holder Name" aria-label="Card Holder Name" disabled={isSaving} />
                   </div>
                 ) : (
                   <>
@@ -223,6 +224,7 @@ const CustomerProfileForm = ({ profileData, setProfileData, isEditing, handleSav
                     aria-label="UPI ID"
                     aria-invalid={!!errors.upiId}
                     aria-describedby={errors.upiId ? "upiId-error" : undefined}
+                    disabled={isSaving}
                   /> : 
                   <p className="font-medium">{profileData.upiId}</p>
                 }
