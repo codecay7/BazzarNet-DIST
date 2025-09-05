@@ -9,6 +9,7 @@
   --shadow: rgba(209, 209, 209, 0.5);
   --accent: #00D1B2;
   --accent-dark: #00A895;
+  --accent-rgb: 0, 209, 178; /* NEW: RGB values for --accent */
   --text: #333;
   --blur: blur(5px);
   --tooltip-bg: #333;
@@ -24,6 +25,7 @@
   --shadow: rgba(0, 0, 0, 0.6);
   --accent: #22D3EE;
   --accent-dark: #0EA5E9;
+  --accent-rgb: 34, 211, 238; /* NEW: RGB values for --accent in dark theme */
   --text: #F1F5F9;
   --tooltip-bg: #1E293B;
   --tooltip-text: #E2E8F0;
