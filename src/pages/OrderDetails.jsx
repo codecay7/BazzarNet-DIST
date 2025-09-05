@@ -65,7 +65,7 @@ const OrderDetails = () => {
                 <p><strong>Order Placed:</strong> {formatTimestamp(order.createdAt)}</p> {/* Display formatted timestamp */}
                 <p><strong>Total:</strong> ₹{order.totalPrice.toFixed(2)}</p>
                 <p><strong>Status:</strong> <span className="font-semibold text-[var(--accent)]">{status}</span></p>
-                <p><strong>Delivery OTP:</strong> <span className="font-semibold text-[var(--accent)]">{order.deliveryOtp}</span></p> {/* Display OTP for vendor */}
+                {/* Removed direct display of Delivery OTP for vendor */}
               </div>
             </div>
             <div className="bg-black/10 p-6 rounded-xl">
