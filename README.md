@@ -13,6 +13,7 @@ BazzarNet is a modern, responsive e-commerce platform designed to connect local 
 *   **Image Uploads:** Integrated image upload functionality for products, store logos, and user profiles.
 *   **Form Validation:** Robust input validation on both frontend (custom hook) and backend (Joi).
 *   **Notifications:** User-friendly toast notifications for important events.
+*   **Comprehensive Testing:** Unit and integration tests implemented for both frontend and backend to ensure code quality and prevent regressions.
 
 ### Customer Features
 *   **Product Browsing:** View all products or filter by store/category.
@@ -44,6 +45,7 @@ BazzarNet is a modern, responsive e-commerce platform designed to connect local 
 
 ### Frontend
 *   **Framework:** React (with Vite for a fast development experience)
+*   **Testing:** Vitest, React Testing Library, Jest DOM
 *   **Styling:** Tailwind CSS (utility-first for rapid UI development)
 *   **Icons:** Font Awesome (`@fortawesome/react-fontawesome`) and Lucide React (`lucide-react`)
 *   **Animations:** Framer Motion
@@ -56,6 +58,7 @@ BazzarNet is a modern, responsive e-commerce platform designed to connect local 
 
 ### Backend
 *   **Framework:** Node.js with Express
+*   **Testing:** Jest, Supertest
 *   **Database:** MongoDB (using Mongoose ODM)
 *   **Authentication:** JWT (JSON Web Tokens)
 *   **Validation:** Joi
@@ -87,6 +90,7 @@ src/
 │   │   └── ReviewForm.jsx
 │   ├── Footer.jsx
 │   ├── Header.jsx
+│   ├── Header.test.jsx  <-- NEW
 │   ├── Layout.jsx
 │   ├── Loader.jsx
 │   ├── LoginButton.jsx
@@ -157,6 +161,7 @@ src/
 │   └── VendorRoutes.jsx
 ├── services/
 │   └── api.js
+├── setupTests.js  <-- NEW
 ├── utils/
 │   └── imageUtils.js
 ├── App.jsx
@@ -216,6 +221,8 @@ backend/
 │   └── vendorRoutes.js
 ├── services/
 │   └── emailService.js
+├── tests/
+│   └── auth.test.js  <-- NEW
 ├── uploads/
 │   ├── .gitkeep
 │   ├── image-1757008714296.jpg
@@ -295,6 +302,7 @@ To get the BazzarNet application up and running on your local machine, follow th
         **Remember to replace placeholders with your actual credentials.** For `EMAIL_HOST`, `EMAIL_USER`, `EMAIL_PASS`, you can use [Ethereal Email](https://ethereal.email/) for testing during development.
     *   Start the backend development server: `npm run dev`
     *   This will start the Node.js/Express server, usually at `http://localhost:5000`. If the database is empty, it will automatically seed initial data (customers, vendors, products).
+    *   **Run Backend Tests:** While in the `backend/` directory, run: `npm test`
 
 3.  **Frontend Setup:**
     *   Navigate back to the project root directory (where the frontend `package.json` is): `cd ..`
@@ -305,6 +313,7 @@ To get the BazzarNet application up and running on your local machine, follow th
         ```
     *   Start the frontend development server: `npm run dev`
     *   This will start the Vite development server, usually at `http://localhost:5173`.
+    *   **Run Frontend Tests:** While in the project root directory, run: `npm test`
 
 4.  **Access the Application:**
     *   Open your web browser and navigate to `http://localhost:5173`.
@@ -317,3 +326,8 @@ To get the BazzarNet application up and running on your local machine, follow th
 *   **State:** Prefer React Context for global state.
 *   **Dependencies:** Avoid adding new libraries unless there's a clear and strong justification.
 *   **Backend Modularity:** Adhere to the established backend file structure (models, controllers, routes, middleware, services, utils, validators).
+*   **Code Reviews:** All code changes should go through a peer review process (e.g., via Pull Requests) to ensure quality, consistency, and knowledge sharing.
+*   **Documentation:**
+    *   **API Documentation:** Maintain up-to-date API documentation (e.g., using Swagger/OpenAPI) detailing endpoints, parameters, and responses.
+    *   **Internal Code Comments:** Use JSDoc for functions, components, and hooks, and add inline comments for complex logic or non-obvious decisions.
+    *   **Directory READMEs:** Consider adding brief `README.md` files in key sub-directories to explain their purpose and contents.
