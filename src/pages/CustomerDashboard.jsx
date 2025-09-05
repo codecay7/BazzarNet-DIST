@@ -16,7 +16,7 @@ const CustomerDashboard = () => {
   const [loading, setLoading] = useState(true);
   const [recommendedProducts, setRecommendedProducts] = useState([]);
   const [recommendedLoading, setRecommendedLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState('all'); // State for category filter in recommended section
+  const [selectedBrowseCategory, setSelectedBrowseCategory] = useState('all'); // State for category filter in 'Browse All Products' section
 
   const categories = [ // Define categories for the filter and for separate sections
     'all', 'Groceries', 'Bakery', 'Butcher', 'Cafe', 'Electronics', 
@@ -83,14 +83,6 @@ const CustomerDashboard = () => {
     }
     return stars;
   };
-
-  // Filtered recommended products based on selected category
-  const filteredRecommendedProducts = useMemo(() => {
-    if (selectedCategory === 'all') {
-      return recommendedProducts;
-    }
-    return recommendedProducts.filter(product => product.category === selectedCategory);
-  }, [recommendedProducts, selectedCategory]);
 
   // Helper component to render a product card
   const ProductCard = ({ product }) => {
@@ -208,34 +200,10 @@ const CustomerDashboard = () => {
               ))}
             </div>
 
-            {/* Recommended Products Section */}
+            {/* Recommended Products Section (without category filter) */}
             <div className="bg-black/10 p-6 rounded-xl mb-8">
               <h2 className="text-2xl font-bold mb-4">Recommended Products</h2>
               
-              {/* Category Filter Section for Recommended Products */}
-              <div className="mb-6">
-                <h3 className="text-lg font-semibold mb-3">Filter Recommended by Category:</h3>
-                <div className="flex gap-3 pb-2 overflow-x-auto whitespace-nowrap scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
-                  {categories.map(cat => (
-                    <motion.button
-                      key={cat}
-                      onClick={() => setSelectedCategory(cat)}
-                      className={`flex-shrink-0 px-5 py-2 rounded-full font-medium transition-colors duration-300 ${
-                        selectedCategory === cat
-                          ? 'bg-[var(--accent)] text-white shadow-md'
-                          : 'bg-white/10 text-[var(--text)] hover:bg-white/20'
-                      }`}
-                      whileHover={{ scale: 1.05 }}
-                      whileTap={{ scale: 0.95 }}
-                      aria-pressed={selectedCategory === cat}
-                      aria-label={`Filter recommended by ${cat === 'all' ? 'All Categories' : cat}`}
-                    >
-                      {cat === 'all' ? 'All Categories' : cat}
-                    </motion.button>
-                  ))}
-                </div>
-              </div>
-
               {recommendedLoading ? (
                 <div className="flex gap-4 overflow-x-auto pb-2">
                   {[...Array(6)].map((_, index) => (
@@ -244,34 +212,76 @@ const CustomerDashboard = () => {
                     </div>
                   ))}
                 </div>
-              ) : filteredRecommendedProducts.length > 0 ? (
+              ) : recommendedProducts.length > 0 ? (
                 <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
-                  {filteredRecommendedProducts.map(product => (
+                  {recommendedProducts.map(product => (
                     <ProductCard key={product._id} product={product} />
                   ))}
                 </div>
               ) : (
-                <p className="text-center text-lg opacity-80 py-10">No recommended products available for this category.</p>
+                <p className="text-center text-lg opacity-80 py-10">No recommended products available.</p>
               )}
             </div>
 
             {/* Browse All Products by Category Section */}
             <div className="bg-black/10 p-6 rounded-xl">
               <h2 className="text-2xl font-bold mb-6">Browse All Products by Category</h2>
-              {categories.filter(cat => cat !== 'all').map(category => (
-                <div key={category} className="mb-8 last:mb-0">
-                  <h3 className="text-xl font-semibold mb-4 border-b border-white/20 pb-2">{category}</h3>
-                  {allAppProducts.filter(p => p.category === category).length > 0 ? (
+              
+              {/* Category Filter Section for Browse All Products */}
+              <div className="mb-6">
+                <h3 className="text-lg font-semibold mb-3">Select a Category:</h3>
+                <div className="flex gap-3 pb-2 overflow-x-auto whitespace-nowrap scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
+                  {categories.map(cat => (
+                    <motion.button
+                      key={cat}
+                      onClick={() => setSelectedBrowseCategory(cat)}
+                      className={`flex-shrink-0 px-5 py-2 rounded-full font-medium transition-colors duration-300 ${
+                        selectedBrowseCategory === cat
+                          ? 'bg-[var(--accent)] text-white shadow-md'
+                          : 'bg-white/10 text-[var(--text)] hover:bg-white/20'
+                      }`}
+                      whileHover={{ scale: 1.05 }}
+                      whileTap={{ scale: 0.95 }}
+                      aria-pressed={selectedBrowseCategory === cat}
+                      aria-label={`Browse ${cat === 'all' ? 'All Categories' : cat}`}
+                    >
+                      {cat === 'all' ? 'All Categories' : cat}
+                    </motion.button>
+                  ))}
+                </div>
+              </div>
+
+              {selectedBrowseCategory === 'all' ? (
+                // Display all categories separately if 'all' is selected
+                categories.filter(cat => cat !== 'all').map(category => (
+                  <div key={category} className="mb-8 last:mb-0">
+                    <h3 className="text-xl font-semibold mb-4 border-b border-white/20 pb-2">{category}</h3>
+                    {allAppProducts.filter(p => p.category === category).length > 0 ? (
+                      <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
+                        {allAppProducts.filter(p => p.category === category).map(product => (
+                          <ProductCard key={product._id} product={product} />
+                        ))}
+                      </div>
+                    ) : (
+                      <p className="text-center text-base opacity-80 py-4">No products found in the {category} category.</p>
+                    )}
+                  </div>
+                ))
+              ) : (
+                // Display only products of the selected category
+                <div className="mb-8 last:mb-0">
+                  <h3 className="text-xl font-semibold mb-4 border-b border-white/20 pb-2">{selectedBrowseCategory}</h3>
+                  {allAppProducts.filter(p => p.category === selectedBrowseCategory).length > 0 ? (
                     <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
-                      {allAppProducts.filter(p => p.category === category).map(product => (
+                      {allAppProducts.filter(p => p.category === selectedBrowseCategory).map(product => (
                         <ProductCard key={product._id} product={product} />
                       ))}
                     </div>
                   ) : (
-                    <p className="text-center text-base opacity-80 py-4">No products found in the {category} category.</p>
+                    <p className="text-center text-base opacity-80 py-4">No products found in the {selectedBrowseCategory} category.</p>
                   )}
                 </div>
-              ))}
+              )}
             </div>
           </>
         )}
