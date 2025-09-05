@@ -90,11 +90,12 @@ src/
 │   │   └── ReviewForm.jsx
 │   ├── Footer.jsx
 │   ├── Header.jsx
-│   ├── Header.test.jsx  <-- NEW
+│   ├── Header.test.jsx
 │   ├── Layout.jsx
 │   ├── Loader.jsx
 │   ├── LoginButton.jsx
 │   ├── MobileNav.jsx
+│   ├── Modal.jsx
 │   ├── Pagination.jsx
 │   ├── ProductCard.jsx
 │   ├── ProductForm.jsx
@@ -161,7 +162,7 @@ src/
 │   └── VendorRoutes.jsx
 ├── services/
 │   └── api.js
-├── setupTests.js  <-- NEW
+├── setupTests.js
 ├── utils/
 │   └── imageUtils.js
 ├── App.jsx
@@ -222,7 +223,7 @@ backend/
 ├── services/
 │   └── emailService.js
 ├── tests/
-│   └── auth.test.js  <-- NEW
+│   └── auth.test.js
 ├── uploads/
 │   ├── .gitkeep
 │   ├── image-1757008714296.jpg
@@ -243,8 +244,6 @@ backend/
 ├── .env
 ├── AI_RULES.md
 ├── ABSTRACT.md
-├── backend/uploads/image-1757008714296.jpg
-├── backend/uploads/image-1757008924565.png
 ├── package.json
 ├── seeder.js
 └── server.js
