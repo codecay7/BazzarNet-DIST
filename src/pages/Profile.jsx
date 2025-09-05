@@ -172,15 +172,7 @@ const Profile = () => {
     }
   };
 
-  const handleImageChange = async (e) => {
-    // For now, we're handling image URLs directly in the input.
-    // If you later want to re-introduce file uploads (e.g., to local storage),
-    // this function would be updated to handle the file object.
-    // For now, it's effectively a no-op as the input is a text field.
-    // The profileImage field is updated via handleInputChange directly.
-    console.log("Image change handled via direct URL input.");
-  };
-
+  // This function is now called by the child forms' handleSubmitWrapper
   const handleSaveChanges = async () => {
     if (!validate(profileData)) {
       toast.error('Please correct the errors in the form.');
@@ -188,11 +180,8 @@ const Profile = () => {
     }
 
     try {
-      // Create a copy of profileData and remove profileImage before sending
       const dataToUpdate = { ...profileData };
-      // profileImage is now a direct URL in profileData, so it can be sent directly
-      // No need to delete dataToUpdate.profileImage;
-
+      // profileImage is already updated in profileData by the child form's upload logic
       const updatedUser = await api.userProfile.updateProfile(dataToUpdate);
       updateUserInContext(updatedUser); // Use the new function to update context
       toast.success('Profile updated successfully!');
@@ -236,7 +225,7 @@ const Profile = () => {
         <div className="flex flex-col md:flex-row justify-end items-center mb-8 gap-4">
           <button
             className="bg-[var(--accent)] w-full md:w-fit text-white border-none py-2 px-6 rounded-lg flex items-center justify-center gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300"
-            onClick={() => isEditing ? handleSaveChanges() : setIsEditing(true)}
+            onClick={() => isEditing ? null : setIsEditing(true)} // Button will trigger child form's submit
             aria-label={isEditing ? 'Save changes to profile' : 'Edit profile'}
           >
             <FontAwesomeIcon icon={isEditing ? faSave : faPen} aria-hidden="true" /> {isEditing ? 'Save Changes' : 'Edit Profile'}
@@ -248,8 +237,7 @@ const Profile = () => {
             profileData={profileData}
             setProfileData={setProfileData}
             isEditing={isEditing}
-            handleImageChange={handleImageChange}
-            handleSaveChanges={handleSaveChanges}
+            handleSaveChanges={handleSaveChanges} // Pass the wrapper function
             errors={errors}
             handleInputChange={handleInputChange}
           />
@@ -258,8 +246,7 @@ const Profile = () => {
             profileData={profileData}
             setProfileData={setProfileData}
             isEditing={isEditing}
-            handleImageChange={handleImageChange}
-            handleSaveChanges={handleSaveChanges}
+            handleSaveChanges={handleSaveChanges} // Pass the wrapper function
             errors={errors}
             handleInputChange={handleInputChange}
           />

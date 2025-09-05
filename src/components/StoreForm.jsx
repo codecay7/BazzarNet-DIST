@@ -32,8 +32,8 @@ const StoreForm = ({ onSubmit, initialData = null }) => {
     logo: '', // This will store the URL
     isActive: true,
   });
-  // Removed logoFile state as we're now using URL input directly
-  // Removed fileInputRef as we're no longer using a hidden file input
+  const [logoFile, setLogoFile] = useState(null); // State to hold the selected logo file
+  const fileInputRef = useRef(null); // Ref for the hidden file input
 
   const categories = [
     'Groceries', 'Bakery', 'Butcher', 'Cafe', 'Electronics', 
@@ -75,14 +75,12 @@ const StoreForm = ({ onSubmit, initialData = null }) => {
     } else if (!/^\d{6}$/.test(data.address.pinCode)) {
       newErrors.address = { ...newErrors.address, pinCode: 'Pin Code must be 6 digits.' };
     }
-    // Logo validation: check if it's a valid URL or empty
-    if (!data.logo.trim()) {
-      newErrors.logo = 'Store logo URL is required.';
-    } else if (!/^https?:\/\/\S+\.\S+$/.test(data.logo.trim())) { // Basic URL regex
-      newErrors.logo = 'Please provide a valid logo URL.';
+    // Logo validation: require either a file or an existing URL
+    if (!logoFile && !data.logo.trim()) {
+      newErrors.logo = 'Store logo is required (upload a file or provide a URL).';
     }
     return newErrors;
-  }, []);
+  }, [logoFile]);
 
   const { errors, validate, resetErrors } = useFormValidation(store, storeValidationLogic);
 
@@ -98,14 +96,14 @@ const StoreForm = ({ onSubmit, initialData = null }) => {
         logo: initialData.logo || '',
         isActive: initialData.isActive !== undefined ? initialData.isActive : true,
       });
-      // Removed setLogoFile(null);
+      setLogoFile(null); // Clear any selected file when editing existing store
     } else {
       setStore({
         name: '', description: '', category: '',
         address: { houseNo: '', landmark: '', city: '', state: '', pinCode: '' },
         phone: '', email: '', logo: '', isActive: true,
       });
-      // Removed setLogoFile(null);
+      setLogoFile(null); // Clear any selected file
     }
     resetErrors();
   }, [initialData, resetErrors]);
@@ -128,24 +126,62 @@ const StoreForm = ({ onSubmit, initialData = null }) => {
     }
   };
 
-  // Removed handleLogoFileChange
+  const handleLogoFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setLogoFile(e.target.files[0]);
+      // Clear the logo URL if a new file is selected
+      setStore(prev => ({ ...prev, logo: '' }));
+    } else {
+      setLogoFile(null);
+    }
+  };
+
+  const handleLogoUpload = async () => {
+    if (!logoFile) return store.logo; // If no new file, return existing URL
+
+    const formData = new FormData();
+    formData.append('image', logoFile); // Backend expects 'image' field
+
+    try {
+      const response = await api.upload.uploadImage(formData);
+      toast.success('Logo uploaded successfully!');
+      return response.filePath; // Return the URL of the uploaded image
+    } catch (error) {
+      toast.error(`Logo upload failed: ${error.message}`);
+      throw error; // Re-throw to stop form submission if upload fails
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     if (validate(store)) {
-      // No image upload logic needed here, as we're directly using the URL from the input
-      const submittedStore = {
-        ...store,
-        logo: store.logo.trim(), // Use the URL directly
-      };
-      onSubmit(submittedStore);
+      try {
+        let logoUrl = store.logo;
+        if (logoFile) {
+          logoUrl = await handleLogoUpload(); // Upload logo if a new file is selected
+        } else if (!logoUrl.trim()) {
+          toast.error('Store logo is required.');
+          return;
+        }
+
+        const submittedStore = {
+          ...store,
+          logo: logoUrl, // Use the uploaded URL or existing URL
+        };
+        onSubmit(submittedStore);
+      } catch (error) {
+        console.error('Store form submission error:', error);
+        // Error toast already shown by handleLogoUpload
+      }
     } else {
       toast.error('Please correct the errors in the form.');
     }
   };
 
   const inputClasses = "w-full p-2 rounded-lg bg-white/10 border border-black/30 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]";
+
+  const previewLogoSrc = logoFile ? URL.createObjectURL(logoFile) : getFullImageUrl(store.logo);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4" aria-label={initialData ? 'Edit Store Form' : 'Add New Store Form'}>
@@ -198,25 +234,56 @@ const StoreForm = ({ onSubmit, initialData = null }) => {
         {errors.description && <p id="storeDescription-error" className="text-red-400 text-xs mt-1">{errors.description}</p>}
       </div>
 
-      {/* Logo URL Input Section */}
+      {/* Logo Upload Section */}
       <div>
-        <label htmlFor="storeLogo" className="block text-sm font-medium mb-1">Store Logo URL</label>
-        <input 
-          type="text" // Changed to text input for URL
-          id="storeLogo"
-          name="logo" 
-          value={store.logo} 
-          onChange={handleChange} 
-          placeholder="e.g., https://example.com/store-logo.jpg"
-          className={inputClasses} 
-          aria-invalid={!!errors.logo}
-          aria-describedby={errors.logo ? "storeLogo-error" : undefined}
-        />
+        <label htmlFor="storeLogoFile" className="block text-sm font-medium mb-1">Store Logo</label>
+        <div className="flex items-center gap-4">
+          <input
+            type="file"
+            id="storeLogoFile"
+            ref={fileInputRef}
+            onChange={handleLogoFileChange}
+            className="hidden"
+            accept="image/*"
+            aria-label="Upload store logo file"
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current.click()}
+            className="bg-white/10 text-[var(--text)] py-2 px-4 rounded-lg flex items-center gap-2 font-medium hover:bg-white/20 transition-colors"
+            aria-controls="storeLogoPreview"
+          >
+            <UploadCloud size={20} /> Choose File
+          </button>
+          <span className="text-sm opacity-70">
+            {logoFile ? logoFile.name : (store.logo ? 'Existing Logo' : 'No file chosen')}
+          </span>
+        </div>
         {errors.logo && <p id="storeLogo-error" className="text-red-400 text-xs mt-1">{errors.logo}</p>}
-        {store.logo && (
-          <div className="mt-2 w-32 h-32 border border-white/30 rounded-lg overflow-hidden flex items-center justify-center">
+
+        {/* Optional: Direct Logo URL Input (if no file is selected) */}
+        {!logoFile && (
+          <div className="mt-4">
+            <label htmlFor="storeLogoUrl" className="block text-sm font-medium mb-1">Or enter Logo URL</label>
+            <input 
+              type="text" 
+              id="storeLogoUrl"
+              name="logo" 
+              value={store.logo} 
+              onChange={handleChange} 
+              placeholder="e.g., https://example.com/store-logo.jpg"
+              className={inputClasses} 
+              aria-invalid={!!errors.logo}
+              aria-describedby={errors.logo ? "storeLogoUrl-error" : undefined}
+            />
+            {errors.logo && <p id="storeLogoUrl-error" className="text-red-400 text-xs mt-1">{errors.logo}</p>}
+          </div>
+        )}
+
+        {(logoFile || store.logo) && (
+          <div id="storeLogoPreview" className="mt-4 w-32 h-32 border border-white/30 rounded-lg overflow-hidden flex items-center justify-center">
             <img 
-              src={getFullImageUrl(store.logo)} 
+              src={previewLogoSrc} 
               alt="Logo Preview" 
               className="max-w-full max-h-full object-contain" 
               onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }} // Fallback image

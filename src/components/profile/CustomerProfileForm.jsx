@@ -1,8 +1,8 @@
-import React, { useCallback, useRef } from 'react';
+import React, { useCallback, useRef, useState } from 'react'; // Added useState
 import toast from 'react-hot-toast';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPen, faUser } from '@fortawesome/free-solid-svg-icons'; // Import faUser
-import { Mail, Phone, CreditCard, Landmark, ChevronDown, UploadCloud } from 'lucide-react';
+import { faUser } from '@fortawesome/free-solid-svg-icons'; // Removed faPen
+import { Mail, Phone, CreditCard, Landmark, ChevronDown, UploadCloud } from 'lucide-react'; // Added UploadCloud
 import useFormValidation from '../../hooks/useFormValidation';
 import * as api from '../../services/api';
 import placeholderImage from '../../assets/placeholder.png'; // Import placeholder image
@@ -19,16 +19,62 @@ const indianStates = [
 
 const inputClasses = "w-full p-2 rounded-lg bg-white/10 border border-black/30 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] text-[var(--text)]";
 
-const CustomerProfileForm = ({ profileData, setProfileData, isEditing, handleImageChange, handleSaveChanges, errors, handleInputChange }) => {
-  // Removed fileInputRef as we're no longer using a hidden file input
+const CustomerProfileForm = ({ profileData, setProfileData, isEditing, handleSaveChanges, errors, handleInputChange }) => {
+  const [profileImageFile, setProfileImageFile] = useState(null); // State for profile image file
+  const fileInputRef = useRef(null); // Ref for the hidden file input
+
+  const handleProfileImageFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setProfileImageFile(e.target.files[0]);
+      // Clear the image URL if a new file is selected
+      setProfileData(prev => ({ ...prev, profileImage: '' }));
+    } else {
+      setProfileImageFile(null);
+    }
+  };
+
+  const handleProfileImageUpload = async () => {
+    if (!profileImageFile) return profileData.profileImage; // If no new file, return existing URL
+
+    const formData = new FormData();
+    formData.append('image', profileImageFile); // Backend expects 'image' field
+
+    try {
+      const response = await api.userProfile.uploadProfileImage(formData);
+      toast.success('Profile image uploaded successfully!');
+      return response.profileImage; // Backend returns the updated user object with new profileImage
+    } catch (error) {
+      toast.error(`Profile image upload failed: ${error.message}`);
+      throw error; // Re-throw to stop form submission if upload fails
+    }
+  };
+
+  const handleSubmitWrapper = async (e) => {
+    e.preventDefault();
+    try {
+      let imageUrl = profileData.profileImage;
+      if (profileImageFile) {
+        imageUrl = await handleProfileImageUpload(); // Upload image if a new file is selected
+        // Update profileData with the new image URL before saving other changes
+        setProfileData(prev => ({ ...prev, profileImage: imageUrl }));
+      }
+      // Now call the original handleSaveChanges to save other form data
+      handleSaveChanges();
+    } catch (error) {
+      console.error('Profile form submission error:', error);
+      // Error toast already shown by handleProfileImageUpload
+    }
+  };
+
+  const previewImageSrc = profileImageFile ? URL.createObjectURL(profileImageFile) : getFullImageUrl(profileData.profileImage);
 
   return (
-    <form onSubmit={(e) => { e.preventDefault(); handleSaveChanges(); }} className="space-y-6">
+    <form onSubmit={handleSubmitWrapper} className="space-y-6">
       <div className="flex flex-col items-center text-center max-w-lg mx-auto mb-8">
         <div className="relative w-24 h-24 mb-4">
-          {profileData.profileImage ? (
+          {(profileImageFile || profileData.profileImage) ? (
             <img 
-              src={getFullImageUrl(profileData.profileImage)} 
+              src={previewImageSrc} 
               alt="User Profile" 
               className="w-24 h-24 rounded-full object-cover border-4 border-white/30 shadow-lg" 
               onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }} // Fallback image
@@ -39,19 +85,18 @@ const CustomerProfileForm = ({ profileData, setProfileData, isEditing, handleIma
             </div>
           )}
           {isEditing && (
-            <div className="absolute bottom-0 right-0 bg-white/80 rounded-full p-1.5 text-gray-800 hover:bg-white shadow-md">
-              <label htmlFor="profileImageUrl" className="sr-only">Profile Image URL</label>
+            <div className="absolute bottom-0 right-0 bg-white/80 rounded-full p-1.5 text-gray-800 hover:bg-white shadow-md cursor-pointer">
+              <label htmlFor="profileImageFile" className="sr-only">Upload Profile Image</label>
               <input
-                type="text"
-                id="profileImageUrl"
-                name="profileImage"
-                value={profileData.profileImage || ''}
-                onChange={handleInputChange} // Use handleInputChange for direct URL update
-                placeholder="Image URL"
-                className="absolute inset-0 opacity-0 cursor-pointer" // Make it invisible but clickable
-                aria-label="Enter profile image URL"
+                type="file"
+                id="profileImageFile"
+                ref={fileInputRef}
+                onChange={handleProfileImageFileChange}
+                className="absolute inset-0 opacity-0 cursor-pointer"
+                accept="image/*"
+                aria-label="Upload new profile image"
               />
-              <FontAwesomeIcon icon={faPen} size="sm" aria-hidden="true" />
+              <UploadCloud size={16} aria-hidden="true" />
             </div>
           )}
         </div>

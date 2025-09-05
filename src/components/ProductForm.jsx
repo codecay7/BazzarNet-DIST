@@ -17,8 +17,8 @@ const ProductForm = ({ onSubmit, initialData = null }) => {
     description: '',
     image: '', // This will store the URL
   });
-  // Removed imageFile state as we're now using URL input directly
-  // Removed fileInputRef as we're no longer using a hidden file input
+  const [imageFile, setImageFile] = useState(null); // State to hold the selected image file
+  const fileInputRef = useRef(null); // Ref for the hidden file input
 
   const categories = [
     'Groceries', 'Bakery', 'Butcher', 'Cafe', 'Electronics', 
@@ -60,14 +60,12 @@ const ProductForm = ({ onSubmit, initialData = null }) => {
     } else if (data.description.trim().length < 10) { // Updated validation for description length
       newErrors.description = 'Description must be at least 10 characters long.';
     }
-    // Image validation: check if it's a valid URL or empty
-    if (!data.image.trim()) {
-      newErrors.image = 'Product image URL is required.';
-    } else if (!/^https?:\/\/\S+\.\S+$/.test(data.image.trim())) { // Basic URL regex
-      newErrors.image = 'Please provide a valid image URL.';
+    // Image validation: require either a file or an existing URL
+    if (!imageFile && !data.image.trim()) {
+      newErrors.image = 'Product image is required (upload a file or provide a URL).';
     }
     return newErrors;
-  }, []);
+  }, [imageFile]);
 
   // Use the custom validation hook
   const { errors, validate, resetErrors } = useFormValidation(product, productValidationLogic);
@@ -84,7 +82,7 @@ const ProductForm = ({ onSubmit, initialData = null }) => {
         description: initialData.description || '',
         image: initialData.image || '', // Keep existing image URL
       });
-      // Removed setImageFile(null);
+      setImageFile(null); // Clear any selected file when editing existing product
     } else {
       // Reset form for new product
       setProduct({
@@ -92,7 +90,7 @@ const ProductForm = ({ onSubmit, initialData = null }) => {
         unit: 'pc', // Reset unit
         category: '', description: '', image: '',
       });
-      // Removed setImageFile(null);
+      setImageFile(null); // Clear any selected file
     }
     resetErrors(); // Clear errors on initialData change
   }, [initialData, resetErrors]);
@@ -102,29 +100,67 @@ const ProductForm = ({ onSubmit, initialData = null }) => {
     setProduct(prev => ({ ...prev, [name]: value }));
   };
 
-  // Removed handleImageFileChange
+  const handleImageFileChange = (e) => {
+    if (e.target.files && e.target.files[0]) {
+      setImageFile(e.target.files[0]);
+      // Clear the image URL if a new file is selected
+      setProduct(prev => ({ ...prev, image: '' }));
+    } else {
+      setImageFile(null);
+    }
+  };
+
+  const handleImageUpload = async () => {
+    if (!imageFile) return product.image; // If no new file, return existing URL
+
+    const formData = new FormData();
+    formData.append('image', imageFile);
+
+    try {
+      const response = await api.upload.uploadImage(formData);
+      toast.success('Image uploaded successfully!');
+      return response.filePath; // Return the URL of the uploaded image
+    } catch (error) {
+      toast.error(`Image upload failed: ${error.message}`);
+      throw error; // Re-throw to stop form submission if upload fails
+    }
+  };
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     
     // Validate with current product state
     if (validate(product)) {
-      // No image upload logic needed here, as we're directly using the URL from the input
-      const submittedProduct = {
-        ...product,
-        // Removed id: initialData?.id || Date.now(), as backend generates _id
-        price: parseFloat(product.price),
-        originalPrice: product.originalPrice ? parseFloat(product.originalPrice) : null,
-        stock: parseInt(product.stock),
-        image: product.image.trim(), // Use the URL directly
-      };
-      onSubmit(submittedProduct);
+      try {
+        let imageUrl = product.image;
+        if (imageFile) {
+          imageUrl = await handleImageUpload(); // Upload image if a new file is selected
+        } else if (!imageUrl.trim()) {
+          // If no file and no URL, it should have been caught by validation, but double-check
+          toast.error('Product image is required.');
+          return;
+        }
+
+        const submittedProduct = {
+          ...product,
+          price: parseFloat(product.price),
+          originalPrice: product.originalPrice ? parseFloat(product.originalPrice) : null,
+          stock: parseInt(product.stock),
+          image: imageUrl, // Use the uploaded URL or existing URL
+        };
+        onSubmit(submittedProduct);
+      } catch (error) {
+        console.error('Product form submission error:', error);
+        // Error toast already shown by handleImageUpload
+      }
     } else {
       toast.error('Please correct the errors in the form.');
     }
   };
 
   const inputClasses = "w-full p-2 rounded-lg bg-white/10 border border-black/30 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]";
+
+  const previewImageSrc = imageFile ? URL.createObjectURL(imageFile) : getFullImageUrl(product.image);
 
   return (
     <form onSubmit={handleSubmit} className="space-y-4" aria-label={initialData ? 'Edit Product Form' : 'Add New Product Form'}>
@@ -162,25 +198,56 @@ const ProductForm = ({ onSubmit, initialData = null }) => {
         </div>
       </div>
       
-      {/* Image URL Input Section */}
+      {/* Image Upload Section */}
       <div>
-        <label htmlFor="productImage" className="block text-sm font-medium mb-1">Product Image URL</label>
-        <input 
-          type="text" // Changed to text input for URL
-          id="productImage"
-          name="image" 
-          value={product.image} 
-          onChange={handleChange} 
-          placeholder="e.g., https://example.com/image.jpg"
-          className={inputClasses} 
-          aria-invalid={!!errors.image}
-          aria-describedby={errors.image ? "productImage-error" : undefined}
-        />
+        <label htmlFor="productImageFile" className="block text-sm font-medium mb-1">Product Image</label>
+        <div className="flex items-center gap-4">
+          <input
+            type="file"
+            id="productImageFile"
+            ref={fileInputRef}
+            onChange={handleImageFileChange}
+            className="hidden"
+            accept="image/*"
+            aria-label="Upload product image file"
+          />
+          <button
+            type="button"
+            onClick={() => fileInputRef.current.click()}
+            className="bg-white/10 text-[var(--text)] py-2 px-4 rounded-lg flex items-center gap-2 font-medium hover:bg-white/20 transition-colors"
+            aria-controls="productImagePreview"
+          >
+            <UploadCloud size={20} /> Choose File
+          </button>
+          <span className="text-sm opacity-70">
+            {imageFile ? imageFile.name : (product.image ? 'Existing Image' : 'No file chosen')}
+          </span>
+        </div>
         {errors.image && <p id="productImage-error" className="text-red-400 text-xs mt-1">{errors.image}</p>}
-        {product.image && (
-          <div className="mt-2 w-32 h-32 border border-white/30 rounded-lg overflow-hidden flex items-center justify-center">
+        
+        {/* Optional: Direct Image URL Input (if no file is selected) */}
+        {!imageFile && (
+          <div className="mt-4">
+            <label htmlFor="productImageUrl" className="block text-sm font-medium mb-1">Or enter Image URL</label>
+            <input 
+              type="text" 
+              id="productImageUrl"
+              name="image" 
+              value={product.image} 
+              onChange={handleChange} 
+              placeholder="e.g., https://example.com/image.jpg"
+              className={inputClasses} 
+              aria-invalid={!!errors.image}
+              aria-describedby={errors.image ? "productImageUrl-error" : undefined}
+            />
+            {errors.image && <p id="productImageUrl-error" className="text-red-400 text-xs mt-1">{errors.image}</p>}
+          </div>
+        )}
+
+        {(imageFile || product.image) && (
+          <div id="productImagePreview" className="mt-4 w-32 h-32 border border-white/30 rounded-lg overflow-hidden flex items-center justify-center">
             <img 
-              src={getFullImageUrl(product.image)} 
+              src={previewImageSrc} 
               alt="Image Preview" 
               className="max-w-full max-h-full object-contain" 
               onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }} // Fallback image
