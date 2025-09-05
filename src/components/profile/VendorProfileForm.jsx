@@ -1,7 +1,7 @@
 import React, { useCallback, useRef, useState } from 'react';
 import toast from 'react-hot-toast';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faStore, faSpinner } from '@fortawesome/free-solid-svg-icons'; // Added faSpinner
+import { faStore, faSpinner, faSave } from '@fortawesome/free-solid-svg-icons'; // Added faSpinner, faSave
 import { Building2, Mail, Phone, Landmark, ChevronDown, FileText, UploadCloud } from 'lucide-react';
 import useFormValidation from '../../hooks/useFormValidation';
 import * as api from '../../services/api';
@@ -24,14 +24,15 @@ const categories = [
 
 const inputClasses = "w-full p-2 rounded-lg bg-white/10 border border-black/30 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] text-[var(--text)]";
 
-const VendorProfileForm = ({ profileData, setProfileData, isEditing, handleSaveChanges, errors, handleInputChange, isSaving, setIsSaving }) => {
+const VendorProfileForm = ({ profileData, setProfileData, isEditing, handleSaveChanges, errors, handleInputChange, originalProfileData, setIsEditing, resetErrors }) => {
   const [profileImageFile, setProfileImageFile] = useState(null);
   const fileInputRef = useRef(null);
+  const [isSaving, setIsSaving] = useState(false); // Local saving state for the form
 
   const handleProfileImageFileChange = (e) => {
     if (e.target.files && e.target.files[0]) {
       setProfileImageFile(e.target.files[0]);
-      setProfileData(prev => ({ ...prev, profileImage: '' }));
+      setProfileData(prev => ({ ...prev, profileImage: '' })); // Clear URL if new file selected
     } else {
       setProfileImageFile(null);
     }
@@ -54,19 +55,39 @@ const VendorProfileForm = ({ profileData, setProfileData, isEditing, handleSaveC
   };
 
   const handleSubmitWrapper = async (e) => {
-    e.preventDefault(); // Prevent default form submission
-    setIsSaving(true); // Start saving feedback
+    e.preventDefault();
+    setIsSaving(true); // Start local saving feedback
+
     try {
+      // Check for changes before proceeding
+      const hasFormDataChanged = JSON.stringify(profileData) !== JSON.stringify(originalProfileData);
+      const hasImageFileChanged = !!profileImageFile;
+
+      if (!hasFormDataChanged && !hasImageFileChanged) {
+        toast('No changes detected.', { icon: 'ℹ️' });
+        setIsEditing(false); // Exit edit mode
+        resetErrors();
+        return;
+      }
+
       let imageUrl = profileData.profileImage;
-      if (profileImageFile) {
+      if (hasImageFileChanged) {
         imageUrl = await handleProfileImageUpload();
+        // Update profileData with the new image URL before calling parent's save
         setProfileData(prev => ({ ...prev, profileImage: imageUrl }));
       }
-      await handleSaveChanges(); // Call the parent's save function
+
+      // Call parent's save function, which will perform API call and update context
+      const success = await handleSaveChanges();
+      if (success) {
+        // Parent already handles setIsEditing(false) and resetErrors() on success
+        setProfileImageFile(null); // Clear file input state
+      }
     } catch (error) {
       console.error('Vendor profile form submission error:', error);
+      // Error toast already shown by handleProfileImageUpload or handleSaveChanges
     } finally {
-      setIsSaving(false); // End saving feedback
+      setIsSaving(false); // End local saving feedback
     }
   };
 
@@ -226,10 +247,10 @@ const VendorProfileForm = ({ profileData, setProfileData, isEditing, handleSaveC
                   <input 
                     type="text" 
                     name="upiId" 
-                    id="upiId"
                     value={profileData.upiId} 
                     onChange={handleInputChange} 
                     className={inputClasses} 
+                    placeholder="UPI ID" 
                     aria-label="UPI ID"
                     aria-invalid={!!errors.upiId}
                     aria-describedby={errors.upiId ? "upiId-error" : undefined}
@@ -312,6 +333,19 @@ const VendorProfileForm = ({ profileData, setProfileData, isEditing, handleSaveC
           </div>
         </div>
       </div>
+      {isEditing && (
+        <div className="flex justify-end mt-8">
+          <button
+            type="submit"
+            className="bg-[var(--accent)] text-white border-none py-2 px-6 rounded-lg flex items-center justify-center gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300"
+            disabled={isSaving}
+            aria-label="Save changes to profile"
+          >
+            {isSaving ? <FontAwesomeIcon icon={faSpinner} spin className="mr-2" /> : <FontAwesomeIcon icon={faSave} aria-hidden="true" />}
+            {isSaving ? 'Saving...' : 'Save Changes'}
+          </button>
+        </div>
+      )}
     </form>
   );
 };
