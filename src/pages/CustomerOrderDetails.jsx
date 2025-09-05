@@ -1,11 +1,13 @@
-import React, { useContext, useMemo } from 'react';
+import React, { useContext, useState, useEffect, useMemo } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { AppContext } from '../context/AppContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faBox, faTruck, faHome, faUndoAlt } from '@fortawesome/free-solid-svg-icons'; // Added faUndoAlt icon for refund
+import { faBox, faTruck, faHome, faUndoAlt, faSpinner } from '@fortawesome/free-solid-svg-icons'; // Added faSpinner for loading
 import placeholderImage from '../assets/placeholder.png'; // Import placeholder image
 import { getFullImageUrl } from '../utils/imageUtils'; // Import utility
 import QRCode from 'react-qr-code'; // Ensure QRCode is imported
+import * as api from '../services/api'; // Import API service
+import toast from 'react-hot-toast'; // Import toast for error messages
 
 // Helper function to format ISO timestamp
 const formatTimestamp = (isoString) => {
@@ -19,27 +21,68 @@ const formatTimestamp = (isoString) => {
 
 const CustomerOrderDetails = () => {
   const { orderId } = useParams();
-  const { orders } = useContext(AppContext);
-  const order = orders.find(o => o._id === orderId); // Find order using _id
+  const { orders } = useContext(AppContext); // Keep orders from context for initial check
+  const [localOrder, setLocalOrder] = useState(null); // Local state for the specific order
+  const [loadingLocalOrder, setLoadingLocalOrder] = useState(true); // Loading state for local fetch
 
-  if (!order) {
+  // Determine which order object to use: localOrder if fetched, otherwise from context
+  const currentOrder = localOrder || orders.find(o => o._id === orderId);
+
+  useEffect(() => {
+    const fetchSpecificOrder = async () => {
+      setLoadingLocalOrder(true);
+      try {
+        const fetchedOrder = await api.customer.getOrderById(orderId);
+        setLocalOrder(fetchedOrder);
+      } catch (error) {
+        console.error('Failed to fetch specific order details:', error);
+        toast.error(`Failed to load order details: ${error.message}`);
+        setLocalOrder(null); // Ensure localOrder is null on error
+      } finally {
+        setLoadingLocalOrder(false);
+      }
+    };
+
+    // Fetch the specific order if it's not available in the context's orders array
+    // or if the context's orders array is empty (e.g., direct navigation)
+    if (!currentOrder) {
+      fetchSpecificOrder();
+    } else {
+      setLoadingLocalOrder(false); // If found in context, no need to fetch, and not loading
+    }
+  }, [orderId, orders]); // Depend on orderId and context's orders array
+
+  if (loadingLocalOrder) {
     return (
       <section className="w-full max-w-[1200px] my-10 text-center">
-        <h2 className="text-2xl font-bold">Order not found.</h2>
-        <Link to="/orders" className="text-[var(--accent)] hover:underline">Back to Your Orders</Link>
+        <div className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-8 mx-4 flex flex-col items-center justify-center min-h-[300px]">
+          <FontAwesomeIcon icon={faSpinner} spin className="text-4xl text-[var(--accent)] mb-4" aria-hidden="true" />
+          <h2 className="text-2xl font-bold">Loading Order Details...</h2>
+        </div>
+      </section>
+    );
+  }
+
+  if (!currentOrder) {
+    return (
+      <section className="w-full max-w-[1200px] my-10 text-center">
+        <div className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-8 mx-4">
+          <h2 className="text-2xl font-bold mb-4">Order not found.</h2>
+          <Link to="/orders" className="text-[var(--accent)] hover:underline">Back to Your Orders</Link>
+        </div>
       </section>
     );
   }
 
   const steps = useMemo(() => {
-    const currentStatus = order?.orderStatus || ''; // Use orderStatus
+    const currentStatus = currentOrder?.orderStatus || ''; // Use currentOrder
     return [
       { name: 'Ordered', completed: true, icon: faBox },
-      { name: 'Processing', completed: ['Processing', 'Shipped', 'Delivered', 'Refunded'].includes(currentStatus), icon: faBox }, // Added Processing, Refunded
+      { name: 'Processing', completed: ['Processing', 'Shipped', 'Delivered', 'Refunded'].includes(currentStatus), icon: faBox },
       { name: 'Shipped', completed: ['Shipped', 'Delivered', 'Refunded'].includes(currentStatus), icon: faTruck },
       { name: 'Delivered', completed: currentStatus === 'Delivered', icon: faHome },
     ];
-  }, [order?.orderStatus]); // Dependency on order.orderStatus
+  }, [currentOrder?.orderStatus]); // Dependency on currentOrder.orderStatus
 
   const getStatusClasses = (status) => {
     switch (status) {
@@ -48,32 +91,32 @@ const CustomerOrderDetails = () => {
       case 'Shipped': return 'text-blue-400';
       case 'Delivered': return 'text-green-400';
       case 'Cancelled': return 'text-red-400';
-      case 'Refunded': return 'text-purple-400'; // Specific color for refunded
+      case 'Refunded': return 'text-purple-400';
       default: return 'text-[var(--accent)]';
     }
   };
 
-  const isRefunded = order.orderStatus === 'Refunded';
-  const isCancelled = order.orderStatus === 'Cancelled';
+  const isRefunded = currentOrder.orderStatus === 'Refunded';
+  const isCancelled = currentOrder.orderStatus === 'Cancelled';
 
   return (
     <section className="w-full max-w-[1200px] my-10">
       <div className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-8 mx-4">
         <h2 className="text-3xl font-bold mb-2">Order Details</h2>
-        <p className="text-lg text-[var(--text)] opacity-80 mb-2">Order ID: {order._id}</p>
-        <p className="text-lg text-[var(--text)] opacity-80 mb-8">Order Placed: {formatTimestamp(order.createdAt)}</p> {/* Display formatted timestamp */}
+        <p className="text-lg text-[var(--text)] opacity-80 mb-2">Order ID: {currentOrder._id}</p>
+        <p className="text-lg text-[var(--text)] opacity-80 mb-8">Order Placed: {formatTimestamp(currentOrder.createdAt)}</p>
 
         {/* Order Status & Tracker */}
         <div className="bg-black/10 p-6 rounded-xl mb-8">
           <h3 className="text-xl font-semibold mb-6">
-            Order Status: <span className={`font-bold ${getStatusClasses(order.orderStatus)}`}>{order.orderStatus}</span>
+            Order Status: <span className={`font-bold ${getStatusClasses(currentOrder.orderStatus)}`}>{currentOrder.orderStatus}</span>
           </h3>
 
           {isRefunded ? (
             <div className="text-center py-4">
               <FontAwesomeIcon icon={faUndoAlt} className="text-6xl text-purple-400 mb-4" aria-hidden="true" />
               <p className="text-2xl font-bold text-purple-400">This order has been refunded.</p>
-              <p className="text-lg opacity-80 mt-2">The total amount of ₹{order.totalPrice.toFixed(2)} has been processed for refund.</p>
+              <p className="text-lg opacity-80 mt-2">The total amount of ₹{currentOrder.totalPrice.toFixed(2)} has been processed for refund.</p>
             </div>
           ) : isCancelled ? (
             <div className="text-center py-4">
@@ -82,7 +125,7 @@ const CustomerOrderDetails = () => {
             </div>
           ) : (
             steps && steps.length > 0 && (
-              <div className="flex items-center" role="progressbar" aria-valuenow={steps.filter(s => s.completed).length} aria-valuemin="0" aria-valuemax={steps.length} aria-label={`Order ${order._id} progress`}>
+              <div className="flex items-center" role="progressbar" aria-valuenow={steps.filter(s => s.completed).length} aria-valuemin="0" aria-valuemax={steps.length} aria-label={`Order ${currentOrder._id} progress`}>
                 {steps.map((step, index) => (
                   <React.Fragment key={step.name}>
                     <div className="flex flex-col items-center">
@@ -104,15 +147,15 @@ const CustomerOrderDetails = () => {
         {/* Payment & Transaction Details */}
         <div className="bg-black/10 p-6 rounded-xl mb-8">
           <h3 className="text-xl font-semibold mb-4">Payment Information</h3>
-          <p className="mb-2"><strong>Payment Method:</strong> {order.paymentMethod}</p>
-          <p><strong>Transaction ID:</strong> {order.transactionId || 'N/A'}</p>
+          <p className="mb-2"><strong>Payment Method:</strong> {currentOrder.paymentMethod}</p>
+          <p><strong>Transaction ID:</strong> {currentOrder.transactionId || 'N/A'}</p>
         </div>
 
         {/* Items List */}
         <div className="bg-black/10 p-6 rounded-xl">
           <h3 className="text-xl font-semibold mb-4">Items in Your Order</h3>
           <div className="space-y-4" role="list">
-            {(order.items || []).map(item => (
+            {(currentOrder.items || []).map(item => (
               <div key={item.product} className="flex items-center gap-4 bg-black/10 p-3 rounded-lg" role="listitem" aria-label={`Item: ${item.name}, Quantity: ${item.quantity}, Price: ₹{(item.price * item.quantity).toFixed(2)}`}>
                 <img 
                   src={getFullImageUrl(item.image)} 
@@ -122,26 +165,26 @@ const CustomerOrderDetails = () => {
                 />
                 <div className="flex-grow">
                   <p className="font-semibold">{item.name}</p>
-                  <p className="text-sm opacity-80">Quantity: {item.quantity} {item.unit}</p> {/* Display unit */}
+                  <p className="text-sm opacity-80">Quantity: {item.quantity} {item.unit}</p>
                 </div>
                 <p className="font-semibold">₹{(item.price * item.quantity).toFixed(2)}</p>
               </div>
             ))}
           </div>
           <div className="text-right mt-4 pt-4 border-t border-white/20">
-            <p className="text-xl font-bold">Total: ₹{order.totalPrice.toFixed(2)}</p>
+            <p className="text-xl font-bold">Total: ₹{currentOrder.totalPrice.toFixed(2)}</p>
           </div>
         </div>
         
         {/* OTP and QR Code Section (only for non-refunded/cancelled orders) */}
-        {!isRefunded && !isCancelled && order.deliveryOtp && (
+        {!isRefunded && !isCancelled && currentOrder.deliveryOtp && (
           <div className="bg-black/10 p-6 rounded-lg max-w-md mx-auto mt-8">
               <h3 className="text-xl font-semibold mb-4">Delivery Confirmation</h3>
               <p className="mb-4">Please show this QR code to the delivery person to confirm your order.</p>
               <div className="flex justify-center mb-4 p-2 bg-white rounded-lg">
-                  <QRCode value={JSON.stringify({ orderId: order._id, deliveryOtp: order.deliveryOtp || 'N/A' })} size={180} level="H" className="rounded-lg" aria-label={`QR code for order ${order._id} with OTP ${order.deliveryOtp || 'N/A'}`} />
+                  <QRCode value={JSON.stringify({ orderId: currentOrder._id, deliveryOtp: currentOrder.deliveryOtp || 'N/A' })} size={180} level="H" className="rounded-lg" aria-label={`QR code for order ${currentOrder._id} with OTP ${currentOrder.deliveryOtp || 'N/A'}`} />
               </div>
-              <p className="text-lg font-bold">OTP: <span className="text-[var(--accent)]">{order.deliveryOtp || 'N/A'}</span></p>
+              <p className="text-lg font-bold">OTP: <span className="text-[var(--accent)]">{currentOrder.deliveryOtp || 'N/A'}</span></p>
               <p className="text-sm opacity-80 mt-2">The delivery person will scan this QR or ask for the OTP.</p>
           </div>
         )}
