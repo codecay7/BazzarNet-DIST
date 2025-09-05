@@ -44,10 +44,10 @@ const LandingPage = () => {
       animate={pageLoaded ? "visible" : "hidden"}
     >
       {/* Background Blobs / Premium Look */}
-      <div className="absolute top-10 left-10 w-72 h-72 bg-[var(--accent)] rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob z-0"></div>
-      <div className="absolute top-10 right-10 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000 z-0"></div>
-      <div className="absolute bottom-10 left-10 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000 z-0"></div>
-      <div className="absolute top-1/2 right-10 -translate-y-1/2 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-1000 z-0"></div>
+      <div className="absolute top-10 left-10 w-72 h-72 bg-[var(--accent)] rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob z-[-1]"></div>
+      <div className="absolute top-10 right-10 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000 z-[-1]"></div>
+      <div className="absolute bottom-10 left-10 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000 z-[-1]"></div>
+      <div className="absolute top-1/2 right-10 -translate-y-1/2 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-1000 z-[-1]"></div>
 
       {/* Hero Section */}
       <motion.div
@@ -55,7 +55,7 @@ const LandingPage = () => {
         variants={containerVariants}
       >
         <motion.h1
-          className="text-6xl sm:text-7xl lg:text-8xl font-black leading-tight md:leading-snug mb-4 tracking-tight"
+          className="text-7xl sm:text-8xl lg:text-9xl font-black leading-tight md:leading-snug mb-4 tracking-tight"
           variants={itemVariants}
         >
           Shop Locally, Delivered Fast with
@@ -63,7 +63,7 @@ const LandingPage = () => {
             BazzarNet
           </span>
         </motion.h1>
-        <motion.p className="text-xl md:text-2xl lg:text-3xl font-medium mb-5" variants={itemVariants}>
+        <motion.p className="text-2xl md:text-3xl lg:text-4xl font-medium mb-5" variants={itemVariants}>
           Support your favorite local stores with quick doorstep delivery.
         </motion.p>
       </motion.div>
@@ -71,7 +71,7 @@ const LandingPage = () => {
       {/* How It Works Section */}
       <div className="container mx-auto px-5 py-20 relative z-10">
         <h2 className="text-3xl font-bold mb-10 md:text-4xl text-center">How It Works</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 justify-items-center">
           <motion.div
             className="bg-[var(--card-bg)] backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-[0_8px_40px_var(--shadow)] hover:-translate-y-1 transition-transform duration-300"
             variants={cardVariants}
@@ -138,7 +138,7 @@ const LandingPage = () => {
       {/* Why BazzarNet Section */}
       <div className="container mx-auto px-5 py-20 relative z-10">
         <h2 className="text-3xl font-bold mb-10 md:text-4xl text-center">Why BazzarNet?</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8 justify-items-center">
           <motion.div
             className="bg-[var(--card-bg)] backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-[0_8px_40px_var(--shadow)] hover:-translate-y-1 transition-transform duration-300"
             variants={cardVariants}
