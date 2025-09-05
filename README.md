@@ -68,57 +68,180 @@ BazzarNet is a modern, responsive e-commerce platform designed to connect local 
 
 The project follows a clear and modular structure for both frontend and backend, promoting maintainability and scalability.
 
-### Frontend (`./src/`)
-*   `assets/`: Images and other media.
-*   `components/`: Reusable UI components (e.g., `Header`, `Footer`, `Modal`, `StatCard`, `ProductForm`, `Pagination`, `SkeletonCard`, `MobileNav`, `SupportForm`, `ReviewForm`, `ProductCard`, `CustomerProfileForm`, `VendorProfileForm`, `LoginButton`, `Loader`, `CheckoutSteps`, `CouponSection`, `OrderSummary`, `QrPaymentForm`).
-*   `context/`: `AppContext.jsx` for global state management, centralizing authentication, theme, cart, wishlist, products, stores, orders, users, and coupons.
-*   `hooks/`: Custom React hooks encapsulating logic (e.g., `useFormValidation`, `useAuth`, `useProducts`, `useCart`, `useOrders`, `useUsers`, `useCoupons`).
-*   `pages/`: Top-level views/pages of the application (e.g., `Dashboard`, `Products`, `Login`, `Register`, `Profile`, `Orders`, `AdminDashboard`, `ManageProducts`).
-*   `routes/`: Defines application routing based on user roles (`PublicRoutes`, `CustomerRoutes`, `VendorRoutes`, `AdminRoutes`).
-*   `services/`: `api.js` for abstracting all frontend-backend API interactions.
-*   `utils/`: Small, pure utility functions (e.g., `imageUtils.js` for image URL handling).
-*   `App.jsx`: Main application component, responsible for rendering routes based on user authentication and role.
-*   `main.jsx`: Entry point for the React application.
-*   `index.css`: Global Tailwind CSS imports and custom CSS variables for theming.
+### Frontend (`./src/`) Folder Structure
+```
+src/
+├── assets/
+│   └── placeholder.png
+├── components/
+│   ├── checkout/
+│   │   ├── CheckoutSteps.jsx
+│   │   ├── CouponSection.jsx
+│   │   ├── OrderSummary.jsx
+│   │   └── QrPaymentForm.jsx
+│   ├── profile/
+│   │   ├── CustomerProfileForm.jsx
+│   │   └── VendorProfileForm.jsx
+│   ├── reviews/
+│   │   ├── ProductReviews.jsx
+│   │   └── ReviewForm.jsx
+│   ├── Footer.jsx
+│   ├── Header.jsx
+│   ├── Layout.jsx
+│   ├── Loader.jsx
+│   ├── LoginButton.jsx
+│   ├── MobileNav.jsx
+│   ├── Pagination.jsx
+│   ├── ProductCard.jsx
+│   ├── ProductForm.jsx
+│   ├── PublicHeader.jsx
+│   ├── PublicLayout.jsx
+│   ├── SkeletonCard.jsx
+│   ├── SkeletonStoreCard.jsx
+│   ├── SkeletonText.jsx
+│   ├── StatCard.jsx
+│   ├── StoreForm.jsx
+│   ├── SupportForm.jsx
+│   ├── UserSignupForm.jsx
+│   └── VendorRegistrationForm.jsx
+├── context/
+│   └── AppContext.jsx
+├── hooks/
+│   ├── useAdminProducts.js
+│   ├── useAdminStores.js
+│   ├── useAuth.js
+│   ├── useCart.js
+│   ├── useCoupons.js
+│   ├── useFormValidation.js
+│   ├── useOrders.js
+│   ├── useProducts.js
+│   ├── useStores.js
+│   ├── useTheme.js
+│   ├── useUsers.js
+│   ├── useUtils.js
+│   ├── useVendorProducts.js
+│   └── useWishlist.js
+├── pages/
+│   ├── About.jsx
+│   ├── AdminDashboard.jsx
+│   ├── AdminOrderManagement.jsx
+│   ├── AdminProductManagement.jsx
+│   ├── AdminStoreManagement.jsx
+│   ├── AdminUserManagement.jsx
+│   ├── Cart.jsx
+│   ├── Checkout.jsx
+│   ├── CustomerDashboard.jsx
+│   ├── CustomerOrderDetails.jsx
+│   ├── Dashboard.jsx
+│   ├── FAQ.jsx
+│   ├── ForgotPassword.jsx
+│   ├── Help.jsx
+│   ├── LandingPage.jsx
+│   ├── Login.jsx
+│   ├── ManageProducts.jsx
+│   ├── OrderConfirmation.jsx
+│   ├── OrderDetails.jsx
+│   ├── Orders.jsx
+│   ├── Payments.jsx
+│   ├── Products.jsx
+│   ├── Profile.jsx
+│   ├── Register.jsx
+│   ├── ResetPassword.jsx
+│   ├── StorePage.jsx
+│   ├── Stores.jsx
+│   └── Wishlist.jsx
+├── routes/
+│   ├── AdminRoutes.jsx
+│   ├── CustomerRoutes.jsx
+│   ├── PublicRoutes.jsx
+│   └── VendorRoutes.jsx
+├── services/
+│   └── api.js
+├── utils/
+│   └── imageUtils.js
+├── App.jsx
+└── main.jsx
+```
 
-### Backend (`./backend/`)
-*   `config/`:
-    *   `db.js`: Database connection setup (MongoDB).
-    *   `env.js`: Environment variable loading and validation.
-*   `controllers/`: Contains the core business logic for API operations (e.g., `authController`, `productController`, `orderController`, `adminController`).
-*   `middleware/`: Reusable Express middleware (e.g., `authMiddleware` for JWT, `errorMiddleware` for centralized error handling, `validationMiddleware` for Joi, `uploadMiddleware` for Multer, `rateLimitMiddleware` for security).
-*   `models/`: Mongoose schemas defining database collections (e.g., `User`, `Product`, `Store`, `Order`, `Cart`, `Wishlist`, `Payment`, `Coupon`, `Review`).
-*   `routes/`: Defines API endpoints and maps them to controller functions (e.g., `authRoutes`, `userRoutes`, `productRoutes`, `adminRoutes`).
-*   `services/`: Encapsulates logic for external integrations (e.g., `emailService` for Nodemailer).
-*   `utils/`: Small, pure utility functions (e.g., `jwt.js` for JWT token generation/verification, `helpers.js` for OTP generation).
-*   `validators/`: Joi schemas for input validation for various data models.
-*   `seeder.js`: Script to populate the database with sample data for development.
-*   `server.js`: Main application entry point, handles database connection, middleware setup, and route registration.
-*   `uploads/`: Directory for locally stored uploaded images.
-
-## Workflow
-
-### Authentication and Authorization
-*   Users register as `customer`, `vendor`, or `admin`.
-*   Login generates a JWT, stored client-side, and user data is saved in `AppContext`.
-*   `authMiddleware` on the backend protects routes, verifying JWTs and attaching user information to the request.
-*   `authorizeRoles` middleware restricts access to specific roles (e.g., only `vendor` can manage products).
-
-### Data Flow
-1.  **Frontend Interaction:** User actions trigger functions from `AppContext` (e.g., `addToCart`, `fetchOrders`).
-2.  **API Service Layer:** `AppContext` functions call methods in `src/services/api.js`.
-3.  **HTTP Request:** `api.js` constructs and sends HTTP requests (GET, POST, PUT, DELETE) to the backend API endpoints, including the JWT for authenticated requests.
-4.  **Backend Processing:**
-    *   **Routes:** Express routes (`backend/routes/`) match the incoming request to a controller function.
-    *   **Middleware:** Requests pass through middleware:
-        *   `rateLimitMiddleware`: Prevents abuse.
-        *   `mongoSanitize`, `xss-clean`: Security against injection attacks.
-        *   `authMiddleware`: Authenticates the user via JWT.
-        *   `validationMiddleware`: Validates request body using Joi schemas.
-    *   **Controllers:** Business logic (`backend/controllers/`) is executed, interacting with Mongoose models (`backend/models/`) to perform database operations.
-    *   **Services/Utilities:** Controllers may use `backend/services/` (e.g., `emailService`) or `backend/utils/` (e.g., `jwt.js`, `helpers.js`).
-5.  **Response:** The backend sends a JSON response back to the frontend.
-6.  **Frontend Update:** The `AppContext` updates its state based on the response, triggering re-renders in relevant components.
+### Backend (`./backend/`) Folder Structure
+```
+backend/
+├── config/
+│   ├── db.js
+│   └── env.js
+├── controllers/
+│   ├── adminController.js
+│   ├── authController.js
+│   ├── cartController.js
+│   ├── couponController.js
+│   ├── orderController.js
+│   ├── passwordResetController.js
+│   ├── paymentController.js
+│   ├── productController.js
+│   ├── storeController.js
+│   ├── supportController.js
+│   ├── uploadController.js
+│   ├── userController.js
+│   └── vendorController.js
+├── middleware/
+│   ├── asyncHandler.js
+│   ├── authMiddleware.js
+│   ├── errorMiddleware.js
+│   ├── rateLimitMiddleware.js
+│   ├── uploadMiddleware.js
+│   └── validationMiddleware.js
+├── models/
+│   ├── Cart.js
+│   ├── Coupon.js
+│   ├── Order.js
+│   ├── Payment.js
+│   ├── Product.js
+│   ├── Review.js
+│   ├── Store.js
+│   ├── User.js
+│   └── Wishlist.js
+├── routes/
+│   ├── adminRoutes.js
+│   ├── authRoutes.js
+│   ├── cartRoutes.js
+│   ├── couponRoutes.js
+│   ├── orderRoutes.js
+│   ├── passwordResetRoutes.js
+│   ├── paymentRoutes.js
+│   ├── productRoutes.js
+│   ├── storeRoutes.js
+│   ├── supportRoutes.js
+│   ├── uploadRoutes.js
+│   ├── userRoutes.js
+│   └── vendorRoutes.js
+├── services/
+│   └── emailService.js
+├── uploads/
+│   ├── .gitkeep
+│   ├── image-1757008714296.jpg
+│   └── image-1757008924565.png
+├── utils/
+│   ├── helpers.js
+│   └── jwt.js
+├── validators/
+│   ├── authValidator.js
+│   ├── couponValidator.js
+│   ├── orderValidator.js
+│   ├── passwordResetValidator.js
+│   ├── productValidator.js
+│   ├── reviewValidator.js
+│   ├── storeValidator.js
+│   ├── supportValidator.js
+│   └── userValidator.js
+├── .env
+├── AI_RULES.md
+├── ABSTRACT.md
+├── backend/uploads/image-1757008714296.jpg
+├── backend/uploads/image-1757008924565.png
+├── package.json
+├── seeder.js
+└── server.js
+```
 
 ### Key Workflows
 
