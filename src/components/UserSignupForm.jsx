@@ -3,7 +3,7 @@ import { AppContext } from '../context/AppContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserPlus } from '@fortawesome/free-solid-svg-icons';
+import { faUserPlus, faSpinner } from '@fortawesome/free-solid-svg-icons'; // Import faSpinner
 import toast from 'react-hot-toast';
 
 const UserSignupForm = () => {
@@ -13,6 +13,7 @@ const UserSignupForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false); // New loading state
 
   const validateForm = () => {
     let newErrors = {};
@@ -40,22 +41,27 @@ const UserSignupForm = () => {
   const handleSignup = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-      // Include optional fields with default empty values to match backend schema
-      const userData = {
-        name,
-        email,
-        password,
-        phone: '', // Default empty phone
-        address: { // Default empty address object
-          houseNo: '',
-          landmark: '',
-          city: '',
-          state: '',
-          pinCode: '',
-        },
-      };
-      if (await registerUser(userData)) {
-        navigate('/dashboard');
+      setIsLoading(true); // Set loading true
+      try {
+        // Include optional fields with default empty values to match backend schema
+        const userData = {
+          name,
+          email,
+          password,
+          phone: '', // Default empty phone
+          address: { // Default empty address object
+            houseNo: '',
+            landmark: '',
+            city: '',
+            state: '',
+            pinCode: '',
+          },
+        };
+        if (await registerUser(userData)) {
+          navigate('/dashboard');
+        }
+      } finally {
+        setIsLoading(false); // Set loading false
       }
     } else {
       toast.error('Please correct the errors in the form.');
@@ -88,6 +94,7 @@ const UserSignupForm = () => {
         className="w-full p-3 mb-1 text-[var(--text)] border border-white/30 rounded-lg bg-white/10 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]" 
         aria-invalid={!!errors.name}
         aria-describedby={errors.name ? "fullName-error" : undefined}
+        disabled={isLoading}
       />
       {errors.name && <p id="fullName-error" className="text-red-400 text-xs mb-3">{errors.name}</p>}
       
@@ -101,6 +108,7 @@ const UserSignupForm = () => {
         className="w-full p-3 mb-1 text-[var(--text)] border border-white/30 rounded-lg bg-white/10 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]" 
         aria-invalid={!!errors.email}
         aria-describedby={errors.email ? "email-error" : undefined}
+        disabled={isLoading}
       />
       {errors.email && <p id="email-error" className="text-red-400 text-xs mb-3">{errors.email}</p>}
       
@@ -114,11 +122,17 @@ const UserSignupForm = () => {
         className="w-full p-3 mb-1 text-[var(--text)] border border-white/30 rounded-lg bg-white/10 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]" 
         aria-invalid={!!errors.password}
         aria-describedby={errors.password ? "password-error" : undefined}
+        disabled={isLoading}
       />
       {errors.password && <p id="password-error" className="text-red-400 text-xs mb-3">{errors.password}</p>}
       
-      <button type="submit" className="bg-[var(--accent)] text-white border-none py-3 px-6 rounded-lg flex items-center justify-center w-full gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300 mt-4">
-        <FontAwesomeIcon icon={faUserPlus} aria-hidden="true" /> Sign Up
+      <button 
+        type="submit" 
+        className="bg-[var(--accent)] text-white border-none py-3 px-6 rounded-lg flex items-center justify-center w-full gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300 mt-4"
+        disabled={isLoading} // Disable when loading
+      >
+        {isLoading ? <FontAwesomeIcon icon={faSpinner} spin className="mr-2" /> : <FontAwesomeIcon icon={faUserPlus} aria-hidden="true" />}
+        {isLoading ? 'Signing Up...' : 'Sign Up'}
       </button>
       <p className="text-center text-sm mt-4">
         Already have an account? <Link to="/login" className="text-[var(--accent)] font-semibold">Login here.</Link>

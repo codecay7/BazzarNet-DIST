@@ -4,6 +4,8 @@ import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
 import { ChevronDown } from 'lucide-react';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faSpinner } from '@fortawesome/free-solid-svg-icons'; // Import faSpinner
 
 const indianStates = [
   "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
@@ -36,6 +38,7 @@ const VendorRegistrationForm = () => {
     password: '',
   });
   const [errors, setErrors] = useState({});
+  const [isLoading, setIsLoading] = useState(false); // New loading state
 
   const categories = [
     'Groceries', 'Bakery', 'Butcher', 'Cafe', 'Electronics', 
@@ -132,21 +135,26 @@ const VendorRegistrationForm = () => {
   const handleRegistration = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-      // Ensure GST is sent, even if empty, to match backend schema
-      const vendorData = {
-        name: formData.fullName,
-        email: formData.email,
-        password: formData.password,
-        storeName: formData.businessName,
-        businessDescription: formData.description,
-        category: formData.category,
-        phone: formData.phone,
-        pan: formData.pan,
-        gst: formData.gst || '', // Ensure GST is an empty string if not provided
-        address: formData.address,
-      };
-      if (await registerVendor(vendorData)) {
-        navigate('/dashboard');
+      setIsLoading(true); // Set loading true
+      try {
+        // Ensure GST is sent, even if empty, to match backend schema
+        const vendorData = {
+          name: formData.fullName,
+          email: formData.email,
+          password: formData.password,
+          storeName: formData.businessName,
+          businessDescription: formData.description,
+          category: formData.category,
+          phone: formData.phone,
+          pan: formData.pan,
+          gst: formData.gst || '', // Ensure GST is an empty string if not provided
+          address: formData.address,
+        };
+        if (await registerVendor(vendorData)) {
+          navigate('/dashboard');
+        }
+      } finally {
+        setIsLoading(false); // Set loading false
       }
     } else {
       toast.error('Please correct the errors in the form.');
@@ -183,6 +191,7 @@ const VendorRegistrationForm = () => {
             className={inputClasses} 
             aria-invalid={!!errors.fullName}
             aria-describedby={errors.fullName ? "vendorFullName-error" : undefined}
+            disabled={isLoading}
           />
           {errors.fullName && <p id="vendorFullName-error" className="text-red-400 text-xs mt-1">{errors.fullName}</p>}
         </div>
@@ -197,6 +206,7 @@ const VendorRegistrationForm = () => {
             className={inputClasses} 
             aria-invalid={!!errors.businessName}
             aria-describedby={errors.businessName ? "businessName-error" : undefined}
+            disabled={isLoading}
           />
           {errors.businessName && <p id="businessName-error" className="text-red-400 text-xs mt-1">{errors.businessName}</p>}
         </div>
@@ -211,6 +221,7 @@ const VendorRegistrationForm = () => {
             className={inputClasses} 
             aria-invalid={!!errors.email}
             aria-describedby={errors.email ? "vendorEmail-error" : undefined}
+            disabled={isLoading}
           />
           {errors.email && <p id="vendorEmail-error" className="text-red-400 text-xs mt-1">{errors.email}</p>}
         </div>
@@ -225,6 +236,7 @@ const VendorRegistrationForm = () => {
             className={inputClasses} 
             aria-invalid={!!errors.phone}
             aria-describedby={errors.phone ? "vendorPhone-error" : undefined}
+            disabled={isLoading}
           />
           {errors.phone && <p id="vendorPhone-error" className="text-red-400 text-xs mt-1">{errors.phone}</p>}
         </div>
@@ -239,6 +251,7 @@ const VendorRegistrationForm = () => {
             className={inputClasses} 
             aria-invalid={!!errors.pan}
             aria-describedby={errors.pan ? "vendorPan-error" : undefined}
+            disabled={isLoading}
           />
           {errors.pan && <p id="vendorPan-error" className="text-red-400 text-xs mt-1">{errors.pan}</p>}
         </div>
@@ -251,6 +264,7 @@ const VendorRegistrationForm = () => {
             value={formData.gst} 
             onChange={handleChange} 
             className={inputClasses} 
+            disabled={isLoading}
           />
         </div>
       </div>
@@ -265,6 +279,7 @@ const VendorRegistrationForm = () => {
           className={inputClasses} 
           aria-invalid={!!errors.address?.houseNo}
           aria-describedby={errors.address?.houseNo ? "vendorAddressHouseNo-error" : undefined}
+          disabled={isLoading}
         />
         {errors.address?.houseNo && <p id="vendorAddressHouseNo-error" className="text-red-400 text-xs mt-1">{errors.address.houseNo}</p>}
       </div>
@@ -277,6 +292,7 @@ const VendorRegistrationForm = () => {
           value={formData.address.landmark} 
           onChange={handleChange} 
           className={inputClasses} 
+          disabled={isLoading}
         />
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -291,6 +307,7 @@ const VendorRegistrationForm = () => {
             className={inputClasses} 
             aria-invalid={!!errors.address?.city}
             aria-describedby={errors.address?.city ? "vendorAddressCity-error" : undefined}
+            disabled={isLoading}
           />
           {errors.address?.city && <p id="vendorAddressCity-error" className="text-red-400 text-xs mt-1">{errors.address.city}</p>}
         </div>
@@ -304,11 +321,12 @@ const VendorRegistrationForm = () => {
             className={`${inputClasses} appearance-none pr-8`}
             aria-invalid={!!errors.address?.state}
             aria-describedby={errors.address?.state ? "vendorAddressState-error" : undefined}
+            disabled={isLoading}
           >
             <option value="" disabled>Select State</option>
             {indianStates.map(state => <option key={state} value={state}>{state}</option>)}
           </select>
-          <div className="pointer-events-none absolute inset-y-0 right-0 top-0 flex items-center px-2 text-[var(--text)]" aria-hidden="true"><ChevronDown size={20} /></div>
+          <div className="pointer-events-none absolute inset-y-0 right-0 top-5 flex items-center px-2 text-[var(--text)]" aria-hidden="true"><ChevronDown size={20} /></div>
           {errors.address?.state && <p id="vendorAddressState-error" className="text-red-400 text-xs mt-1">{errors.address.state}</p>}
         </div>
       </div>
@@ -323,6 +341,7 @@ const VendorRegistrationForm = () => {
           className={inputClasses} 
           aria-invalid={!!errors.address?.pinCode}
           aria-describedby={errors.address?.pinCode ? "vendorAddressPinCode-error" : undefined}
+          disabled={isLoading}
         />
         {errors.address?.pinCode && <p id="vendorAddressPinCode-error" className="text-red-400 text-xs mt-1">{errors.address.pinCode}</p>}
       </div>
@@ -337,6 +356,7 @@ const VendorRegistrationForm = () => {
           className={inputClasses}
           aria-invalid={!!errors.description}
           aria-describedby={errors.description ? "vendorDescription-error" : undefined}
+          disabled={isLoading}
         ></textarea>
         {errors.description && <p id="vendorDescription-error" className="text-red-400 text-xs mt-1">{errors.description}</p>}
       </div>
@@ -350,6 +370,7 @@ const VendorRegistrationForm = () => {
           className={`${inputClasses} appearance-none pr-8`}
           aria-invalid={!!errors.category}
           aria-describedby={errors.category ? "vendorCategory-error" : undefined}
+          disabled={isLoading}
         >
           {categories.map(cat => <option key={cat} value={cat}>{cat}</option>)}
         </select>
@@ -367,11 +388,16 @@ const VendorRegistrationForm = () => {
           className={inputClasses} 
           aria-invalid={!!errors.password}
           aria-describedby={errors.password ? "vendorPassword-error" : undefined}
+          disabled={isLoading}
         />
         {errors.password && <p id="vendorPassword-error" className="text-red-400 text-xs mt-1">{errors.password}</p>}
       </div>
-      <button type="submit" className="bg-[var(--accent)] text-white border-none py-3 px-6 rounded-lg flex items-center justify-center w-full gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300 mt-4">
-        Register Business
+      <button 
+        type="submit" 
+        className="bg-[var(--accent)] text-white border-none py-3 px-6 rounded-lg flex items-center justify-center w-full gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300 mt-4"
+        disabled={isLoading} // Disable when loading
+      >
+        {isLoading ? <FontAwesomeIcon icon={faSpinner} spin className="mr-2" /> : 'Register Business'}
       </button>
       <p className="text-center text-sm mt-4">
         Already have an account? <Link to="/login" className="text-[var(--accent)] font-semibold">Login here.</Link>
