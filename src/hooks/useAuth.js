@@ -8,14 +8,21 @@ const useAuth = () => {
   const [isVendor, setIsVendor] = useState(false);
   const [isAdmin, setIsAdmin] = useState(false);
 
-  // Helper to set user state and local storage
+  // Helper to set user state and local storage, optimized to prevent unnecessary re-renders
   const loginUserInState = useCallback((userData) => {
-    setUser(userData);
-    setIsLoggedIn(true);
-    setIsVendor(userData.role === 'vendor');
-    setIsAdmin(userData.role === 'admin');
-    localStorage.setItem('user', JSON.stringify(userData));
-  }, []);
+    setUser(prevUser => {
+      // Perform a shallow comparison of critical user data to avoid unnecessary state updates
+      if (prevUser && prevUser._id === userData._id && prevUser.token === userData.token && prevUser.role === userData.role) {
+        return prevUser; // Return previous state if effectively no change
+      }
+      // If there's a significant change or no previous user, update state
+      setIsLoggedIn(true);
+      setIsVendor(userData.role === 'vendor');
+      setIsAdmin(userData.role === 'admin');
+      localStorage.setItem('user', JSON.stringify(userData));
+      return userData;
+    });
+  }, [setIsLoggedIn, setIsVendor, setIsAdmin]); // Dependencies are stable setters
 
   // Centralized login handler with role enforcement
   const handleLogin = useCallback(async (email, password, expectedRole) => {
