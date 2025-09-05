@@ -119,6 +119,7 @@ const CustomerDashboard = () => {
           </div>
           <div className="p-3 flex-grow flex-col">
             <h3 className="text-base sm:text-lg font-semibold mb-1 truncate">{product.name}</h3>
+            <p className="text-xs opacity-80 mb-1 truncate">Category: {product.category}</p> {/* Display Category */}
             <p className="text-xs opacity-80 mb-1 truncate">From: {storeName}</p>
             <div className="flex items-baseline gap-1 mb-1">
               <p className="text-sm sm:text-base font-bold text-[var(--accent)]">₹{product.price.toFixed(2)} / {product.unit}</p>
