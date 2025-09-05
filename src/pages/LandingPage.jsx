@@ -70,7 +70,7 @@ const LandingPage = () => {
             animate="visible"
           >
             <motion.h1
-              className="text-6xl sm:text-7xl md:text-8xl lg:text-9xl xl:text-9xl font-black leading-tight md:leading-snug mb-4 tracking-tight"
+              className="text-7xl sm:text-8xl md:text-9xl lg:text-9xl xl:text-9xl font-black leading-tight md:leading-snug mb-4 tracking-tight"
             >
               <motion.span variants={textChildVariants} className="inline-block">Shop Locally, Delivered Fast with</motion.span>
               <motion.span variants={textChildVariants} className="inline-block ml-2 px-2 py-1 bg-[var(--accent)] text-white rounded-md shadow-md text-[1.2em] font-black">
