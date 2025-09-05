@@ -31,12 +31,14 @@ const ProductDetail = () => {
     return stars;
   };
 
+  const isOutOfStock = product.stock === 0;
+
   return (
     <section className="w-full max-w-[1200px] my-10">
       <div className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-8 mx-4">
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
-            <img src={product.image} alt={product.name} className="w-full h-auto object-cover rounded-lg shadow-lg" />
+            <img src={product.image} alt={product.name} className={`w-full h-auto object-cover rounded-lg shadow-lg ${isOutOfStock ? 'grayscale' : ''}`} />
           </div>
           <div>
             <h2 className="text-3xl md:text-4xl font-bold mb-2">{product.name}</h2>
@@ -45,12 +47,23 @@ const ProductDetail = () => {
               <span className="text-sm text-[var(--text)] opacity-80">({product.reviews} reviews)</span>
             </div>
             <p className="text-2xl font-semibold text-[var(--accent)] mb-4">₹{product.price.toFixed(2)} / {product.unit}</p> {/* Display unit */}
+            
+            {/* Stock Status */}
+            <div className="mb-4">
+              {isOutOfStock ? (
+                <p className="text-lg font-bold text-red-500">Out of Stock</p>
+              ) : (
+                <p className="text-lg font-bold text-green-500">In Stock: {product.stock}</p>
+              )}
+            </div>
+
             <p className="text-base md:text-lg mb-6">{product.description}</p>
             <div className="flex gap-4">
               <button
                 className="bg-[var(--accent)] text-white border-none py-3 px-6 rounded-lg flex items-center gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300"
                 onClick={() => addToCart(product)}
                 aria-label={`Add ${product.name} to cart`}
+                disabled={isOutOfStock} // Disable button if out of stock
               >
                 <FontAwesomeIcon icon={faCartPlus} aria-hidden="true" /> Add to Cart
               </button>
