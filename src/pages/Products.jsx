@@ -19,7 +19,6 @@ const Products = () => {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      // Removed await simulateLoading(800); // REMOVED
       
       const params = {
         page: currentPage,
@@ -124,13 +123,13 @@ const Products = () => {
         </div>
 
         {loading ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8 justify-items-center">
             {[...Array(itemsPerPage)].map((_, index) => (
               <SkeletonCard key={index} />
             ))}
           </div>
         ) : sortedProducts.length > 0 ? (
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8" role="list">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-8 justify-items-center" role="list">
             {sortedProducts.map((product) => (
               <ProductCard key={product._id} product={product} />
             ))}
