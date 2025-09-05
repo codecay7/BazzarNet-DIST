@@ -59,7 +59,7 @@ const LandingPage = () => {
         variants={containerVariants}
       >
         <motion.h1
-          className="text-5xl md:text-6xl font-extrabold leading-tight md:leading-snug mb-4 tracking-tight"
+          className="text-6xl sm:text-7xl lg:text-8xl font-black leading-tight md:leading-snug mb-4 tracking-tight"
           variants={itemVariants}
         >
           Shop Locally, Delivered Fast with
@@ -67,7 +67,7 @@ const LandingPage = () => {
             BazzarNet
           </span>
         </motion.h1>
-        <motion.p className="text-xl md:text-2xl mb-5" variants={itemVariants}>
+        <motion.p className="text-xl md:text-2xl lg:text-3xl font-medium mb-5" variants={itemVariants}>
           Support your favorite local stores with quick doorstep delivery.
         </motion.p>
       </motion.div>
