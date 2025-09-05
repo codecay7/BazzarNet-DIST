@@ -1,12 +1,13 @@
 import React, { useContext, useState, useMemo, useEffect } from 'react';
 import { AppContext } from '../context/AppContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSearch, faMoneyBillWave } from '@fortawesome/free-solid-svg-icons';
+import { faSearch, faMoneyBillWave, faEye } from '@fortawesome/free-solid-svg-icons'; // Added faEye icon
 import SkeletonText from '../components/SkeletonText';
 import Pagination from '../components/Pagination';
 import toast from 'react-hot-toast';
 import { ChevronDown } from 'lucide-react';
 import * as api from '../services/api'; // Import API service
+import { useNavigate } from 'react-router-dom'; // Import useNavigate
 
 const formatTimestamp = (isoString) => {
   const date = new Date(isoString);
@@ -21,6 +22,7 @@ const AdminOrderManagement = () => {
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
   const itemsPerPage = 8;
+  const navigate = useNavigate(); // Initialize useNavigate
 
   useEffect(() => {
     const loadData = async () => {
@@ -70,6 +72,10 @@ const AdminOrderManagement = () => {
         toast.error(`Failed to initiate refund: ${error.message}`);
       }
     }
+  };
+
+  const handleViewDetails = (orderId) => {
+    navigate(`/admin-orders/${orderId}`); // Navigate to the new admin order details route
   };
 
   return (
@@ -154,6 +160,14 @@ const AdminOrderManagement = () => {
                     </td>
                     <td className="px-4 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <div className="flex justify-end gap-2">
+                        <button
+                          onClick={() => handleViewDetails(order._id)}
+                          className="p-2 rounded-full bg-blue-500/20 hover:bg-blue-500/40 text-blue-400 transition-colors duration-200"
+                          title="View Details"
+                          aria-label={`View details for order ${order._id}`}
+                        >
+                          <FontAwesomeIcon icon={faEye} size="sm" />
+                        </button>
                         <select
                           value={order.orderStatus}
                           onChange={(e) => updateOrderStatus(order._id, e.target.value)}

@@ -9,6 +9,7 @@ const AdminProductManagement = lazy(() => import('../pages/AdminProductManagemen
 const AdminOrderManagement = lazy(() => import('../pages/AdminOrderManagement'));
 const AdminStoreManagement = lazy(() => import('../pages/AdminStoreManagement')); // Import new page
 const Help = lazy(() => import('../pages/Help'));
+const CustomerOrderDetails = lazy(() => import('../pages/CustomerOrderDetails')); // Re-use for admin order details
 
 const AdminRoutes = () => {
   return (
@@ -23,6 +24,7 @@ const AdminRoutes = () => {
           <Route path="/admin-users" element={<AdminUserManagement />} />
           <Route path="/admin-products" element={<AdminProductManagement />} />
           <Route path="/admin-orders" element={<AdminOrderManagement />} />
+          <Route path="/admin-orders/:orderId" element={<CustomerOrderDetails />} /> {/* New route for admin to view order details */}
           <Route path="/admin-stores" element={<AdminStoreManagement />} /> {/* New route */}
           <Route path="/help" element={<Help />} />
           {/* Redirect any other logged-in admin routes to admin dashboard */}
