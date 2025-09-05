@@ -9,7 +9,7 @@ import toast from 'react-hot-toast';
 import placeholderImage from '../assets/placeholder.png'; // Import placeholder image
 
 const AdminStoreManagement = () => {
-  const { appStores, appStoresMeta, fetchAppStores, adminUpdateStore, adminDeleteStore, simulateLoading } = useContext(AppContext);
+  const { appStores, appStoresMeta, fetchAppStores, adminUpdateStore, adminDeleteStore } = useContext(AppContext); // Removed simulateLoading
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all'); // 'all', 'active', 'inactive'
   const [loading, setLoading] = useState(true);
@@ -21,7 +21,7 @@ const AdminStoreManagement = () => {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      await simulateLoading(800);
+      // Removed await simulateLoading(800);
       
       const params = {
         page: currentPage,
@@ -33,7 +33,7 @@ const AdminStoreManagement = () => {
       setLoading(false);
     };
     loadData();
-  }, [searchTerm, filterStatus, currentPage, fetchAppStores, simulateLoading]);
+  }, [searchTerm, filterStatus, currentPage, fetchAppStores]); // Removed simulateLoading from dependencies
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);

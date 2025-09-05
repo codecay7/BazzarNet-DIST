@@ -183,37 +183,50 @@ export const AppProvider = ({ children }) => {
 
   // --- Initial Data Load on Login/Role Change ---
   useEffect(() => {
-    if (isLoggedIn) {
-      // Trigger initial fetches for all relevant data
-      fetchAllProducts();
-      fetchAppStores();
-      fetchCart();
-      fetchWishlist();
-      fetchOrders();
-      refetch(); // Corrected: Now calls the refetch function directly
-      if (isAdmin) {
-        fetchAllUsers();
+    const loadInitialData = async () => {
+      if (isLoggedIn) {
+        const promises = [
+          fetchAllProducts(),
+          fetchAppStores(),
+          fetchCart(),
+          fetchWishlist(),
+          fetchOrders(),
+          refetch(), // Fetch coupons
+        ];
+
+        if (isAdmin) {
+          promises.push(fetchAllUsers());
+        }
+        if (isVendor) {
+          promises.push(fetchVendorProducts());
+        }
+
+        try {
+          await Promise.all(promises);
+        } catch (error) {
+          console.error("Error loading initial data:", error);
+          // Optionally, show a generic error toast here if multiple fetches fail
+        }
+      } else {
+        // Clear all data if logged out
+        setCart([]);
+        setWishlist([]);
+        setAllAppProducts([]);
+        setAllAppProductsMeta({ page: 1, pages: 1, count: 0 });
+        setVendorProducts([]);
+        setVendorProductsMeta({ page: 1, pages: 1, count: 0 });
+        setOrders([]);
+        setOrdersMeta({ page: 1, pages: 1, count: 0 });
+        setAppStores([]);
+        setAppStoresMeta({ page: 1, pages: 1, count: 0 });
+        setAllAppUsers([]); 
+        setAllAppUsersMeta({ page: 1, pages: 1, count: 0 });
+        setAppliedCoupon(null); 
+        setDiscountAmount(0); 
       }
-      if (isVendor) {
-        fetchVendorProducts();
-      }
-    } else {
-      // Clear all data if logged out
-      setCart([]);
-      setWishlist([]);
-      setAllAppProducts([]);
-      setAllAppProductsMeta({ page: 1, pages: 1, count: 0 });
-      setVendorProducts([]);
-      setVendorProductsMeta({ page: 1, pages: 1, count: 0 });
-      setOrders([]);
-      setOrdersMeta({ page: 1, pages: 1, count: 0 });
-      setAppStores([]);
-      setAppStoresMeta({ page: 1, pages: 1, count: 0 });
-      setAllAppUsers([]); // This line should now work correctly
-      setAllAppUsersMeta({ page: 1, pages: 1, count: 0 });
-      setAppliedCoupon(null); // New: Clear applied coupon
-      setDiscountAmount(0); // New: Clear discount amount
-    }
+    };
+
+    loadInitialData();
   }, [isLoggedIn, user, isAdmin, isVendor, fetchAllProducts, fetchAppStores, fetchCart, fetchWishlist, fetchOrders, fetchAllUsers, fetchVendorProducts, refetch, setCart, setWishlist, setAllAppProducts, setAllAppProductsMeta, setAppStores, setAppStoresMeta, setOrders, setOrdersMeta, setAllAppUsers, setAllAppUsersMeta, setVendorProducts, setVendorProductsMeta, setAppliedCoupon, setDiscountAmount]);
 
 

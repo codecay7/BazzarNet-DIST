@@ -6,9 +6,10 @@ import { useNavigate } from 'react-router-dom';
 import SkeletonText from '../components/SkeletonText';
 import SkeletonCard from '../components/SkeletonCard';
 import * as api from '../services/api'; // Import API service
+import placeholderImage from '../assets/placeholder.png'; // Import placeholder image
 
 const CustomerDashboard = () => {
-  const { user, cart, wishlist, simulateLoading, orders, addToCart } = useContext(AppContext);
+  const { user, cart, wishlist, orders, addToCart } = useContext(AppContext); // Removed simulateLoading
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [recommendedProducts, setRecommendedProducts] = useState([]);
@@ -17,11 +18,11 @@ const CustomerDashboard = () => {
   useEffect(() => {
     const loadDashboardData = async () => {
       setLoading(true);
-      await simulateLoading(1000);
+      // Removed await simulateLoading(1000);
       setLoading(false);
     };
     loadDashboardData();
-  }, [simulateLoading]);
+  }, []); // Removed simulateLoading from dependencies
 
   useEffect(() => {
     const fetchRecommended = async () => {
@@ -117,7 +118,12 @@ const CustomerDashboard = () => {
                     const isOutOfStock = product.stock === 0;
                     return (
                       <div key={product._id} className={`flex flex-col bg-black/10 p-3 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 ${isOutOfStock ? 'grayscale' : ''}`}>
-                        <img src={product.image} alt={product.name} className="w-full h-32 object-cover rounded-md mb-2" />
+                        <img 
+                          src={product.image} 
+                          alt={product.name} 
+                          className="w-full h-32 object-cover rounded-md mb-2" 
+                          onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }} // Fallback image
+                        />
                         <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
                         <p className="text-sm opacity-70 mb-2">₹{product.price.toFixed(2)} / {product.unit}</p> {/* Display unit */}
                         {isOutOfStock && (

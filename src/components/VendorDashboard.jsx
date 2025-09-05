@@ -9,7 +9,7 @@ import * as api from '../services/api'; // Import API service
 import placeholderImage from '../assets/placeholder.png'; // Import placeholder image
 
 const VendorDashboard = () => {
-  const { user, simulateLoading } = useContext(AppContext);
+  const { user } = useContext(AppContext); // Removed simulateLoading
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState(null);

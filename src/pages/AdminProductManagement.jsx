@@ -10,7 +10,7 @@ import { Search, Store, Tag, ChevronDown } from 'lucide-react';
 import placeholderImage from '../assets/placeholder.png'; // Import placeholder image
 
 const AdminProductManagement = () => {
-  const { allAppProducts, allAppProductsMeta, fetchAllProducts, adminEditProduct, adminDeleteProduct, simulateLoading, appStores } = useContext(AppContext);
+  const { allAppProducts, allAppProductsMeta, fetchAllProducts, adminEditProduct, adminDeleteProduct, appStores } = useContext(AppContext); // Removed simulateLoading
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -28,7 +28,7 @@ const AdminProductManagement = () => {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      await simulateLoading(800); // Simulate network delay
+      // Removed await simulateLoading(800); // Simulate network delay
       
       const params = {
         page: currentPage,
@@ -41,7 +41,7 @@ const AdminProductManagement = () => {
       setLoading(false);
     };
     loadData();
-  }, [searchTerm, filterStore, filterCategory, currentPage, fetchAllProducts, simulateLoading]);
+  }, [searchTerm, filterStore, filterCategory, currentPage, fetchAllProducts]); // Removed simulateLoading from dependencies
 
   const handleOpenModal = (product = null) => {
     setEditingProduct(product);

@@ -7,17 +7,17 @@ import SkeletonCard from '../components/SkeletonCard'; // Assuming you might nee
 import placeholderImage from '../assets/placeholder.png'; // Import placeholder image
 
 const Wishlist = () => {
-  const { wishlist, removeFromWishlist, moveToCart, simulateLoading } = useContext(AppContext);
+  const { wishlist, removeFromWishlist, moveToCart } = useContext(AppContext); // Removed simulateLoading
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      await simulateLoading(500); // Simulate loading for wishlist
+      // Removed await simulateLoading(500); // Simulate loading for wishlist
       setLoading(false);
     };
     loadData();
-  }, [simulateLoading, wishlist.length]); // Re-run loading when wishlist changes
+  }, [wishlist.length]); // Re-run loading when wishlist changes
 
   return (
     <section className="w-full max-w-[1200px] my-10">

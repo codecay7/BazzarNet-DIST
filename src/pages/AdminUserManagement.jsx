@@ -7,7 +7,7 @@ import toast from 'react-hot-toast';
 import * as api from '../services/api'; // Import API service
 
 const AdminUserManagement = () => {
-  const { simulateLoading, allAppUsers, allAppUsersMeta, fetchAllUsers, deleteUser, updateUserStatus } = useContext(AppContext);
+  const { allAppUsers, allAppUsersMeta, fetchAllUsers, deleteUser, updateUserStatus } = useContext(AppContext); // Removed simulateLoading
   const [searchTerm, setSearchTerm] = useState('');
   const [filterRole, setFilterRole] = useState('all'); // 'all', 'customer', 'vendor'
   const [filterStatus, setFilterStatus] = useState('all'); // 'all', 'active', 'inactive'
@@ -18,7 +18,7 @@ const AdminUserManagement = () => {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      await simulateLoading(800); // Simulate network delay
+      // Removed await simulateLoading(800); // Simulate network delay
       
       const params = {
         page: currentPage,
@@ -31,7 +31,7 @@ const AdminUserManagement = () => {
       setLoading(false);
     };
     loadData();
-  }, [searchTerm, filterRole, filterStatus, currentPage, fetchAllUsers, simulateLoading]);
+  }, [searchTerm, filterRole, filterStatus, currentPage, fetchAllUsers]); // Removed simulateLoading from dependencies
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);

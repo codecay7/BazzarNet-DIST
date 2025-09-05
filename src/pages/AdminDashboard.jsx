@@ -9,7 +9,7 @@ import SkeletonText from '../components/SkeletonText';
 import * as api from '../services/api'; // Import API service
 
 const AdminDashboard = () => {
-  const { user, simulateLoading } = useContext(AppContext);
+  const { user } = useContext(AppContext); // Removed simulateLoading
   const [loading, setLoading] = useState(true);
   const [dashboardData, setDashboardData] = useState(null);
 
