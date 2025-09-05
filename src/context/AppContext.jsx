@@ -128,6 +128,7 @@ export const AppProvider = ({ children }) => {
     removeCoupon,
     setAppliedCoupon,
     setDiscountAmount,
+    setAvailableCoupons, // <--- Added this line
   } = useCoupons(user, isLoggedIn, orders); // Pass the necessary values here
 
   // --- User Profile Update in Context ---
