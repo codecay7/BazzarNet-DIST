@@ -142,6 +142,12 @@ const Checkout = () => {
 
   const handlePlaceOrder = async () => {
     console.log('Attempting to place order. Current cart:', cart); // ADDED LOG
+    // NEW LOG: Inspect each item in the cart
+    cart.forEach((item, index) => {
+      console.log(`Cart item ${index}:`, item);
+      console.log(`Cart item ${index} unit:`, item.unit);
+    });
+
     if (cart.length === 0) {
       console.error('Cart is empty when trying to place order!');
       toast.error('Your cart is empty. Please add items before checking out.');
