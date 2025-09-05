@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faShoppingBag, faStore, faCartPlus, faTruck, faUser, faQuoteLeft, faArrowRight, faShieldAlt, faTags, faCheckCircle } from '@fortawesome/free-solid-svg-icons'; // Added faCheckCircle
+import { faShoppingBag, faStore, faCartPlus, faTruck, faUser, faQuoteLeft, faArrowRight, faTags, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
@@ -55,7 +55,7 @@ const LandingPage = () => {
 
       {/* Hero Section */}
       <motion.div
-        className="text-center py-16 px-5 text-[var(--text)] rounded-2xl mx-4 md:py-20 md:px-10 relative z-10 min-h-screen flex flex-col justify-center"
+        className="text-center py-20 px-5 text-[var(--text)] rounded-2xl mx-4 md:py-24 md:px-10 relative z-10"
         variants={containerVariants}
       >
         <motion.h1
@@ -73,9 +73,9 @@ const LandingPage = () => {
       </motion.div>
 
       {/* How It Works Section */}
-      <div className="container mx-auto px-5 my-10 relative z-10 min-h-screen flex flex-col justify-center">
-        <h2 className="text-3xl font-bold mb-5 md:text-4xl text-center">How It Works</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"> {/* Changed to lg:grid-cols-4 */}
+      <div className="container mx-auto px-5 py-20 relative z-10">
+        <h2 className="text-3xl font-bold mb-10 md:text-4xl text-center">How It Works</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           <motion.div
             className="bg-[var(--card-bg)] backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-[0_8px_40px_var(--shadow)] hover:-translate-y-1 transition-transform duration-300"
             variants={cardVariants}
@@ -121,7 +121,6 @@ const LandingPage = () => {
               </div>
             </div>
           </motion.div>
-          {/* New Card for How It Works */}
           <motion.div
             className="bg-[var(--card-bg)] backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-[0_8px_40px_var(--shadow)] hover:-translate-y-1 transition-transform duration-300"
             variants={cardVariants}
@@ -130,7 +129,7 @@ const LandingPage = () => {
             viewport={{ once: true, amount: 0.5 }}
           >
             <div className="flex items-start gap-4">
-              <FontAwesomeIcon icon={faCheckCircle} className="text-3xl text-[var(--accent)]" /> {/* Using faCheckCircle */}
+              <FontAwesomeIcon icon={faCheckCircle} className="text-3xl text-[var(--accent)]" />
               <div>
                 <h3 className="text-xl font-bold text-[var(--accent)] mb-1">Enjoy & Review</h3>
                 <p className="text-[var(--text)] text-base">Receive your order and share your feedback.</p>
@@ -141,9 +140,9 @@ const LandingPage = () => {
       </div>
 
       {/* Why BazzarNet Section */}
-      <div className="container mx-auto px-5 my-10 relative z-10 min-h-screen flex flex-col justify-center">
-        <h2 className="text-3xl font-bold mb-5 md:text-4xl text-center">Why BazzarNet?</h2>
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8"> {/* Changed to lg:grid-cols-4 */}
+      <div className="container mx-auto px-5 py-20 relative z-10">
+        <h2 className="text-3xl font-bold mb-10 md:text-4xl text-center">Why BazzarNet?</h2>
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
           <motion.div
             className="bg-[var(--card-bg)] backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-[0_8px_40px_var(--shadow)] hover:-translate-y-1 transition-transform duration-300"
             variants={cardVariants}
@@ -189,7 +188,6 @@ const LandingPage = () => {
               </div>
             </div>
           </motion.div>
-          {/* New Card for Why BazzarNet */}
           <motion.div
             className="bg-[var(--card-bg)] backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-[0_8px_40px_var(--shadow)] hover:-translate-y-1 transition-transform duration-300"
             variants={cardVariants}
@@ -198,7 +196,7 @@ const LandingPage = () => {
             viewport={{ once: true, amount: 0.5 }}
           >
             <div className="flex items-start gap-4">
-              <FontAwesomeIcon icon={faTags} className="text-3xl text-[var(--accent)]" /> {/* Using faTags */}
+              <FontAwesomeIcon icon={faTags} className="text-3xl text-[var(--accent)]" />
               <div>
                 <h3 className="text-xl font-bold text-[var(--accent)] mb-1">Exclusive Deals</h3>
                 <p className="text-[var(--text)] text-base">Access special offers and discounts.</p>
@@ -209,8 +207,8 @@ const LandingPage = () => {
       </div>
 
       {/* Testimonials Section */}
-      <div className="container mx-auto px-5 my-10 relative z-10 min-h-screen flex flex-col justify-center">
-        <h2 className="text-3xl font-bold mb-8 md:text-4xl text-center">What Our Customers Say</h2>
+      <div className="container mx-auto px-5 py-20 relative z-10">
+        <h2 className="text-3xl font-bold mb-10 md:text-4xl text-center">What Our Customers Say</h2>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <motion.div
             className="bg-[var(--card-bg)] backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-[0_8px_40px_var(--shadow)] hover:-translate-y-1 transition-transform duration-300"
@@ -241,7 +239,7 @@ const LandingPage = () => {
 
       {/* Delivery Time Estimator */}
       <motion.div
-        className="bg-[var(--card-bg)] w-full max-w-6xl mx-auto my-10 backdrop-blur-md border border-white/20 rounded-3xl p-8 md:p-12 shadow-[0_8px_40px_var(--shadow)] flex flex-col justify-between hover:-translate-y-1 transition-transform duration-300 ease-in-out relative z-10 min-h-screen flex flex-col justify-center"
+        className="bg-[var(--card-bg)] w-full max-w-6xl mx-auto py-20 px-8 md:px-12 shadow-[0_8px_40px_var(--shadow)] flex flex-col justify-between hover:-translate-y-1 transition-transform duration-300 ease-in-out relative z-10"
         variants={cardVariants}
         whileInView="visible"
         initial="hidden"
@@ -287,7 +285,7 @@ const LandingPage = () => {
 
       {/* Call to Action Section */}
       <motion.div
-        className="bg-[var(--accent)] text-white rounded-3xl p-10 md:p-16 text-center my-10 mx-4 shadow-[0_8px_40px_var(--shadow)] relative z-10 min-h-screen flex flex-col justify-center"
+        className="bg-[var(--accent)] text-white rounded-3xl p-20 text-center mx-4 shadow-[0_8px_40px_var(--shadow)] relative z-10"
         variants={cardVariants}
         whileInView="visible"
         initial="hidden"
