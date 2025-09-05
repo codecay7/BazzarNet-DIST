@@ -128,18 +128,12 @@ const LandingPage = () => {
             <motion.h1
               className=" font-black leading-tight md:leading-snug mb-4 tracking-tight break-words"
             >
-              <motion.span variants={textChildVariants} className="inline-block text-5xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-9xl font-black">Shop Locally, Delivered Fast </motion.span>
+              <motion.span variants={textChildVariants} className="inline-block text-5xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-9xl font-black">Shop Locally, Delivered Fast⌯⌲ </motion.span>
               <motion.span
                 variants={textChildVariants}
                 className="inline-block ml-2  px-2 py-1 bg-[var(--accent)] text-white rounded-md shadow-md text-[1.8em] font-black"
               >
-                <motion.span
-                  variants={glitchVariants}
-                  initial="initial"
-                  animate={glitchControls} // Use controls here
-                >
-                  BazzarNet
-                </motion.span>
+               
               </motion.span>
             </motion.h1>
             <motion.p className="text-s sm:text-lg md:text-xl lg:text-xl xl:text-2xl font-medium mb-5" variants={textChildVariants}>
