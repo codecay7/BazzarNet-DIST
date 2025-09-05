@@ -173,24 +173,12 @@ const Profile = () => {
   };
 
   const handleImageChange = async (e) => {
-    if (e.target.files && e.target.files[0]) {
-      const file = e.target.files[0];
-      const formData = new FormData();
-      formData.append('image', file);
-
-      try {
-        const uploadResponse = await api.userProfile.uploadProfileImage(formData); // Use the dedicated upload API
-        const imageUrl = uploadResponse.profileImage; // Get the actual URL from the backend response
-        setProfileData(prev => ({
-          ...prev,
-          profileImage: imageUrl
-        }));
-        updateUserInContext({ profileImage: imageUrl }); // Update context immediately
-        toast.success('Image uploaded successfully! Click "Save Changes" to update your profile.');
-      } catch (uploadError) {
-        toast.error(`Image upload failed: ${uploadError.message}`);
-      }
-    }
+    // For now, we're handling image URLs directly in the input.
+    // If you later want to re-introduce file uploads (e.g., to local storage),
+    // this function would be updated to handle the file object.
+    // For now, it's effectively a no-op as the input is a text field.
+    // The profileImage field is updated via handleInputChange directly.
+    console.log("Image change handled via direct URL input.");
   };
 
   const handleSaveChanges = async () => {
@@ -202,7 +190,8 @@ const Profile = () => {
     try {
       // Create a copy of profileData and remove profileImage before sending
       const dataToUpdate = { ...profileData };
-      delete dataToUpdate.profileImage; // Exclude profileImage from this update
+      // profileImage is now a direct URL in profileData, so it can be sent directly
+      // No need to delete dataToUpdate.profileImage;
 
       const updatedUser = await api.userProfile.updateProfile(dataToUpdate);
       updateUserInContext(updatedUser); // Use the new function to update context

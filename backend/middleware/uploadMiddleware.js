@@ -1,24 +1,18 @@
 import multer from 'multer';
-import { CloudinaryStorage } from 'multer-storage-cloudinary';
-import { v2 as cloudinary } from 'cloudinary';
-import env from '../config/env.js'; // Import env for Cloudinary credentials
+import path from 'path';
+import { fileURLToPath } from 'url';
 
-// Configure Cloudinary
-cloudinary.config({
-  cloud_name: env.CLOUDINARY_CLOUD_NAME,
-  api_key: env.CLOUDINARY_API_KEY,
-  api_secret: env.CLOUDINARY_API_SECRET,
-});
+// Fix __dirname for ES Modules
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = path.dirname(__filename);
 
-// Configure Cloudinary storage for Multer
-const storage = new CloudinaryStorage({
-  cloudinary: cloudinary,
-  params: {
-    folder: 'bazzarnet_uploads', // Folder name in Cloudinary
-    format: async (req, file) => 'png', // supports promises as well
-    public_id: (req, file) => `${file.fieldname}-${Date.now()}`,
-    allowed_formats: ['jpg', 'jpeg', 'png', 'gif', 'svg'], // Allowed image formats
-    transformation: [{ width: 500, height: 500, crop: 'limit' }], // Optional: resize images
+// Set storage engine
+const storage = multer.diskStorage({
+  destination: function (req, file, cb) {
+    cb(null, path.join(__dirname, '../uploads/')); // Save to backend/uploads
+  },
+  filename: function (req, file, cb) {
+    cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname));
   },
 });
 

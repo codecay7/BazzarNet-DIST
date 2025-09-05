@@ -5,8 +5,8 @@ import asyncHandler from '../middleware/asyncHandler.js';
 // @access  Private
 const uploadImage = asyncHandler(async (req, res) => {
   if (req.file) {
-    // req.file.path contains the URL from CloudinaryStorage
-    const filePath = req.file.path; 
+    // req.file.filename contains the filename from diskStorage
+    const filePath = `/uploads/${req.file.filename}`; 
     res.json({ message: 'Image uploaded successfully', filePath });
   } else {
     res.status(400);

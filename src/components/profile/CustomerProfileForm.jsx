@@ -19,7 +19,7 @@ const indianStates = [
 const inputClasses = "w-full p-2 rounded-lg bg-white/10 border border-black/30 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] text-[var(--text)]";
 
 const CustomerProfileForm = ({ profileData, setProfileData, isEditing, handleImageChange, handleSaveChanges, errors, handleInputChange }) => {
-  const fileInputRef = useRef(null);
+  // Removed fileInputRef as we're no longer using a hidden file input
 
   return (
     <form onSubmit={(e) => { e.preventDefault(); handleSaveChanges(); }} className="space-y-6">
@@ -38,12 +38,20 @@ const CustomerProfileForm = ({ profileData, setProfileData, isEditing, handleIma
             </div>
           )}
           {isEditing && (
-            <>
-              <input type="file" ref={fileInputRef} onChange={handleImageChange} className="hidden" accept="image/*" id="profile-image-upload" aria-label="Upload new profile image" />
-              <button type="button" onClick={() => fileInputRef.current.click()} className="absolute bottom-0 right-0 bg-white/80 rounded-full p-1.5 text-gray-800 hover:bg-white shadow-md" aria-label="Change profile image">
-                <FontAwesomeIcon icon={faPen} size="sm" aria-hidden="true" />
-              </button>
-            </>
+            <div className="absolute bottom-0 right-0 bg-white/80 rounded-full p-1.5 text-gray-800 hover:bg-white shadow-md">
+              <label htmlFor="profileImageUrl" className="sr-only">Profile Image URL</label>
+              <input
+                type="text"
+                id="profileImageUrl"
+                name="profileImage"
+                value={profileData.profileImage || ''}
+                onChange={handleInputChange} // Use handleInputChange for direct URL update
+                placeholder="Image URL"
+                className="absolute inset-0 opacity-0 cursor-pointer" // Make it invisible but clickable
+                aria-label="Enter profile image URL"
+              />
+              <FontAwesomeIcon icon={faPen} size="sm" aria-hidden="true" />
+            </div>
           )}
         </div>
         <h2 className="text-3xl font-bold mb-1">{profileData.name}</h2>
