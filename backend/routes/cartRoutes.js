@@ -17,6 +17,10 @@ const addItemToCartSchema = Joi.object({
     'number.integer': 'Quantity must be an integer.',
     'number.min': 'Quantity must be at least 1.',
   }),
+  unit: Joi.string().required().messages({ // Added unit field
+    'string.empty': 'Unit is required.',
+    'any.required': 'Unit is required.',
+  }),
 });
 
 // Joi schema for updating item quantity in cart
