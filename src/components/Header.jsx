@@ -63,7 +63,7 @@ const Header = () => {
   };
 
   return (
-    <header className="relative flex items-center py-4 bg-[var(--card-bg)] backdrop-blur-[5px] sticky top-0 z-[1000] rounded-b-2xl shadow-[0_4px_20px_var(--shadow)]">
+    <header className="relative flex items-center py-4 bg-[var(--bg)] sticky top-0 z-[1000] rounded-b-2xl shadow-[0_4px_20px_var(--shadow)]">
       <div className="container mx-auto px-5 flex items-center justify-between">
         <div className="flex items-center gap-6">
           <div className="flex-shrink-0">
