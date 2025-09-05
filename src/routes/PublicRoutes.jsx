@@ -14,11 +14,7 @@ const ResetPassword = lazy(() => import('../pages/ResetPassword')); // Import ne
 
 const PublicRoutes = () => {
   return (
-    <Suspense fallback={
-      <div className="flex items-center justify-center min-h-screen text-2xl font-semibold text-[var(--accent)]">
-        Loading...
-      </div>
-    }>
+    <Suspense fallback={null}> {/* Changed fallback to null */}
       <Routes>
         <Route path="/login" element={<Login />} />
         <Route path="/register" element={<Register />} />
