@@ -49,7 +49,7 @@ const StyledButton = styled.button`
     width: 100%; /* Ensure content fills the button */
     height: 100%; /* Ensure content fills the button */
     border-radius: 8px;
-    background-color: rgba(0, 0, 0, 0.3);
+    /* Removed conflicting background-color */
     color: white;
     font-weight: 600;
   }
