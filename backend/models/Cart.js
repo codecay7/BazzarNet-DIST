@@ -1,6 +1,6 @@
 import mongoose from 'mongoose';
 
-const cartItemSchema = new mongoose.Schema({
+const cartItemSchema = new new mongoose.Schema({
   product: {
     type: mongoose.Schema.Types.ObjectId,
     ref: 'Product',
@@ -15,6 +15,7 @@ const cartItemSchema = new mongoose.Schema({
     min: 1,
     default: 1,
   },
+  unit: { type: String, required: true }, // NEW: Added unit field
 });
 
 const cartSchema = new mongoose.Schema({

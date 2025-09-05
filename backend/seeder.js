@@ -210,7 +210,7 @@ const productsData = {
       price: 150,
       originalPrice: 180,
       stock: 100,
-      unit: 'kg',
+      unit: 'kg', // NEW: Added unit
       category: 'Groceries',
       image: 'https://images.unsplash.com/photo-1579613832107-c3018366a156?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     },
@@ -219,7 +219,7 @@ const productsData = {
       description: 'Pure and wholesome milk, delivered fresh from the farm.',
       price: 60,
       stock: 50,
-      unit: 'L',
+      unit: 'L', // NEW: Added unit
       category: 'Groceries',
       image: 'https://images.unsplash.com/photo-1628088999033-211112111111?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     },
@@ -228,7 +228,7 @@ const productsData = {
       description: 'Healthy and delicious brown bread, baked fresh daily.',
       price: 40,
       stock: 70,
-      unit: 'pc',
+      unit: 'pc', // NEW: Added unit
       category: 'Groceries',
       image: 'https://images.unsplash.com/photo-1598373182133-52452f7691ef?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     },
@@ -239,7 +239,7 @@ const productsData = {
       description: 'Flaky croissant filled with rich dark chocolate.',
       price: 80,
       stock: 40,
-      unit: 'pc',
+      unit: 'pc', // NEW: Added unit
       category: 'Bakery',
       image: 'https://images.unsplash.com/photo-1567620905732-2d1ec7ab7445?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     },
@@ -248,7 +248,7 @@ const productsData = {
       description: 'Artisan sourdough bread, perfect with any meal.',
       price: 180,
       stock: 20,
-      unit: 'pc',
+      unit: 'pc', // NEW: Added unit
       category: 'Bakery',
       image: 'https://images.unsplash.com/photo-1583339752135-c172740306f7?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     },
@@ -260,7 +260,7 @@ const productsData = {
       price: 2500,
       originalPrice: 3000,
       stock: 30,
-      unit: 'set',
+      unit: 'set', // NEW: Added unit
       category: 'Electronics',
       image: 'https://images.unsplash.com/photo-1607863680198-a4319de6207e?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     },
@@ -269,7 +269,7 @@ const productsData = {
       description: 'Track your fitness and stay connected with this sleek smartwatch.',
       price: 7000,
       stock: 15,
-      unit: 'pc',
+      unit: 'pc', // NEW: Added unit
       category: 'Electronics',
       image: 'https://images.unsplash.com/photo-1546868871-7041f2a55e12?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     },
@@ -281,7 +281,7 @@ const productsData = {
       price: 1200,
       originalPrice: 1500,
       stock: 80,
-      unit: 'pc',
+      unit: 'pc', // NEW: Added unit
       category: 'Clothing',
       image: 'https://images.unsplash.com/photo-1541099649105-f69dbd582eed?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     },
@@ -290,7 +290,7 @@ const productsData = {
       description: 'Soft and breathable cotton t-shirt, available in various colors.',
       price: 450,
       stock: 150,
-      unit: 'pc',
+      unit: 'pc', // NEW: Added unit
       category: 'Clothing',
       image: 'https://images.unsplash.com/photo-1576566588028-cdfd73055780?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     },
@@ -301,7 +301,7 @@ const productsData = {
       description: 'Hand-painted ceramic vase, perfect for your living room.',
       price: 800,
       stock: 25,
-      unit: 'pc',
+      unit: 'pc', // NEW: Added unit
       category: 'Decor',
       image: 'https://images.unsplash.com/photo-1587334175721-ad1e1071317e?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     },
@@ -310,7 +310,7 @@ const productsData = {
       description: 'A set of aromatic scented candles to create a relaxing ambiance.',
       price: 350,
       stock: 60,
-      unit: 'set',
+      unit: 'set', // NEW: Added unit
       category: 'Decor',
       image: 'https://images.unsplash.com/photo-1582794543139-c317030b6731?q=80&w=1974&auto=format&fit=crop&ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D',
     },

@@ -6,7 +6,7 @@ import Product from '../models/Product.js';
 // @route   GET /api/cart
 // @access  Private
 const getCart = asyncHandler(async (req, res) => {
-  const cart = await Cart.findOne({ user: req.user._id }).populate('items.product', 'name price image stock');
+  const cart = await Cart.findOne({ user: req.user._id }).populate('items.product', 'name price image stock unit'); // NEW: Populate unit
 
   if (cart) {
     res.json(cart); // Return the full cart object, including items array
@@ -20,7 +20,7 @@ const getCart = asyncHandler(async (req, res) => {
 // @route   POST /api/cart
 // @access  Private
 const addItemToCart = asyncHandler(async (req, res) => {
-  const { productId, quantity } = req.body;
+  const { productId, quantity, unit } = req.body; // NEW: Destructure unit
 
   const product = await Product.findById(productId);
 
@@ -61,11 +61,12 @@ const addItemToCart = asyncHandler(async (req, res) => {
       image: product.image,
       price: product.price,
       quantity,
+      unit, // NEW: Add unit to cart item
     });
   }
 
   await cart.save();
-  const updatedCart = await Cart.findById(cart._id).populate('items.product', 'name price image stock');
+  const updatedCart = await Cart.findById(cart._id).populate('items.product', 'name price image stock unit'); // NEW: Populate unit
   res.status(201).json(updatedCart);
 });
 
@@ -104,7 +105,7 @@ const updateCartItemQuantity = asyncHandler(async (req, res) => {
     }
     cart.items[itemIndex].quantity = quantity;
     await cart.save();
-    const updatedCart = await Cart.findById(cart._id).populate('items.product', 'name price image stock');
+    const updatedCart = await Cart.findById(cart._id).populate('items.product', 'name price image stock unit'); // NEW: Populate unit
     res.json(updatedCart);
   } else {
     res.status(404);
@@ -136,7 +137,7 @@ const removeItemFromCart = asyncHandler(async (req, res) => {
   }
 
   await cart.save();
-  const updatedCart = await Cart.findById(cart._id).populate('items.product', 'name price image stock');
+  const updatedCart = await Cart.findById(cart._id).populate('items.product', 'name price image stock unit'); // NEW: Populate unit
   res.json(updatedCart);
 });
 

@@ -32,7 +32,7 @@ const useCart = (isLoggedIn, user, isVendor, isAdmin) => {
       return;
     }
     try {
-      const response = await api.customer.addToCart(product._id, 1, product.unit);
+      const response = await api.customer.addToCart(product._id, 1, product.unit); // NEW: Pass product.unit
       setCart(response.items);
       toast.success(`${product.name} added to cart!`);
     } catch (error) {
