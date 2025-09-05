@@ -150,8 +150,9 @@ const Products = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8" role="list">
             {sortedProducts.map((product) => {
               const discount = calculateDiscount(product.price, product.originalPrice);
+              const isOutOfStock = product.stock === 0;
               return (
-                <div key={product._id} className="bg-black/10 border border-white/10 rounded-2xl overflow-hidden shadow-lg flex flex-col" role="listitem" aria-label={`Product: ${product.name}`}>
+                <div key={product._id} className={`bg-black/10 border border-white/10 rounded-2xl overflow-hidden shadow-lg flex flex-col ${isOutOfStock ? 'grayscale' : ''}`} role="listitem" aria-label={`Product: ${product.name}`}>
                   <Link to={`/products/${product._id}`} className="flex-grow" aria-label={`View details for ${product.name}`}>
                     <div className="relative">
                       <img
