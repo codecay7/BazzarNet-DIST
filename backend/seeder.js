@@ -7,7 +7,10 @@ import Product from './models/Product.js';
 import connectDB from './config/db.js';
 import env from './config/env.js'; // Import env for MONGO_URI
 
-dotenv.config(); // Load environment variables
+// Load environment variables only if not in test environment
+if (process.env.NODE_ENV !== 'test') {
+  dotenv.config();
+}
 
 // Connect to DB
 // This connectDB call is for when seeder.js is run directly.

@@ -42,7 +42,10 @@ const __dirname = path.dirname(__filename);
 const app = express();
 
 // Connect DB
-connectDB();
+// Only connect to DB if not in test environment
+if (process.env.NODE_ENV !== 'test') {
+  connectDB();
+}
 
 // NEW: Auto-seed data if database is empty in development mode
 const seedDatabase = async () => {
@@ -111,8 +114,13 @@ app.use(notFound);
 app.use(errorHandler);
 
 // Start Server
-app.listen(env.PORT, () => {
-  console.log(
-    `🚀 Server running in ${env.NODE_ENV} mode on port ${env.PORT}\nAPI: http://localhost:${env.PORT}`
-  );
-});
+// Only listen if not in test environment
+if (process.env.NODE_ENV !== 'test') {
+  app.listen(env.PORT, () => {
+    console.log(
+      `🚀 Server running in ${env.NODE_ENV} mode on port ${env.PORT}\nAPI: http://localhost:${env.PORT}`
+    );
+  });
+}
+
+export default app; // Export the app for testing
