@@ -4,6 +4,7 @@ import { faShoppingBag, faStore, faCartPlus, faTruck, faUser, faQuoteLeft, faArr
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import LoadingSpinner3D from '../components/LoadingSpinner3D'; // Import the new 3D loader
+import { BubbleBackground } from '../components/BubbleBackground'; // Import the new BubbleBackground
 
 const LandingPage = () => {
   const [isLoading, setIsLoading] = useState(true); // New state for loading screen
@@ -63,11 +64,7 @@ const LandingPage = () => {
           animate="visible"
           exit="hidden" // Animate out when navigating away
         >
-          {/* Background Blobs / Premium Look */}
-          <div className="absolute top-10 left-10 w-72 h-72 bg-[var(--accent)] rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob z-[-1]"></div>
-          <div className="absolute top-10 right-10 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000 z-[-1]"></div>
-          <div className="absolute bottom-10 left-10 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000 z-[-1]"></div>
-          <div className="absolute top-1/2 right-10 -translate-y-1/2 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-1000 z-[-1]"></div>
+          <BubbleBackground interactive={true} className="absolute inset-0 -z-20" /> {/* Apply BubbleBackground here */}
 
           {/* Hero Section */}
           <motion.div
