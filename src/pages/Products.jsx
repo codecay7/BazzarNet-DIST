@@ -131,7 +131,7 @@ const Products = () => {
         ) : sortedProducts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center" role="list">
             {sortedProducts.map((product) => (
-              <ProductCard key={product._id} product={product} className="max-w-sm" />
+              <ProductCard key={product._id} product={product} />
             ))}
           </div>
         ) : (

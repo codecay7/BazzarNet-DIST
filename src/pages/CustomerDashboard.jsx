@@ -154,7 +154,9 @@ const CustomerDashboard = () => {
               ) : recommendedProducts.length > 0 ? (
                 <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
                   {recommendedProducts.map(product => (
-                    <ProductCard key={product._id} product={product} />
+                    <div key={product._id} className="flex-shrink-0 w-[180px] sm:w-[200px] md:w-[220px] lg:w-[250px]">
+                      <ProductCard product={product} />
+                    </div>
                   ))}
                 </div>
               ) : (
@@ -195,7 +197,9 @@ const CustomerDashboard = () => {
                     {allAppProducts.filter(p => p.category === category).length > 0 ? (
                       <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
                         {allAppProducts.filter(p => p.category === category).map(product => (
-                          <ProductCard key={product._id} product={product} />
+                          <div key={product._id} className="flex-shrink-0 w-[180px] sm:w-[200px] md:w-[220px] lg:w-[250px]">
+                            <ProductCard product={product} />
+                          </div>
                         ))}
                       </div>
                     ) : (
@@ -209,7 +213,9 @@ const CustomerDashboard = () => {
                   {allAppProducts.filter(p => p.category === selectedBrowseCategory).length > 0 ? (
                     <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
                       {allAppProducts.filter(p => p.category === selectedBrowseCategory).map(product => (
-                        <ProductCard key={product._id} product={product} />
+                        <div key={product._id} className="flex-shrink-0 w-[180px] sm:w-[200px] md:w-[220px] lg:w-[250px]">
+                          <ProductCard product={product} />
+                        </div>
                       ))}
                     </div>
                   ) : (
