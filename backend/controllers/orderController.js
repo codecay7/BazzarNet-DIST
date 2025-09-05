@@ -38,6 +38,12 @@ const placeOrder = asyncHandler(async (req, res) => {
     throw new Error('Store not found for the order.');
   }
 
+  // NEW VALIDATION: Ensure customer's shipping pincode matches the store's pincode
+  if (shippingAddress.pinCode !== store.address.pinCode) {
+    res.status(400);
+    throw new Error(`Cannot place order. Store is not available in your selected pincode (${shippingAddress.pinCode}). This store serves pincode ${store.address.pinCode}.`);
+  }
+
   // --- Stock Validation and Decrement ---
   const productsToUpdate = [];
   for (const item of items) {
