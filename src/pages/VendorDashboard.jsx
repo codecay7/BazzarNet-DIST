@@ -2,9 +2,9 @@ import React, { useContext, useMemo, useState, useEffect } from 'react';
 import { AppContext } from '../context/AppContext';
 import { BarChart, Bar, XAxis, YAxis, Tooltip, ResponsiveContainer, CartesianGrid, LineChart, Line, Legend } from 'recharts';
 import { Wallet, Package, Users, Tag, Search, Calendar as CalendarIcon } from 'lucide-react';
-import StatCard from './StatCard';
+import StatCard from '../components/StatCard'; // Corrected import path
 import { useNavigate } from 'react-router-dom';
-import SkeletonText from './SkeletonText';
+import SkeletonText from '../components/SkeletonText';
 import * as api from '../services/api'; // Import API service
 import placeholderImage from '../assets/placeholder.png'; // Import placeholder image
 import { getFullImageUrl } from '../utils/imageUtils'; // Import utility
