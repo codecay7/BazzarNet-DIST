@@ -7,6 +7,7 @@ import { ChevronDown } from 'lucide-react';
 import SkeletonCard from '../components/SkeletonCard';
 import Pagination from '../components/Pagination';
 import placeholderImage from '../assets/placeholder.png'; // Import placeholder image
+import { getFullImageUrl } from '../utils/imageUtils'; // Import utility
 
 const Products = () => {
   const { addToCart, addToWishlist, simulateLoading, allAppProducts, allAppProductsMeta, fetchAllProducts, appStores } = useContext(AppContext);
@@ -157,7 +158,7 @@ const Products = () => {
                   <Link to={`/products/${product._id}`} className="flex-grow" aria-label={`View details for ${product.name}`}>
                     <div className="relative">
                       <img
-                        src={product.image}
+                        src={getFullImageUrl(product.image)}
                         alt={product.name}
                         className="w-full h-48 object-cover"
                         onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }} // Fallback image

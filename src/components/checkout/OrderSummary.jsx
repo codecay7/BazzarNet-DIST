@@ -2,6 +2,7 @@ import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
 import placeholderImage from '../../assets/placeholder.png'; // Corrected import path
+import { getFullImageUrl } from '../../utils/imageUtils'; // Import utility
 
 const OrderSummary = ({ cart, subtotal, total, shippingAddress, appliedCoupon, discountAmount, onEditAddress, onNextStep, onPreviousStep }) => {
   const displayAddress = (address) => {
@@ -24,7 +25,7 @@ const OrderSummary = ({ cart, subtotal, total, shippingAddress, appliedCoupon, d
             <li key={item.product._id} className="flex justify-between items-center" role="listitem">
               <div className="flex items-center gap-3">
                 <img 
-                  src={item.image} 
+                  src={getFullImageUrl(item.image)} 
                   alt={item.name} 
                   className="w-12 h-12 object-cover rounded-md" 
                   onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }} // Fallback image

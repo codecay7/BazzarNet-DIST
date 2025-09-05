@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCartPlus, faHeart, faStar, faStarHalfAlt } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
 import placeholderImage from '../assets/placeholder.png'; // Import placeholder image
+import { getFullImageUrl } from '../utils/imageUtils'; // Import utility
 
 const StorePage = () => {
   const { addToCart, addToWishlist, allAppProducts, appStores } = useContext(AppContext);
@@ -61,7 +62,7 @@ const StorePage = () => {
                   <Link to={`/products/${product._id}`} className="flex-grow" aria-label={`View details for ${product.name}`}>
                     <div className="relative">
                       <img 
-                        src={product.image} 
+                        src={getFullImageUrl(product.image)} 
                         alt={product.name} 
                         className="w-full h-48 object-cover" 
                         onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }} // Fallback image

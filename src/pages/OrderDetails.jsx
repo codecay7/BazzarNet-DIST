@@ -4,6 +4,7 @@ import { AppContext } from '../context/AppContext';
 import toast from 'react-hot-toast';
 import { ChevronDown } from 'lucide-react';
 import placeholderImage from '../assets/placeholder.png'; // Import placeholder image
+import { getFullImageUrl } from '../utils/imageUtils'; // Import utility
 
 // Helper function to format ISO timestamp
 const formatTimestamp = (isoString) => {
@@ -79,7 +80,7 @@ const OrderDetails = () => {
                   <li key={item.product} className="flex justify-between" role="listitem">
                     <div className="flex items-center gap-2">
                       <img 
-                        src={item.image} 
+                        src={getFullImageUrl(item.image)} 
                         alt={item.name} 
                         className="w-12 h-12 object-cover rounded-md" 
                         onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }} // Fallback image

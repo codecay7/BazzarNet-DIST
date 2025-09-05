@@ -7,6 +7,7 @@ import SkeletonText from '../components/SkeletonText';
 import SkeletonCard from '../components/SkeletonCard';
 import * as api from '../services/api'; // Import API service
 import placeholderImage from '../assets/placeholder.png'; // Import placeholder image
+import { getFullImageUrl } from '../utils/imageUtils'; // Import utility
 
 const CustomerDashboard = () => {
   const { user, cart, wishlist, orders, addToCart } = useContext(AppContext); // Removed simulateLoading
@@ -119,7 +120,7 @@ const CustomerDashboard = () => {
                     return (
                       <div key={product._id} className={`flex flex-col bg-black/10 p-3 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 ${isOutOfStock ? 'grayscale' : ''}`}>
                         <img 
-                          src={product.image} 
+                          src={getFullImageUrl(product.image)} 
                           alt={product.name} 
                           className="w-full h-32 object-cover rounded-md mb-2" 
                           onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }} // Fallback image

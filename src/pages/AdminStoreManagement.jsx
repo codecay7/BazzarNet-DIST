@@ -7,6 +7,7 @@ import Modal from '../components/Modal';
 import StoreForm from '../components/StoreForm';
 import toast from 'react-hot-toast';
 import placeholderImage from '../assets/placeholder.png'; // Import placeholder image
+import { getFullImageUrl } from '../utils/imageUtils'; // Import utility
 
 const AdminStoreManagement = () => {
   const { appStores, appStoresMeta, fetchAppStores, adminUpdateStore, adminDeleteStore } = useContext(AppContext); // Removed simulateLoading
@@ -136,7 +137,7 @@ const AdminStoreManagement = () => {
                     <tr key={store._id} className="hover:bg-black/5 transition-colors duration-200">
                       <td className="px-4 py-4 whitespace-nowrap">
                         <img 
-                          src={store.logo} 
+                          src={getFullImageUrl(store.logo)} 
                           alt={`${store.name} logo`} 
                           className="w-10 h-10 rounded-full object-cover" 
                           onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }} // Fallback image

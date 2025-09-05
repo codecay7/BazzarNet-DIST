@@ -4,6 +4,7 @@ import { faCreditCard, faShoppingBag, faHeart } from '@fortawesome/free-solid-sv
 import { AppContext } from '../context/AppContext';
 import { useNavigate, Link } from 'react-router-dom';
 import placeholderImage from '../assets/placeholder.png'; // Import placeholder image
+import { getFullImageUrl } from '../utils/imageUtils'; // Import utility
 
 const Cart = () => {
   const { cart, removeFromCart, updateCartQuantity, moveToWishlist } = useContext(AppContext);
@@ -30,7 +31,7 @@ const Cart = () => {
                 <div key={item.product._id} className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4" role="listitem" aria-label={`Item: ${item.name}, Price: ₹${item.price.toFixed(2)}, Quantity: ${item.quantity}`}>
                   <div className="flex items-center gap-4">
                     <img 
-                      src={item.image} 
+                      src={getFullImageUrl(item.image)} 
                       alt={item.name} 
                       className="w-20 h-20 object-cover rounded-lg" 
                       onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }} // Fallback image

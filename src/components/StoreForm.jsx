@@ -4,6 +4,7 @@ import { ChevronDown, UploadCloud } from 'lucide-react';
 import useFormValidation from '../hooks/useFormValidation';
 import * as api from '../services/api';
 import placeholderImage from '../assets/placeholder.png'; // Import placeholder image
+import { getFullImageUrl } from '../utils/imageUtils'; // Import utility
 
 const indianStates = [
   "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
@@ -215,7 +216,7 @@ const StoreForm = ({ onSubmit, initialData = null }) => {
         {store.logo && (
           <div className="mt-2 w-32 h-32 border border-white/30 rounded-lg overflow-hidden flex items-center justify-center">
             <img 
-              src={store.logo} 
+              src={getFullImageUrl(store.logo)} 
               alt="Logo Preview" 
               className="max-w-full max-h-full object-contain" 
               onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }} // Fallback image

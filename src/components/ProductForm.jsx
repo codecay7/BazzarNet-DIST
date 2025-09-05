@@ -4,6 +4,7 @@ import { ChevronDown, UploadCloud } from 'lucide-react'; // Added UploadCloud ic
 import useFormValidation from '../hooks/useFormValidation'; // Import the custom hook
 import * as api from '../services/api'; // Import API service for uploads
 import placeholderImage from '../assets/placeholder.png'; // Import placeholder image
+import { getFullImageUrl } from '../utils/imageUtils'; // Import utility
 
 const ProductForm = ({ onSubmit, initialData = null }) => {
   const [product, setProduct] = useState({
@@ -179,7 +180,7 @@ const ProductForm = ({ onSubmit, initialData = null }) => {
         {product.image && (
           <div className="mt-2 w-32 h-32 border border-white/30 rounded-lg overflow-hidden flex items-center justify-center">
             <img 
-              src={product.image} 
+              src={getFullImageUrl(product.image)} 
               alt="Image Preview" 
               className="max-w-full max-h-full object-contain" 
               onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }} // Fallback image

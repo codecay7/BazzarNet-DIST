@@ -7,6 +7,7 @@ import ProductForm from '../components/ProductForm';
 import SkeletonCard from '../components/SkeletonCard';
 import Pagination from '../components/Pagination';
 import placeholderImage from '../assets/placeholder.png'; // Import placeholder image
+import { getFullImageUrl } from '../utils/imageUtils'; // Import utility
 
 const ManageProducts = () => {
   const { vendorProducts, vendorProductsMeta, fetchVendorProducts, addVendorProduct, editVendorProduct, deleteVendorProduct, simulateLoading, user } = useContext(AppContext);
@@ -107,7 +108,7 @@ const ManageProducts = () => {
                   <div key={product._id} className="bg-black/10 border border-white/10 rounded-2xl overflow-hidden shadow-lg flex flex-col" role="listitem" aria-label={`Product: ${product.name}`}>
                     <div className="relative">
                       <img 
-                        src={product.image} 
+                        src={getFullImageUrl(product.image)} 
                         alt={product.name} 
                         className="w-full h-48 object-cover" 
                         onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }} // Fallback image

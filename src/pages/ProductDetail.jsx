@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCartPlus, faHeart, faStar, faStarHalfAlt } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
 import placeholderImage from '../assets/placeholder.png'; // Import placeholder image
+import { getFullImageUrl } from '../utils/imageUtils'; // Import utility
 
 const ProductDetail = () => {
   const { addToCart, addToWishlist, allAppProducts } = useContext(AppContext);
@@ -40,7 +41,7 @@ const ProductDetail = () => {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
           <div>
             <img 
-              src={product.image} 
+              src={getFullImageUrl(product.image)} 
               alt={product.name} 
               className={`w-full h-auto object-cover rounded-lg shadow-lg ${isOutOfStock ? 'grayscale' : ''}`} 
               onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }} // Fallback image

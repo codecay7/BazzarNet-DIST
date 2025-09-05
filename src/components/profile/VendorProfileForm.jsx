@@ -6,6 +6,7 @@ import { Building2, Mail, Phone, Landmark, ChevronDown, FileText, UploadCloud } 
 import useFormValidation from '../../hooks/useFormValidation';
 import * as api from '../../services/api';
 import placeholderImage from '../../assets/placeholder.png'; // Import placeholder image
+import { getFullImageUrl } from '../../utils/imageUtils'; // Import utility
 
 const indianStates = [
   "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
@@ -33,7 +34,7 @@ const VendorProfileForm = ({ profileData, setProfileData, isEditing, handleImage
           <div className="relative w-24 h-24 flex-shrink-0">
             {profileData.profileImage ? (
               <img 
-                src={profileData.profileImage} 
+                src={getFullImageUrl(profileData.profileImage)} 
                 alt="Store Logo" 
                 className="w-24 h-24 rounded-full object-cover border-4 border-white/30 shadow-lg" 
                 onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }} // Fallback image
