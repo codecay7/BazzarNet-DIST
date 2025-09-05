@@ -30,9 +30,18 @@ const placeOrderSchema = Joi.object({
     'any.required': 'Order items are required.',
   }),
   shippingAddress: shippingAddressSchema.required(),
-  paymentMethod: Joi.string().valid('Credit Card', 'UPI', 'Cash on Delivery').required().messages({
+  paymentMethod: Joi.string().valid('Credit Card', 'UPI', 'Cash on Delivery', 'UPI QR Payment').required().messages({ // NEW: Added 'UPI QR Payment'
     'any.only': 'Invalid payment method.',
     'any.required': 'Payment method is required.',
+  }),
+  transactionId: Joi.string().when('paymentMethod', { // NEW: Conditionally require transactionId
+    is: 'UPI QR Payment',
+    then: Joi.string().pattern(/^[a-zA-Z0-9]{12}$/).required().messages({
+      'string.empty': 'Transaction ID is required for UPI QR Payment.',
+      'string.pattern.base': 'Transaction ID must be 12 alphanumeric characters.',
+      'any.required': 'Transaction ID is required for UPI QR Payment.',
+    }),
+    otherwise: Joi.string().allow(null, ''), // Allow null or empty for other methods
   }),
   totalPrice: Joi.number().positive().required().messages({
     'number.base': 'Total price must be a number.',

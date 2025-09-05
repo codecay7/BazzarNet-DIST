@@ -13,7 +13,7 @@ import mongoose from 'mongoose'; // Import mongoose for transactions
 // @access  Private/Customer
 const placeOrder = asyncHandler(async (req, res) => {
   console.log('Backend: placeOrder controller reached.'); // NEW LOG
-  const { items, shippingAddress, paymentMethod, totalPrice, appliedCoupon } = req.body; // New: Get appliedCoupon
+  const { items, shippingAddress, paymentMethod, totalPrice, appliedCoupon, transactionId } = req.body; // New: Get appliedCoupon and transactionId
   console.log('Backend: Received items in req.body:', items); // ADDED LOG
 
   if (!items || items.length === 0) {
@@ -97,7 +97,7 @@ const placeOrder = asyncHandler(async (req, res) => {
       paymentMethod,
       totalPrice,
       deliveryOtp: generateOtp(), // Generate OTP for delivery confirmation
-      transactionId: paymentMethod !== 'Cash on Delivery' ? `TXN-${Date.now()}` : undefined, // Mock transaction ID
+      transactionId: paymentMethod === 'UPI QR Payment' ? transactionId : undefined, // NEW: Assign transactionId for UPI QR Payment
       // New: Store coupon details if applied
       coupon: appliedCoupon ? {
         code: appliedCoupon.code,
@@ -137,6 +137,7 @@ const placeOrder = asyncHandler(async (req, res) => {
       <p><strong>Total Price:</strong> ₹${createdOrder.totalPrice.toFixed(2)}</p>
       ${createdOrder.coupon ? `<p><strong>Coupon Applied:</strong> ${createdOrder.coupon.code} (Discount: ₹${createdOrder.coupon.discountAmount.toFixed(2)})</p>` : ''}
       <p><strong>Payment Method:</strong> ${createdOrder.paymentMethod}</p>
+      ${createdOrder.transactionId ? `<p><strong>Transaction ID:</strong> ${createdOrder.transactionId}</p>` : ''}
       <p><strong>Shipping Address:</strong></p>
       <p>
         ${createdOrder.shippingAddress.houseNo}, ${createdOrder.shippingAddress.landmark ? createdOrder.shippingAddress.landmark + ', ' : ''}

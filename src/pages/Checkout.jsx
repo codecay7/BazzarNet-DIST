@@ -11,10 +11,7 @@ import * as api from '../services/api'; // Import API service
 import CheckoutSteps from '../components/checkout/CheckoutSteps';
 import ShippingAddressForm from '../components/checkout/ShippingAddressForm';
 import OrderSummary from '../components/checkout/OrderSummary';
-import PaymentMethodSelector from '../components/checkout/PaymentMethodSelector';
-import CardPaymentForm from '../components/checkout/CardPaymentForm';
-import UpiPaymentForm from '../components/checkout/UpiPaymentForm';
-import CouponSection from '../components/checkout/CouponSection';
+import QrPaymentForm from '../components/checkout/QrPaymentForm'; // NEW: Import QrPaymentForm
 
 const VALID_PINCODE = '825301'; // Define the valid pincode
 
@@ -22,7 +19,7 @@ const Checkout = () => {
   const { cart, checkout, user, appliedCoupon, discountAmount, updateUserInContext } = useContext(AppContext);
   const navigate = useNavigate();
   const [currentStep, setCurrentStep] = useState('address');
-  const [paymentMethod, setPaymentMethod] = useState('card');
+  // Removed paymentMethod state as we're now using a single QR/UPI payment method
 
   // Initialize shippingAddress from user profile, ensuring a deep copy
   const [shippingAddress, setShippingAddress] = useState(() => {
@@ -40,17 +37,11 @@ const Checkout = () => {
 
   const [addressErrors, setAddressErrors] = useState({});
 
-  const [cardFormData, setCardFormData] = useState({
-    cardNumber: '',
-    expiryDate: '',
-    cvv: '',
+  // NEW: State for QR/UPI payment form
+  const [qrPaymentFormData, setQrPaymentFormData] = useState({
+    transactionId: '',
   });
-  const [cardErrors, setCardErrors] = useState({});
-
-  const [upiFormData, setUpiFormData] = useState({
-    upiId: '',
-  });
-  const [upiErrors, setUpiErrors] = useState({});
+  const [qrPaymentErrors, setQrPaymentErrors] = useState({});
 
   const subtotal = cart.reduce((sum, item) => sum + item.price * item.quantity, 0);
   const finalTotal = subtotal - discountAmount;
@@ -71,14 +62,10 @@ const Checkout = () => {
     setShippingAddress(prev => ({ ...prev, [name]: value }));
   };
 
-  const handleCardChange = (e) => {
+  // NEW: Handler for QR/UPI form changes
+  const handleQrPaymentChange = (e) => {
     const { name, value } = e.target;
-    setCardFormData(prev => ({ ...prev, [name]: value }));
-  };
-
-  const handleUpiChange = (e) => {
-    const { name, value } = e.target;
-    setUpiFormData(prev => ({ ...prev, [name]: value }));
+    setQrPaymentFormData(prev => ({ ...prev, [name]: value }));
   };
 
   // Validation functions for each step
@@ -104,35 +91,16 @@ const Checkout = () => {
     return Object.keys(newErrors).length === 0;
   };
 
+  // NEW: Validation for QR/UPI payment form
   const validatePaymentForm = () => {
     let newErrors = {};
-    if (paymentMethod === 'card') {
-      if (!cardFormData.cardNumber.trim()) {
-        newErrors.cardNumber = 'Card Number is required.';
-      } else if (!/^\d{16}$/.test(cardFormData.cardNumber.replace(/\s/g, ''))) {
-        newErrors.cardNumber = 'Card Number must be 16 digits.';
-      }
-      if (!cardFormData.expiryDate.trim()) {
-        newErrors.expiryDate = 'Expiry Date is required.';
-      } else if (!/^(0[1-9]|1[0-2])\/?([0-9]{2})$/.test(cardFormData.expiryDate)) {
-        newErrors.expiryDate = 'Invalid Expiry Date (MM/YY).';
-      }
-      if (!cardFormData.cvv.trim()) {
-        newErrors.cvv = 'CVV is required.';
-      } else if (!/^\d{3,4}$/.test(cardFormData.cvv)) {
-        newErrors.cvv = 'CVV must be 3 or 4 digits.';
-      }
-      setCardErrors(newErrors);
-      return Object.keys(newErrors).length === 0;
-    } else { // UPI
-      if (!upiFormData.upiId.trim()) {
-        newErrors.upiId = 'UPI ID is required.';
-      } else if (!/^[a-zA-Z0-9.\-]+@[a-zA-Z0-9.\-]+$/.test(upiFormData.upiId)) {
-        newErrors.upiId = 'Invalid UPI ID format.';
-      }
-      setUpiErrors(newErrors);
-      return Object.keys(newErrors).length === 0;
+    if (!qrPaymentFormData.transactionId.trim()) {
+      newErrors.transactionId = 'Transaction ID is required.';
+    } else if (!/^[a-zA-Z0-9]{12}$/.test(qrPaymentFormData.transactionId.trim())) { // Example: 12-digit alphanumeric
+      newErrors.transactionId = 'Transaction ID must be 12 alphanumeric characters.';
     }
+    setQrPaymentErrors(newErrors);
+    return Object.keys(newErrors).length === 0;
   };
 
   const handleNextStep = async () => {
@@ -191,7 +159,8 @@ const Checkout = () => {
             unit: item.unit,
           })),
           shippingAddress: shippingAddress,
-          paymentMethod: paymentMethod === 'card' ? 'Credit Card' : 'UPI',
+          paymentMethod: 'UPI QR Payment', // NEW: Set payment method
+          transactionId: qrPaymentFormData.transactionId, // NEW: Include transaction ID
           appliedCoupon: appliedCoupon,
       };
       
@@ -291,25 +260,13 @@ const Checkout = () => {
               exit={{ opacity: 0, y: -20 }}
               transition={{ duration: 0.3 }}
             >
-              <PaymentMethodSelector paymentMethod={paymentMethod} setPaymentMethod={setPaymentMethod}>
-                {paymentMethod === 'card' ? (
-                  <CardPaymentForm
-                    formData={cardFormData}
-                    errors={cardErrors}
-                    handleChange={handleCardChange}
-                    onPreviousStep={handlePreviousStep}
-                    onPlaceOrder={handlePlaceOrder}
-                  />
-                ) : (
-                  <UpiPaymentForm
-                    formData={upiFormData}
-                    errors={upiErrors}
-                    handleChange={handleUpiChange}
-                    onPreviousStep={handlePreviousStep}
-                    onPlaceOrder={handlePlaceOrder}
-                  />
-                )}
-              </PaymentMethodSelector>
+              <QrPaymentForm
+                formData={qrPaymentFormData}
+                errors={qrPaymentErrors}
+                handleChange={handleQrPaymentChange}
+                onPreviousStep={handlePreviousStep}
+                onPlaceOrder={handlePlaceOrder}
+              />
             </motion.div>
           )}
         </AnimatePresence>

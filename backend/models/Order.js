@@ -43,12 +43,12 @@ const orderSchema = new mongoose.Schema({
   },
   paymentMethod: {
     type: String,
-    enum: ['Credit Card', 'UPI', 'Cash on Delivery'],
+    enum: ['Credit Card', 'UPI', 'Cash on Delivery', 'UPI QR Payment'], // NEW: Added 'UPI QR Payment'
     required: true,
   },
   transactionId: { // For payment gateway reference
     type: String,
-    sparse: true, // Not required for COD
+    sparse: true, // Not required for COD, but now required for UPI QR Payment
   },
   totalPrice: {
     type: Number,
