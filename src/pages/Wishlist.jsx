@@ -3,22 +3,21 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCartPlus, faHeart } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
 import { Link } from 'react-router-dom';
-import SkeletonCard from '../components/SkeletonCard'; // Assuming you might need a skeleton for loading
-import placeholderImage from '../assets/placeholder.png'; // Import placeholder image
-import { getFullImageUrl } from '../utils/imageUtils'; // Import utility
+import SkeletonCard from '../components/SkeletonCard';
+import placeholderImage from '../assets/placeholder.png';
+import { getFullImageUrl } from '../utils/imageUtils';
 
 const Wishlist = () => {
-  const { wishlist, removeFromWishlist, moveToCart } = useContext(AppContext); // Removed simulateLoading
+  const { wishlist, removeFromWishlist, moveToCart } = useContext(AppContext);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      // Removed await simulateLoading(500); // Simulate loading for wishlist
       setLoading(false);
     };
     loadData();
-  }, [wishlist.length]); // Re-run loading when wishlist changes
+  }, [wishlist.length]);
 
   return (
     <section className="w-full max-w-[1200px] my-10">
@@ -26,7 +25,7 @@ const Wishlist = () => {
         <h2 className="text-3xl font-bold mb-5 md:text-4xl">Your Wishlist</h2>
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-            {[...Array(3)].map((_, index) => ( // Show a few skeleton cards
+            {[...Array(3)].map((_, index) => (
               <SkeletonCard key={index} />
             ))}
           </div>
@@ -49,7 +48,7 @@ const Wishlist = () => {
                       src={getFullImageUrl(item.image)} 
                       alt={item.name} 
                       className="w-20 h-20 object-cover rounded-lg" 
-                      onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }} // Fallback image
+                      onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }}
                     />
                     <div>
                       <h3 className="text-xl font-semibold">{item.name}</h3>
