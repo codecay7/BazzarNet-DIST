@@ -10,7 +10,7 @@ import placeholderImage from '../assets/placeholder.png'; // Import placeholder 
 import { getFullImageUrl } from '../utils/imageUtils'; // Import utility
 
 const ManageProducts = () => {
-  const { vendorProducts, vendorProductsMeta, fetchVendorProducts, addVendorProduct, editVendorProduct, deleteVendorProduct, /* simulateLoading, */ user } = useContext(AppContext);
+  const { vendorProducts, vendorProductsMeta, fetchVendorProducts, addVendorProduct, editVendorProduct, deleteVendorProduct, user } = useContext(AppContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -21,7 +21,6 @@ const ManageProducts = () => {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      // Removed await simulateLoading(800); // Removed this line - REMOVED
       
       const params = {
         page: currentPage,
@@ -35,7 +34,7 @@ const ManageProducts = () => {
     if (user?.storeId) { // Only fetch if user is a vendor and has a storeId
       loadData();
     }
-  }, [searchTerm, currentPage, fetchVendorProducts, user?.storeId /* , simulateLoading */]); // Removed simulateLoading from dependencies
+  }, [searchTerm, currentPage, fetchVendorProducts, user?.storeId]);
 
   const handleOpenModal = (product = null) => {
     setEditingProduct(product);
@@ -114,7 +113,7 @@ const ManageProducts = () => {
                         onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }} // Fallback image
                       />
                       {discount > 0 && (
-                        <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded" aria-label={`${discount} percent off`}>{discount}% OFF</span>
+                        <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded" aria-label={`${discount} percent off`}>{Math.round(discount)}% OFF</span>
                       )}
                     </div>
                     <div className="p-4 flex-grow flex-col">

@@ -2,9 +2,9 @@ import React from 'react';
 
 const SkeletonCard = () => {
   return (
-    <div className="bg-black/10 border border-white/10 rounded-2xl overflow-hidden shadow-lg flex-shrink-0 w-[180px] sm:w-[200px] md:w-[220px] lg:w-[250px] flex flex-col animate-pulse">
+    <div className="bg-black/10 border border-white/10 rounded-2xl overflow-hidden shadow-lg flex-shrink-0 w-[220px] sm:w-[240px] md:w-[260px] lg:w-[280px] flex flex-col animate-pulse">
       {/* Placeholder for image */}
-      <div className="w-full h-32 sm:h-40 bg-gray-700"></div>
+      <div className="w-full h-40 sm:h-48 bg-gray-700"></div>
       
       {/* Placeholder for text content */}
       <div className="p-3 flex-grow flex-col">

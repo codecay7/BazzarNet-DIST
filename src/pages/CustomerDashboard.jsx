@@ -116,7 +116,7 @@ const CustomerDashboard = () => {
               <SkeletonText width="60%" height="1.5rem" className="mb-4" />
               <div className="flex gap-4 overflow-x-auto pb-2">
                 {[...Array(6)].map((_, index) => (
-                  <div key={index} className="flex-shrink-0 w-[180px] sm:w-[200px] md:w-[220px] lg:w-[250px]">
+                  <div key={index} className="flex-shrink-0 w-[220px] sm:w-[240px] md:w-[260px] lg:w-[280px]">
                     <SkeletonCard />
                   </div>
                 ))}
@@ -146,7 +146,7 @@ const CustomerDashboard = () => {
               {recommendedLoading ? (
                 <div className="flex gap-4 overflow-x-auto pb-2">
                   {[...Array(6)].map((_, index) => (
-                    <div key={index} className="flex-shrink-0 w-[180px] sm:w-[200px] md:w-[220px] lg:w-[250px]">
+                    <div key={index} className="flex-shrink-0 w-[220px] sm:w-[240px] md:w-[260px] lg:w-[280px]">
                       <SkeletonCard />
                     </div>
                   ))}
@@ -154,7 +154,7 @@ const CustomerDashboard = () => {
               ) : recommendedProducts.length > 0 ? (
                 <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
                   {recommendedProducts.map(product => (
-                    <div key={product._id} className="flex-shrink-0 w-[180px] sm:w-[200px] md:w-[220px] lg:w-[250px]">
+                    <div key={product._id} className="flex-shrink-0 w-[220px] sm:w-[240px] md:w-[260px] lg:w-[280px]">
                       <ProductCard product={product} />
                     </div>
                   ))}
@@ -197,7 +197,7 @@ const CustomerDashboard = () => {
                     {allAppProducts.filter(p => p.category === category).length > 0 ? (
                       <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
                         {allAppProducts.filter(p => p.category === category).map(product => (
-                          <div key={product._id} className="flex-shrink-0 w-[180px] sm:w-[200px] md:w-[220px] lg:w-[250px]">
+                          <div key={product._id} className="flex-shrink-0 w-[220px] sm:w-[240px] md:w-[260px] lg:w-[280px]">
                             <ProductCard product={product} />
                           </div>
                         ))}
@@ -213,13 +213,13 @@ const CustomerDashboard = () => {
                   {allAppProducts.filter(p => p.category === selectedBrowseCategory).length > 0 ? (
                     <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
                       {allAppProducts.filter(p => p.category === selectedBrowseCategory).map(product => (
-                        <div key={product._id} className="flex-shrink-0 w-[180px] sm:w-[200px] md:w-[220px] lg:w-[250px]">
+                        <div key={product._id} className="flex-shrink-0 w-[220px] sm:w-[240px] md:w-[260px] lg:w-[280px]">
                           <ProductCard product={product} />
                         </div>
                       ))}
                     </div>
                   ) : (
-                    <p className="text-center text-base opacity-80 py-4">Stock coming soon.</p>
+                    <p className="text-center text-lg opacity-80 py-4">Stock coming soon.</p>
                   )}
                 </div>
               )}
@@ -233,7 +233,7 @@ const CustomerDashboard = () => {
                 {pendingReviewsLoading ? (
                   <div className="flex gap-4 overflow-x-auto pb-2">
                     {[...Array(3)].map((_, index) => (
-                      <div key={index} className="flex-shrink-0 w-[180px] sm:w-[200px] md:w-[220px] lg:w-[250px]">
+                      <div key={index} className="flex-shrink-0 w-[220px] sm:w-[240px] md:w-[260px] lg:w-[280px]">
                         <SkeletonCard />
                       </div>
                     ))}
@@ -241,7 +241,7 @@ const CustomerDashboard = () => {
                 ) : pendingReviews.length > 0 ? (
                   <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
                     {pendingReviews.map(product => (
-                      <div key={product._id} className="bg-black/10 border border-white/10 rounded-2xl overflow-hidden shadow-lg flex-shrink-0 w-[180px] sm:w-[200px] md:w-[220px] lg:w-[250px] flex flex-col">
+                      <div key={product._id} className="bg-black/10 border border-white/10 rounded-2xl overflow-hidden shadow-lg flex-shrink-0 w-[220px] sm:w-[240px] md:w-[260px] lg:w-[280px] flex flex-col">
                         <Link to={`/products/${product._id}`} className="flex-grow flex flex-col">
                           <img 
                             src={getFullImageUrl(product.image)} 
