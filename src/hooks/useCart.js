@@ -32,13 +32,7 @@ const useCart = (isLoggedIn, user, isVendor, isAdmin) => {
       return;
     }
     try {
-      // Determine the actual product ID and unit.
-      // If 'product' is a wishlist item (which has a nested 'product' object), use item.product._id and item.product.unit
-      // Otherwise, assume 'product' is a direct product object.
-      const actualProductId = product.product?._id || product._id;
-      const actualUnit = product.product?.unit || product.unit;
-
-      const response = await api.customer.addToCart(actualProductId, 1, actualUnit);
+      const response = await api.customer.addToCart(product._id, 1, product.unit);
       setCart(response.items);
       toast.success(`${product.name} added to cart!`);
     } catch (error) {
