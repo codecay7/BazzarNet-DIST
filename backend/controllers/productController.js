@@ -120,6 +120,11 @@ const updateProduct = asyncHandler(async (req, res) => {
 
   const { name, description, price, originalPrice, stock, category, image, isActive, unit } = req.body; // Include unit
 
+  console.log('--- Product Update Request ---');
+  console.log('Product ID:', req.params.id);
+  console.log('Image received in req.body:', image);
+  console.log('Current product image in DB (before update):', product.image);
+
   product.name = name || product.name;
   product.description = description || product.description;
   product.price = price || product.price;
@@ -131,6 +136,9 @@ const updateProduct = asyncHandler(async (req, res) => {
   product.unit = unit || product.unit; // Update unit
 
   const updatedProduct = await product.save();
+  console.log('Updated product image in DB (after save):', updatedProduct.image);
+  console.log('--- End Product Update Request ---');
+
   res.json(updatedProduct);
 });
 
