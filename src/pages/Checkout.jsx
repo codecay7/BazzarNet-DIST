@@ -140,6 +140,7 @@ const Checkout = () => {
   };
 
   const handlePlaceOrder = async () => {
+    console.log('Attempting to place order. Current cart:', cart); // ADDED LOG
     if (validatePaymentForm()) {
       const orderDetails = {
           totalPrice: finalTotal, // New: Use finalTotal
