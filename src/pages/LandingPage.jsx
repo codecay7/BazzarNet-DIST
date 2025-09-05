@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faShoppingBag, faStore, faCartPlus, faTruck, faUser, faQuoteLeft, faArrowRight, faTags, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
+import { faShoppingBag, faStore, faCartPlus, faTruck, faUser, faQuoteLeft, faArrowRight, faTags, faCheckCircle, faLock } from '@fortawesome/free-solid-svg-icons'; // Added faLock
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Loader from '../components/Loader'; // Import the new Loader component
@@ -284,7 +284,7 @@ const LandingPage = () => {
                 className="bg-transparent border-2 border-white text-white py-3 px-8 rounded-full font-bold text-lg hover:bg-white/20 transition-colors duration-300 shadow-lg flex items-center justify-center gap-2"
                 aria-label="Explore products"
               >
-                Explore Products <FontAwesomeIcon icon={faShoppingBag} />
+                Explore Products <FontAwesomeIcon icon={faLock} />
               </Link>
             </div>
           </motion.div>
