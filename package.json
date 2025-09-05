@@ -21,7 +21,6 @@
     "react-qr-code": "^2.0.18",
     "react-router-dom": "^6.25.1",
     "recharts": "^3.1.2",
-    "styled-components": "^6.1.19",
     "xss-clean": "^0.1.4"
   },
   "devDependencies": {
