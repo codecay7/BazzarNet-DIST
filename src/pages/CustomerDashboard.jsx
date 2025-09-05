@@ -1,8 +1,8 @@
 import React, { useContext, useState, useEffect, useMemo } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faShoppingBag, faHeart, faReceipt, faCartPlus } from '@fortawesome/free-solid-svg-icons';
+import { faShoppingBag, faHeart, faReceipt, faCartPlus, faStar, faStarHalfAlt } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, Link } from 'react-router-dom';
 import SkeletonText from '../components/SkeletonText';
 import SkeletonCard from '../components/SkeletonCard';
 import * as api from '../services/api'; // Import API service
@@ -10,7 +10,7 @@ import placeholderImage from '../assets/placeholder.png'; // Import placeholder 
 import { getFullImageUrl } from '../utils/imageUtils'; // Import utility
 
 const CustomerDashboard = () => {
-  const { user, cart, wishlist, orders, addToCart } = useContext(AppContext);
+  const { user, cart, wishlist, orders, addToCart, addToWishlist } = useContext(AppContext);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [recommendedProducts, setRecommendedProducts] = useState([]);
@@ -19,11 +19,10 @@ const CustomerDashboard = () => {
   useEffect(() => {
     const loadDashboardData = async () => {
       setLoading(true);
-      // Removed await simulateLoading(1000);
       setLoading(false);
     };
     loadDashboardData();
-  }, []); // Removed simulateLoading from dependencies
+  }, []);
 
   useEffect(() => {
     const fetchRecommended = async () => {
@@ -39,7 +38,7 @@ const CustomerDashboard = () => {
       }
     };
     fetchRecommended();
-  }, []); // Fetch recommended products once on component mount
+  }, []);
 
   // Dynamically find the latest order for the logged-in user (still needed for stats)
   const latestOrder = useMemo(() => {
@@ -57,6 +56,26 @@ const CustomerDashboard = () => {
     { icon: faHeart, label: 'Wishlisted Items', value: wishlist.length, path: '/wishlist' },
     { icon: faReceipt, label: 'Total Orders', value: orders.filter(order => order.user === user?._id).length, path: '/orders' }, // Dynamic total orders
   ];
+
+  // Helper function to calculate discount percentage
+  const calculateDiscount = (price, originalPrice) => {
+    if (!originalPrice || originalPrice <= price) return 0;
+    return ((originalPrice - price) / originalPrice) * 100;
+  };
+
+  // Helper function to render star ratings
+  const renderStars = (rating) => {
+    const fullStars = Math.floor(rating);
+    const halfStar = rating % 1 !== 0;
+    const stars = [];
+    for (let i = 0; i < fullStars; i++) {
+      stars.push(<FontAwesomeIcon key={`full-${i}`} icon={faStar} className="text-yellow-400" aria-hidden="true" />);
+    }
+    if (halfStar) {
+      stars.push(<FontAwesomeIcon key="half" icon={faStarHalfAlt} className="text-yellow-400" aria-hidden="true" />);
+    }
+    return stars;
+  };
 
   return (
     <div className="w-full max-w-[1200px] mx-auto my-10">
@@ -117,29 +136,63 @@ const CustomerDashboard = () => {
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {recommendedProducts.map(product => {
                     const isOutOfStock = product.stock === 0;
+                    const discount = calculateDiscount(product.price, product.originalPrice);
                     return (
-                      <div key={product._id} className={`relative flex flex-col bg-black/10 p-4 rounded-xl border border-white/10 shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 ${isOutOfStock ? 'grayscale' : ''}`}>
-                        <img 
-                          src={getFullImageUrl(product.image)} 
-                          alt={product.name} 
-                          className="w-full h-32 object-cover rounded-md mb-2" 
-                          onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }} // Fallback image
-                        />
-                        <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
-                        <p className="text-sm opacity-70 mb-2">₹{product.price.toFixed(2)} / {product.unit}</p> {/* Display unit */}
-                        {isOutOfStock && (
-                          <div className="absolute inset-0 bg-black/50 flex items-center justify-center rounded-xl">
-                            <span className="text-white text-xl font-bold">OUT OF STOCK</span>
+                      <div key={product._id} className={`bg-black/10 border border-white/10 rounded-2xl overflow-hidden shadow-lg flex flex-col ${isOutOfStock ? 'grayscale' : ''}`} role="listitem" aria-label={`Product: ${product.name}`}>
+                        <Link to={`/products/${product._id}`} className="flex-grow" aria-label={`View details for ${product.name}`}>
+                          <div className="relative">
+                            <img
+                              src={getFullImageUrl(product.image)}
+                              alt={product.name}
+                              className="w-full h-48 object-cover"
+                              onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }} // Fallback image
+                            />
+                            {discount > 0 && (
+                              <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded" aria-label={`${Math.round(discount)} percent off`}>{Math.round(discount)}% OFF</span>
+                            )}
+                            {isOutOfStock && (
+                              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                                <span className="text-white text-xl font-bold">OUT OF STOCK</span>
+                              </div>
+                            )}
                           </div>
-                        )}
-                        <button 
-                          onClick={() => addToCart(product)} 
-                          className="bg-[var(--accent)] text-white py-2 px-3 rounded-lg text-sm flex items-center justify-center gap-2 font-medium hover:bg-[var(--accent-dark)] transition-colors mt-auto"
-                          aria-label={`Add ${product.name} to cart`}
-                          disabled={isOutOfStock}
-                        >
-                          <FontAwesomeIcon icon={faCartPlus} aria-hidden="true" /> Add to Cart
-                        </button>
+                          <div className="p-4 flex-grow flex-col">
+                            <h3 className="text-xl font-semibold mb-2">{product.name}</h3>
+                            <div className="flex items-baseline gap-2 mb-2">
+                              <p className="text-lg font-bold text-[var(--accent)]">₹{product.price.toFixed(2)} / {product.unit}</p>
+                              {product.originalPrice && discount > 0 && (
+                                <p className="text-sm text-gray-400 line-through">₹{product.originalPrice.toFixed(2)}</p>
+                              )}
+                            </div>
+                            <div className="flex items-center gap-2 text-sm mb-2">
+                              <div className="flex">{renderStars(product.rating)}</div>
+                              <span className="opacity-80">({product.reviews})</span>
+                            </div>
+                            {/* Stock information */}
+                            {product.stock > 0 ? (
+                              <p className="text-sm opacity-80 text-green-400">In Stock: {product.stock}</p>
+                            ) : (
+                              <p className="text-sm opacity-80 text-red-400">Out of Stock</p>
+                            )}
+                          </div>
+                        </Link>
+                        <div className="flex gap-2 mt-4 p-4 pt-0">
+                          <button
+                            className="flex-1 bg-[var(--accent)] text-white border-none py-2 px-4 rounded-lg flex items-center justify-center gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300"
+                            onClick={() => addToCart(product)}
+                            aria-label={`Add ${product.name} to cart`}
+                            disabled={product.stock === 0} // Disable button if out of stock
+                          >
+                            <FontAwesomeIcon icon={faCartPlus} aria-hidden="true" /> Cart
+                          </button>
+                          <button
+                            className="bg-white/10 text-[var(--text)] border-none py-2 px-4 rounded-lg flex items-center justify-center gap-2 font-medium hover:bg-white/20 transition-all duration-300"
+                            onClick={() => addToWishlist(product)}
+                            aria-label={`Add ${product.name} to wishlist`}
+                          >
+                            <FontAwesomeIcon icon={faHeart} aria-hidden="true" />
+                          </button>
+                        </div>
                       </div>
                     );
                   })}
