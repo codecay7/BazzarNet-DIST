@@ -7,17 +7,23 @@ import * as api from '../services/api';
 import SkeletonText from '../components/SkeletonText'; // Assuming you might need a skeleton for loading
 
 const Payments = () => {
-  const { user, simulateLoading } = useContext(AppContext);
+  const { user } = useContext(AppContext); // Removed simulateLoading
   const [activeTab, setActiveTab] = useState('all');
   const [payments, setPayments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState('');
 
   const fetchPayments = async () => {
-    if (!user || !user.storeId) return;
+    // Ensure user and user._id exist before attempting to fetch
+    if (!user || !user._id) {
+      setPayments([]);
+      setLoading(false);
+      return;
+    }
     setLoading(true);
     try {
-      const fetchedPayments = await api.vendor.getPayments(user.storeId, { status: activeTab === 'all' ? undefined : activeTab, search: searchTerm });
+      // Corrected: Pass user._id as vendorId to the API
+      const fetchedPayments = await api.vendor.getPayments(user._id, { status: activeTab === 'all' ? undefined : activeTab, search: searchTerm });
       setPayments(fetchedPayments);
     } catch (error) {
       toast.error(`Failed to load payments: ${error.message}`);
@@ -50,6 +56,8 @@ const Payments = () => {
     try {
       const response = await api.vendor.reportPaymentIssue(paymentId);
       toast.success(response.message);
+      // Re-fetch payments to update the status if needed
+      fetchPayments();
     } catch (error) {
       toast.error(`Error reporting issue: ${error.message}`);
     }
