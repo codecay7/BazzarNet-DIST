@@ -4,7 +4,6 @@ import { faShoppingBag, faStore, faCartPlus, faTruck, faUser, faQuoteLeft, faArr
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import Loader from '../components/Loader'; // Import the new Loader component
-import { BubbleBackground } from '../components/BubbleBackground'; // Import the new BubbleBackground
 
 const LandingPage = () => {
   const [isLoading, setIsLoading] = useState(true); // New state for loading screen
@@ -64,7 +63,7 @@ const LandingPage = () => {
           animate="visible"
           exit="hidden" // Animate out when navigating away
         >
-          <BubbleBackground interactive={true} className="absolute inset-0 -z-20" /> {/* Apply BubbleBackground here */}
+          {/* Removed BubbleBackground component */}
 
           {/* Hero Section */}
           <motion.div
@@ -200,7 +199,7 @@ const LandingPage = () => {
                 <p className="text-[var(--text)] text-lg">Get your goods delivered quickly.</p>
               </motion.div>
               <motion.div
-                className="bg-[var(--card-bg)] backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-[0_8px_40px_var(--shadow)] hover:-translate-y-1 transition-transform duration-300 flex flex-col items-center text-center"
+                className="bg-[var(--card-bg)] backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-[0_8px_40px_var(--shadow)] hover:-translate-y-1 transition-transform duration-300"
                 variants={cardVariants}
                 whileInView="visible"
                 initial="hidden"
@@ -217,7 +216,7 @@ const LandingPage = () => {
                 <p className="text-[var(--text)] text-lg">Shop with confidence and security.</p>
               </motion.div>
               <motion.div
-                className="bg-[var(--card-bg)] backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-[0_8px_40px_var(--shadow)] hover:-translate-y-1 transition-transform duration-300 flex flex-col items-center text-center"
+                className="bg-[var(--card-bg)] backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-[0_8px_40px_var(--shadow)] hover:-translate-y-1 transition-transform duration-300"
                 variants={cardVariants}
                 whileInView="visible"
                 initial="hidden"

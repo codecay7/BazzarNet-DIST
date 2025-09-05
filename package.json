@@ -6,7 +6,6 @@
     "@fortawesome/free-solid-svg-icons": "^6.5.2",
     "@fortawesome/react-fontawesome": "^0.2.2",
     "cloudinary": "^2.7.0",
-    "clsx": "^2.1.1",
     "express-mongo-sanitize": "^2.2.0",
     "express-rate-limit": "^8.1.0",
     "framer-motion": "^12.6.2",
@@ -23,7 +22,6 @@
     "react-router-dom": "^6.25.1",
     "recharts": "^3.1.2",
     "styled-components": "^6.1.19",
-    "tailwind-merge": "^3.3.1",
     "xss-clean": "^0.1.4"
   },
   "devDependencies": {
