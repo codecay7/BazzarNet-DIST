@@ -28,6 +28,7 @@ const useWishlist = (isLoggedIn, user, isVendor, isAdmin, addToCart, fetchCart) 
       toast.error('Please log in to add items to your wishlist.');
       return;
     }
+    console.log('useWishlist: addToWishlist called with product:', product); // NEW LOG
     try {
       const response = await api.customer.addToWishlist(product._id, product.unit);
       setWishlist(response);
@@ -64,10 +65,18 @@ const useWishlist = (isLoggedIn, user, isVendor, isAdmin, addToCart, fetchCart) 
   const moveToWishlist = useCallback(async (product) => {
     if (!isLoggedIn || !user?._id) return;
     try {
-      await addToWishlist(product);
       // When moving from cart, 'product' is a cart item object which has a nested 'product' object
-      if (product.product?._id) { // Ensure we're using the actual product ID
-        await api.customer.removeFromCart(product.product._id);
+      // We need to extract the actual product details for addToWishlist
+      const actualProduct = product.product;
+      if (!actualProduct) {
+        toast.error('Invalid product data from cart.');
+        return;
+      }
+      await addToWishlist(actualProduct); // Pass the actual product object
+      
+      // Then remove from cart using the actual product ID
+      if (actualProduct._id) {
+        await api.customer.removeFromCart(actualProduct._id);
         fetchCart(); // Re-fetch cart to ensure UI is updated
       }
     } catch (error) {

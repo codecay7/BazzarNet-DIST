@@ -21,6 +21,7 @@ const getWishlist = asyncHandler(async (req, res) => {
 // @access  Private
 const addItemToWishlist = asyncHandler(async (req, res) => {
   const { productId } = req.body;
+  console.log('Backend: addItemToWishlist - Received productId:', productId); // NEW LOG
 
   const product = await Product.findById(productId);
 
