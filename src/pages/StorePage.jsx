@@ -2,11 +2,15 @@ import React, { useContext } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { AppContext } from '../context/AppContext';
 import ProductCard from '../components/ProductCard'; // Import the new ProductCard component
+import SkeletonCard from '../components/SkeletonCard'; // Import SkeletonCard
 
 const StorePage = () => {
   const { allAppProducts, appStores } = useContext(AppContext);
   const { storeId } = useParams();
   const store = appStores.find(s => s._id === storeId);
+
+  // Filter products for the current store
+  const storeProducts = allAppProducts.filter(product => product.store._id === storeId);
 
   if (!store) {
     return (
@@ -19,7 +23,9 @@ const StorePage = () => {
     );
   }
 
-  const storeProducts = allAppProducts.filter(product => product.store._id === store._id);
+  // Assuming loading state for products is handled by allAppProducts loading,
+  // or we could add a specific loading state for store products if needed.
+  const loading = allAppProducts.length === 0; // Simple loading check
 
   return (
     <section className="w-full max-w-[1200px] my-10">
@@ -30,7 +36,13 @@ const StorePage = () => {
         </div>
         
         <h3 className="text-2xl font-bold mb-6">Products</h3>
-        {storeProducts.length > 0 ? (
+        {loading ? (
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
+            {[...Array(3)].map((_, index) => ( // Show a few skeleton cards
+              <SkeletonCard key={index} className="w-full" />
+            ))}
+          </div>
+        ) : storeProducts.length > 0 ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center" role="list">
             {storeProducts.map((product) => (
               <ProductCard key={product._id} product={product} />

@@ -96,7 +96,7 @@ const ManageProducts = () => {
           {loading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {[...Array(itemsPerPage)].map((_, index) => (
-                <SkeletonCard key={index} />
+                <SkeletonCard key={index} className="w-full" />
               ))}
             </div>
           ) : vendorProducts.length > 0 ? (

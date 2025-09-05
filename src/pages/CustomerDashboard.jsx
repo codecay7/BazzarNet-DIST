@@ -195,11 +195,9 @@ const CustomerDashboard = () => {
                   <div key={category} className="mb-8 last:mb-0">
                     <h3 className="text-xl font-semibold mb-4 border-b border-white/20 pb-2">{category}</h3>
                     {allAppProducts.filter(p => p.category === category).length > 0 ? (
-                      <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
                         {allAppProducts.filter(p => p.category === category).map(product => (
-                          <div key={product._id} className="flex-shrink-0 w-[220px] sm:w-[240px] md:w-[260px] lg:w-[280px]">
-                            <ProductCard product={product} />
-                          </div>
+                          <ProductCard key={product._id} product={product} />
                         ))}
                       </div>
                     ) : (
@@ -211,11 +209,9 @@ const CustomerDashboard = () => {
                 <div className="mb-8 last:mb-0">
                   <h3 className="text-xl font-semibold mb-4 border-b border-white/20 pb-2">{selectedBrowseCategory}</h3>
                   {allAppProducts.filter(p => p.category === selectedBrowseCategory).length > 0 ? (
-                    <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8 justify-items-center">
                       {allAppProducts.filter(p => p.category === selectedBrowseCategory).map(product => (
-                        <div key={product._id} className="flex-shrink-0 w-[220px] sm:w-[240px] md:w-[260px] lg:w-[280px]">
-                          <ProductCard product={product} />
-                        </div>
+                        <ProductCard key={product._id} product={product} />
                       ))}
                     </div>
                   ) : (

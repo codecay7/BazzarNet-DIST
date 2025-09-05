@@ -26,7 +26,7 @@ const Wishlist = () => {
         {loading ? (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
             {[...Array(3)].map((_, index) => (
-              <SkeletonCard key={index} />
+              <SkeletonCard key={index} className="w-full" />
             ))}
           </div>
         ) : wishlist.length === 0 ? (
