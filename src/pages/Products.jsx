@@ -163,6 +163,11 @@ const Products = () => {
                       {discount > 0 && (
                         <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded" aria-label={`${Math.round(discount)} percent off`}>{Math.round(discount)}% OFF</span>
                       )}
+                      {isOutOfStock && (
+                        <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                          <span className="text-white text-xl font-bold">OUT OF STOCK</span>
+                        </div>
+                      )}
                     </div>
                     <div className="p-4 flex-grow flex-col">
                       <h3 className="text-xl font-semibold mb-2">{product.name}</h3>
