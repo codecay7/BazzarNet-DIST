@@ -101,6 +101,17 @@ const CustomerOrderDetails = () => {
           </div>
         </div>
         
+        {/* OTP and QR Code Section */}
+        <div className="bg-black/10 p-6 rounded-lg max-w-md mx-auto mt-8">
+            <h3 className="text-xl font-semibold mb-4">Delivery Confirmation</h3>
+            <p className="mb-4">Please show this QR code to the delivery person to confirm your order.</p>
+            <div className="flex justify-center mb-4 p-2 bg-white rounded-lg">
+                <QRCode value={JSON.stringify({ orderId: order._id, deliveryOtp: order.deliveryOtp })} size={180} level="H" className="rounded-lg" aria-label={`QR code for order ${order._id} with OTP ${order.deliveryOtp}`} />
+            </div>
+            <p className="text-lg font-bold">OTP: <span className="text-[var(--accent)]">{order.deliveryOtp}</span></p>
+            <p className="text-sm opacity-80 mt-2">The delivery person will scan this QR or ask for the OTP.</p>
+        </div>
+
         <div className="text-center mt-8">
             <Link to="/orders" className="bg-[var(--accent)] text-white py-2 px-6 rounded-lg font-medium hover:bg-[var(--accent-dark)] transition-all duration-300">
                 Back to All Orders
