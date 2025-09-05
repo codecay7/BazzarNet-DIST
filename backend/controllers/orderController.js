@@ -24,6 +24,8 @@ const placeOrder = asyncHandler(async (req, res) => {
   const session = await mongoose.startSession();
   session.startTransaction();
 
+  let createdOrder; // Declare createdOrder outside try block to be accessible later
+
   try {
     // Extract product IDs from the incoming items
     const productIds = items.map(item => item.product);
@@ -107,7 +109,7 @@ const placeOrder = asyncHandler(async (req, res) => {
       } : undefined,
     });
 
-    const createdOrder = await order.save({ session }); // Save with session
+    createdOrder = await order.save({ session }); // Save with session
 
     // New: Mark coupon as used if one was applied
     if (appliedCoupon) {
@@ -122,7 +124,19 @@ const placeOrder = asyncHandler(async (req, res) => {
     await session.commitTransaction(); // Commit all changes if successful
     session.endSession();
 
-    // Send order confirmation email to customer (outside transaction, as email sending can fail independently)
+    // Respond to the client immediately after successful transaction commit
+    res.status(201).json(createdOrder);
+
+  } catch (error) {
+    await session.abortTransaction(); // Rollback any changes if an error occurred
+    session.endSession();
+    console.error('Transaction aborted:', error);
+    res.status(error.statusCode || 500);
+    throw new Error(error.message || 'Order placement failed due to a transaction error.');
+  }
+
+  // Send order confirmation email to customer (outside transaction)
+  if (createdOrder) { // Only attempt to send email if order was successfully created
     const orderItemsHtml = createdOrder.items.map(item => `
       <li>${item.name} (Qty: ${item.quantity} ${item.unit}) - ₹${item.price.toFixed(2)}</li>
     `).join('');
@@ -149,15 +163,12 @@ const placeOrder = asyncHandler(async (req, res) => {
       <p>You can track your order status here: <a href="${env.FRONTEND_URL}/my-orders/${createdOrder._id}">${env.FRONTEND_URL}/my-orders/${createdOrder._id}</a></p>
       <p>The BazzarNet Team</p>
     `;
-    await sendEmail(createdOrder.customerEmail, `BazzarNet Order Confirmation #${createdOrder._id}`, 'Your order has been placed!', orderConfirmationEmailHtml);
-
-    res.status(201).json(createdOrder);
-  } catch (error) {
-    await session.abortTransaction(); // Rollback any changes if an error occurred
-    session.endSession();
-    console.error('Transaction aborted:', error);
-    res.status(error.statusCode || 500);
-    throw new Error(error.message || 'Order placement failed due to a transaction error.');
+    try {
+      await sendEmail(createdOrder.customerEmail, `BazzarNet Order Confirmation #${createdOrder._id}`, 'Your order has been placed!', orderConfirmationEmailHtml);
+    } catch (emailError) {
+      console.error('Error sending order confirmation email:', emailError);
+      // Log the email error but don't prevent the order from being placed successfully
+    }
   }
 });
 
