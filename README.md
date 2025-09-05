@@ -2,69 +2,82 @@
 
 ## Project Overview
 
-BazzarNet is a modern, responsive e-commerce platform designed to connect local stores with customers for fast and reliable delivery. It supports both customer and vendor roles, offering a seamless shopping experience for users and powerful product management tools for businesses. The application emphasizes a clean UI, smooth animations, and a robust architecture built with React and a Node.js/Express backend with MongoDB.
-
-## Tech Stack
-
-*   **Frontend Framework:** React (with Vite for a fast development experience)
-*   **Frontend Styling:** Tailwind CSS (utility-first for rapid UI development)
-*   **Frontend Icons:** Font Awesome (`@fortawesome/react-fontawesome`) and Lucide React (`lucide-react`)
-*   **Frontend Animations:** Framer Motion
-*   **Frontend State Management:** React Context API (`useContext`), `useState`, `useEffect`, `useMemo`
-*   **Frontend Routing:** React Router DOM
-*   **Frontend Notifications:** React Hot Toast
-*   **Frontend Charting:** Recharts (for vendor analytics)
-*   **Frontend Language:** JavaScript (ES6+)
-*   **Backend Framework:** Node.js with Express
-*   **Backend Database:** MongoDB (using Mongoose ODM)
-*   **Backend Authentication:** JWT (JSON Web Tokens)
-*   **Backend Language:** JavaScript (ES6+ Modules)
+BazzarNet is a modern, responsive e-commerce platform designed to connect local stores with customers for fast and reliable delivery. It supports three distinct user roles: customers, vendors, and administrators, each with tailored functionalities. The application emphasizes a clean UI, smooth animations, and a robust architecture built with React for the frontend and a Node.js/Express backend with MongoDB.
 
 ## Key Features
 
 ### General
 *   **Responsive Design:** Optimized for various screen sizes (mobile, tablet, desktop).
 *   **Theming:** Toggle between light and dark modes.
-*   **Authentication:** Separate login/registration flows for customers, vendors, and admins.
+*   **Authentication:** Separate login/registration flows for customers, vendors, and admins using JWT.
+*   **Image Uploads:** Integrated image upload functionality for products, store logos, and user profiles.
+*   **Form Validation:** Robust input validation on both frontend (custom hook) and backend (Joi).
+*   **Notifications:** User-friendly toast notifications for important events.
 
 ### Customer Features
 *   **Product Browsing:** View all products or filter by store/category.
-*   **Store Browsing:** Discover local stores and their product offerings.
-*   **Product Details:** Detailed view of individual products with pricing, descriptions, and ratings.
+*   **Store Browsing:** Discover local stores and their product offerings, filtered by user's pincode.
+*   **Product Details:** Detailed view of individual products with pricing, descriptions, ratings, and the ability to leave reviews.
 *   **Shopping Cart:** Add, update quantities, and remove items from the cart.
 *   **Wishlist:** Save products for later.
-*   **Checkout Process:** Multi-step checkout with address and payment options (mocked).
+*   **Checkout Process:** Multi-step checkout with address management, coupon application, and UPI QR payment (mocked).
 *   **Order Confirmation:** Displays order summary, OTP, and QR code for delivery.
-*   **Order Tracking:** View past orders and their current status.
-*   **Profile Management:** View and edit personal contact and payment information.
-*   **Customer Dashboard:** Overview of cart, wishlist, and total orders, along with recommended products.
+*   **Order Tracking:** View past orders and their current status with a visual tracker.
+*   **Profile Management:** View and edit personal contact, address, and payment information.
+*   **Customer Dashboard:** Overview of cart, wishlist, total orders, recommended products, and products awaiting review.
 
 ### Vendor Features
 *   **Vendor Dashboard:** Overview of total revenue, orders, customers, and products. Includes sales analytics and fast-selling items.
 *   **Product Management:** Add, edit, and delete products for their store.
 *   **Order Management:** View and update the status of incoming orders, confirm delivery with OTP.
 *   **Payments Overview:** Track payment statuses for their sales.
-*   **Profile Management:** View and edit business details, legal information, and payment information.
+*   **Profile Management:** View and edit business details, legal information (PAN, GST), payment information (bank, UPI), and store logo.
 
 ### Admin Features
 *   **Admin Dashboard:** Centralized overview of platform metrics (total revenue, active users, vendor/user status, order completion, sales trends).
 *   **User Management:** View, activate/deactivate, and delete customer and vendor accounts.
 *   **Product Management:** View, edit, and delete all products across all stores.
 *   **Order Management:** View all orders, update their status, and initiate refunds.
+*   **Store Management:** View, activate/deactivate, edit, and delete all stores.
 
-## Project Structure
+## Tech Stack
 
-The project follows a clear and modular structure for both frontend and backend:
+### Frontend
+*   **Framework:** React (with Vite for a fast development experience)
+*   **Styling:** Tailwind CSS (utility-first for rapid UI development)
+*   **Icons:** Font Awesome (`@fortawesome/react-fontawesome`) and Lucide React (`lucide-react`)
+*   **Animations:** Framer Motion
+*   **State Management:** React Context API (`useContext`), `useState`, `useEffect`, `useMemo`
+*   **Routing:** React Router DOM
+*   **Notifications:** React Hot Toast
+*   **Charting:** Recharts (for vendor and admin analytics)
+*   **QR Code Generation:** `react-qr-code`
+*   **Language:** JavaScript (ES6+)
+
+### Backend
+*   **Framework:** Node.js with Express
+*   **Database:** MongoDB (using Mongoose ODM)
+*   **Authentication:** JWT (JSON Web Tokens)
+*   **Validation:** Joi
+*   **Email Service:** Nodemailer
+*   **File Uploads:** Multer (for local storage, can be extended to cloud storage like Cloudinary)
+*   **Security:** `express-mongo-sanitize`, `xss-clean`, `express-rate-limit`
+*   **Language:** JavaScript (ES6+ Modules)
+
+## Architecture
+
+The project follows a clear and modular structure for both frontend and backend, promoting maintainability and scalability.
 
 ### Frontend (`./src/`)
 *   `assets/`: Images and other media.
-*   `components/`: Reusable UI components (e.g., `Header`, `Footer`, `Modal`, `StatCard`, `ProductForm`, `Pagination`, `SkeletonCard`, `MobileNav`).
-*   `context/`: Global state management using `AppContext.jsx`.
-*   `data/`: Mock data (`mockData.js`) for products, stores, orders, etc. (will be replaced by backend API).
-*   `hooks/`: Custom React hooks (e.g., `useFormValidation`).
-*   `pages/`: Top-level views/pages of the application (e.g., `Dashboard`, `Products`, `Login`, `Register`, `Profile`, `Orders`).
-*   `services/`: API service layer (`api.js`) for frontend-backend communication.
-*   `App.jsx`: Main application component, handles routing and lazy loading.
+*   `components/`: Reusable UI components (e.g., `Header`, `Footer`, `Modal`, `StatCard`, `ProductForm`, `Pagination`, `SkeletonCard`, `MobileNav`, `SupportForm`, `ReviewForm`, `ProductCard`, `CustomerProfileForm`, `VendorProfileForm`, `LoginButton`, `Loader`, `CheckoutSteps`, `CouponSection`, `OrderSummary`, `QrPaymentForm`).
+*   `context/`: `AppContext.jsx` for global state management, centralizing authentication, theme, cart, wishlist, products, stores, orders, users, and coupons.
+*   `hooks/`: Custom React hooks encapsulating logic (e.g., `useFormValidation`, `useAuth`, `useProducts`, `useCart`, `useOrders`, `useUsers`, `useCoupons`).
+*   `pages/`: Top-level views/pages of the application (e.g., `Dashboard`, `Products`, `Login`, `Register`, `Profile`, `Orders`, `AdminDashboard`, `ManageProducts`).
+*   `routes/`: Defines application routing based on user roles (`PublicRoutes`, `CustomerRoutes`, `VendorRoutes`, `AdminRoutes`).
+*   `services/`: `api.js` for abstracting all frontend-backend API interactions.
+*   `utils/`: Small, pure utility functions (e.g., `imageUtils.js` for image URL handling).
+*   `App.jsx`: Main application component, responsible for rendering routes based on user authentication and role.
 *   `main.jsx`: Entry point for the React application.
 *   `index.css`: Global Tailwind CSS imports and custom CSS variables for theming.
 
@@ -72,83 +85,106 @@ The project follows a clear and modular structure for both frontend and backend:
 *   `config/`:
     *   `db.js`: Database connection setup (MongoDB).
     *   `env.js`: Environment variable loading and validation.
-*   `controllers/`: Contains the core business logic for API operations.
-    *   `authController.js`: User authentication logic.
-    *   `userController.js`: User-related business logic.
-    *   `productController.js`: Product-related business logic.
-    *   `storeController.js`: Store-related business logic.
-    *   `orderController.js`: Order-related business logic.
-    *   `adminController.js`: Admin-specific business logic.
-*   `middleware/`: Reusable Express middleware.
-    *   `authMiddleware.js`: Authentication and authorization checks (JWT).
-    *   `errorMiddleware.js`: Centralized error handling.
-*   `models/`: Mongoose schemas defining database collections.
-    *   `User.js`: Mongoose schema for User.
-    *   `Product.js`: Mongoose schema for Product.
-    *   `Store.js`: Mongoose schema for Store.
-    *   `Order.js`: Mongoose schema for Order.
-    *   `Cart.js`: Mongoose schema for Cart (optional, or embedded in User).
-*   `routes/`: Defines API endpoints and maps them to controller functions.
-    *   `authRoutes.js`: Authentication API endpoints.
-    *   `userRoutes.js`: User profile and customer-specific endpoints.
-    *   `productRoutes.js`: Public product browsing endpoints.
-    *   `storeRoutes.js`: Public store browsing endpoints.
-    *   `orderRoutes.js`: Customer/Vendor order endpoints.
-    *   `vendorRoutes.js`: Vendor-specific product/order management.
-    *   `adminRoutes.js`: Admin-specific management endpoints.
-*   `services/`: Encapsulates logic for external integrations or complex reusable logic.
-    *   `emailService.js`: Email sending (e.g., order confirmation).
-    *   `paymentService.js`: Payment gateway integration.
-    *   `otpService.js`: OTP generation and verification.
-*   `utils/`: Small, pure utility functions.
-    *   `jwt.js`: JWT token generation/verification utilities.
-    *   `helpers.js`: General utility functions.
-*   `validators/`: Input validation for request data.
-    *   `authValidator.js`: Validation for login/registration inputs.
-    *   `productValidator.js`: Validation for product creation/update.
-    *   `orderValidator.js`: Validation for order placement.
-*   `.env`: Environment variables (e.g., `DB_URI`, `JWT_SECRET`).
-*   `.gitignore`: Files/folders to ignore in Git.
-*   `package.json`: Project metadata and dependencies.
-*   `server.js`: Main application entry point.
+*   `controllers/`: Contains the core business logic for API operations (e.g., `authController`, `productController`, `orderController`, `adminController`).
+*   `middleware/`: Reusable Express middleware (e.g., `authMiddleware` for JWT, `errorMiddleware` for centralized error handling, `validationMiddleware` for Joi, `uploadMiddleware` for Multer, `rateLimitMiddleware` for security).
+*   `models/`: Mongoose schemas defining database collections (e.g., `User`, `Product`, `Store`, `Order`, `Cart`, `Wishlist`, `Payment`, `Coupon`, `Review`).
+*   `routes/`: Defines API endpoints and maps them to controller functions (e.g., `authRoutes`, `userRoutes`, `productRoutes`, `adminRoutes`).
+*   `services/`: Encapsulates logic for external integrations (e.g., `emailService` for Nodemailer).
+*   `utils/`: Small, pure utility functions (e.g., `jwt.js` for JWT token generation/verification, `helpers.js` for OTP generation).
+*   `validators/`: Joi schemas for input validation for various data models.
+*   `seeder.js`: Script to populate the database with sample data for development.
+*   `server.js`: Main application entry point, handles database connection, middleware setup, and route registration.
+*   `uploads/`: Directory for locally stored uploaded images.
 
-## How It Works
+## Workflow
 
-### Frontend
-The application uses React's Context API (`AppContext.jsx`) for global state management. This context provides:
-*   User authentication status (`isLoggedIn`, `user`, `isVendor`, `isAdmin`).
-*   Theme settings (`theme`, `toggleTheme`).
-*   Shopping cart and wishlist data (`cart`, `wishlist`, `addToCart`, `removeFromCart`, etc.).
-*   Centralized product and store data (`allAppProducts`, `appStores`).
-*   Order data (`orders`, `updateOrderStatus`, `checkout`).
-*   Utility functions like `simulateLoading` and `generateOtp`.
+### Authentication and Authorization
+*   Users register as `customer`, `vendor`, or `admin`.
+*   Login generates a JWT, stored client-side, and user data is saved in `AppContext`.
+*   `authMiddleware` on the backend protects routes, verifying JWTs and attaching user information to the request.
+*   `authorizeRoles` middleware restricts access to specific roles (e.g., only `vendor` can manage products).
 
-Components consume this context using the `useContext` hook to access and modify shared state. `react-router-dom` is used for navigation, with routes lazy-loaded using `React.lazy` and `Suspense` for performance. All styling is done using **Tailwind CSS**.
+### Data Flow
+1.  **Frontend Interaction:** User actions trigger functions from `AppContext` (e.g., `addToCart`, `fetchOrders`).
+2.  **API Service Layer:** `AppContext` functions call methods in `src/services/api.js`.
+3.  **HTTP Request:** `api.js` constructs and sends HTTP requests (GET, POST, PUT, DELETE) to the backend API endpoints, including the JWT for authenticated requests.
+4.  **Backend Processing:**
+    *   **Routes:** Express routes (`backend/routes/`) match the incoming request to a controller function.
+    *   **Middleware:** Requests pass through middleware:
+        *   `rateLimitMiddleware`: Prevents abuse.
+        *   `mongoSanitize`, `xss-clean`: Security against injection attacks.
+        *   `authMiddleware`: Authenticates the user via JWT.
+        *   `validationMiddleware`: Validates request body using Joi schemas.
+    *   **Controllers:** Business logic (`backend/controllers/`) is executed, interacting with Mongoose models (`backend/models/`) to perform database operations.
+    *   **Services/Utilities:** Controllers may use `backend/services/` (e.g., `emailService`) or `backend/utils/` (e.g., `jwt.js`, `helpers.js`).
+5.  **Response:** The backend sends a JSON response back to the frontend.
+6.  **Frontend Update:** The `AppContext` updates its state based on the response, triggering re-renders in relevant components.
 
-### Backend
-The backend is built with Node.js and Express, connecting to a MongoDB database via Mongoose. It follows a modular architecture with dedicated directories for configuration, models, controllers, routes, middleware, services, utilities, and validators. This structure ensures a clear separation of concerns, making the API robust, scalable, and easy to maintain. Authentication is handled using JWTs, and input validation is enforced for all API requests.
+### Key Workflows
 
-### Data Handling (Currently Mocked, Transitioning to Backend)
-Currently, much of the application data (products, stores, orders, user information) is managed using in-memory mock data defined in `src/data/mockData.js` and `AppContext.jsx`. This allows for full frontend functionality.
-
-The `src/services/api.js` file has been introduced to abstract API interactions. The `AppContext.jsx` has been refactored to conceptually integrate with this API layer, showing where actual backend calls will replace the mock logic. The backend setup is now in place to handle persistent data storage and user authentication.
+*   **Product Management (Vendor):** Vendors use `ManageProducts` page to `addVendorProduct`, `editVendorProduct`, `deleteVendorProduct` via `api.vendor` calls. Image uploads are handled by `api.upload`.
+*   **Order Placement (Customer):**
+    1.  Customer adds items to cart (`addToCart`).
+    2.  Proceeds to `Checkout` (multi-step form).
+    3.  `ShippingAddressForm` collects address, which is saved to user profile.
+    4.  `CouponSection` allows applying discounts via `api.coupon.validate`.
+    5.  `OrderSummary` displays final details.
+    6.  `QrPaymentForm` handles UPI QR payment and transaction ID input.
+    7.  `checkout` function (in `useCart`) calls `api.customer.placeOrder`.
+    8.  Backend `placeOrder` controller performs:
+        *   Stock validation and decrement (within a MongoDB transaction).
+        *   Creates `Order` and `Payment` records.
+        *   Updates `Coupon` usage.
+        *   Generates a `deliveryOtp`.
+        *   Sends an order confirmation email.
+    9.  Customer is redirected to `OrderConfirmation` with order details, OTP, and QR code.
+*   **Order Confirmation (Vendor):** Vendors view orders on `Orders` page. On `OrderDetails` page, they can `confirmDeliveryWithOtp` by entering the customer's OTP, which updates the order status to 'Delivered'.
+*   **Profile Management:** Users (customer/vendor) can update their profile via `Profile` page, using `api.userProfile.updateProfile` and `api.userProfile.uploadProfileImage`.
+*   **Admin Operations:** Admins use dedicated pages (`AdminUserManagement`, `AdminProductManagement`, `AdminStoreManagement`, `AdminOrderManagement`) to manage platform data, calling `api.admin` methods.
 
 ## Running the Project Locally
 
 To get the BazzarNet application up and running on your local machine, follow these steps:
 
-1.  **Frontend Setup:**
-    *   Navigate to the project root directory (where `package.json` for the frontend is).
-    *   Install dependencies: `npm install`
-    *   Start the development server: `npm run dev`
-    *   This will start the Vite development server, usually at `http://localhost:5173`.
+1.  **Clone the Repository:**
+    ```bash
+    git clone <repository-url>
+    cd bazzarnet
+    ```
 
 2.  **Backend Setup:**
-    *   Navigate to the `backend/` directory.
-    *   Create a `.env` file and populate it with your MongoDB URI, JWT secret, and email service credentials (see `backend/.env` example). **Remember to replace placeholders with your actual credentials.**
+    *   Navigate to the `backend/` directory: `cd backend`
     *   Install dependencies: `npm install`
-    *   Start the development server: `npm run dev`
-    *   This will start the Node.js/Express server, usually at `http://localhost:5000`.
+    *   Create a `.env` file in the `backend/` directory and populate it with your MongoDB URI, JWT secret, and email service credentials.
+        ```
+        NODE_ENV=development
+        PORT=5000
+        MONGO_URI=mongodb+srv://<username>:<password>@<cluster-url>/bazzarnet?retryWrites=true&w=majority
+        JWT_SECRET=your_jwt_secret_key
+        JWT_EXPIRES_IN=1h
+        EMAIL_HOST=smtp.ethereal.email # or your SMTP host
+        EMAIL_PORT=587 # or your SMTP port (e.g., 465 for SSL)
+        EMAIL_USER=your_email@example.com # or ethereal.email user
+        EMAIL_PASS=your_email_password # or ethereal.email password
+        FRONTEND_URL=http://localhost:5173
+        ADMIN_EMAIL=admin@example.com # Email for receiving support requests
+        ```
+        **Remember to replace placeholders with your actual credentials.** For `EMAIL_HOST`, `EMAIL_USER`, `EMAIL_PASS`, you can use [Ethereal Email](https://ethereal.email/) for testing during development.
+    *   Start the backend development server: `npm run dev`
+    *   This will start the Node.js/Express server, usually at `http://localhost:5000`. If the database is empty, it will automatically seed initial data (customers, vendors, products).
+
+3.  **Frontend Setup:**
+    *   Navigate back to the project root directory (where the frontend `package.json` is): `cd ..`
+    *   Install dependencies: `npm install`
+    *   Create a `.env` file in the project root (same level as `package.json`) and add the frontend API base URL:
+        ```
+        VITE_API_BASE_URL=http://localhost:5000/api
+        ```
+    *   Start the frontend development server: `npm run dev`
+    *   This will start the Vite development server, usually at `http://localhost:5173`.
+
+4.  **Access the Application:**
+    *   Open your web browser and navigate to `http://localhost:5173`.
 
 ## Development Guidelines
 
@@ -158,13 +194,3 @@ To get the BazzarNet application up and running on your local machine, follow th
 *   **State:** Prefer React Context for global state.
 *   **Dependencies:** Avoid adding new libraries unless there's a clear and strong justification.
 *   **Backend Modularity:** Adhere to the established backend file structure (models, controllers, routes, middleware, services, utils, validators).
-
-## Future Enhancements
-
-*   Full integration with the backend for persistent data storage and real user authentication.
-*   Advanced search and filtering options for products and stores.
-*   Real-time order tracking with map integration.
-*   User reviews and ratings system for products and stores.
-*   Payment gateway integration for actual transactions.
-*   More comprehensive vendor analytics and reporting.
-*   Admin dashboard for overall platform management.
