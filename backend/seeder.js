@@ -10,7 +10,10 @@ import env from './config/env.js'; // Import env for MONGO_URI
 dotenv.config(); // Load environment variables
 
 // Connect to DB
-connectDB();
+// This connectDB call is for when seeder.js is run directly.
+// When imported, server.js will handle the DB connection.
+// To avoid multiple connections, we can make connectDB idempotent or only call it if not already connected.
+// For now, I'll keep it as is, assuming it's fine for a simple seeder.
 
 const sampleCustomers = [
   {
@@ -331,8 +334,13 @@ const ensureAbsoluteImageUrl = (url) => {
 };
 
 
-const importData = async () => {
+export const importData = async () => { // Exported
   try {
+    // Ensure DB is connected before operations
+    if (mongoose.connection.readyState !== 1) {
+      await connectDB();
+    }
+
     await User.deleteMany();
     await Store.deleteMany();
     await Product.deleteMany();
@@ -391,29 +399,50 @@ const importData = async () => {
     console.log(`${createdVendors.length} vendor users and stores created.`);
 
     console.log('Data Imported!');
-    process.exit();
+    // Only exit if run directly, not when imported by server.js
+    if (process.env.NODE_ENV !== 'test' && !process.argv.includes('--imported-by-server')) {
+      process.exit();
+    }
   } catch (error) {
     console.error(`Error importing data: ${error.message}`);
-    process.exit(1);
+    // Only exit if run directly, not when imported by server.js
+    if (process.env.NODE_ENV !== 'test' && !process.argv.includes('--imported-by-server')) {
+      process.exit(1);
+    }
+    throw error; // Re-throw for server.js to catch
   }
 };
 
-const destroyData = async () => {
+export const destroyData = async () => { // Exported
   try {
+    // Ensure DB is connected before operations
+    if (mongoose.connection.readyState !== 1) {
+      await connectDB();
+    }
+
     await User.deleteMany();
     await Store.deleteMany();
     await Product.deleteMany();
 
     console.log('Data Destroyed!');
-    process.exit();
+    // Only exit if run directly
+    if (process.env.NODE_ENV !== 'test' && !process.argv.includes('--imported-by-server')) {
+      process.exit();
+    }
   } catch (error) {
     console.error(`Error destroying data: ${error.message}`);
-    process.exit(1);
+    // Only exit if run directly
+    if (process.env.NODE_ENV !== 'test' && !process.argv.includes('--imported-by-server')) {
+      process.exit(1);
+    }
+    throw error; // Re-throw for server.js to catch
   }
 };
 
+// This block only runs if seeder.js is executed directly
 if (process.argv[2] === '-d') {
   destroyData();
-} else {
+} else if (process.argv[1].includes('seeder.js') && !process.argv.includes('--imported-by-server')) {
+  // Only import data if seeder.js is run directly and not as an import
   importData();
 }

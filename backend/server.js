@@ -27,6 +27,10 @@ import couponRoutes from "./routes/couponRoutes.js";
 import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
 import { authLimiter, passwordResetLimiter } from "./middleware/rateLimitMiddleware.js"; // New: Import rate limiters
 
+// NEW: Import User model and importData from seeder
+import User from './models/User.js';
+import { importData } from './seeder.js';
+
 // Fix __dirname for ES Modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -36,6 +40,30 @@ const app = express();
 
 // Connect DB
 connectDB();
+
+// NEW: Auto-seed data if database is empty in development mode
+const seedDatabase = async () => {
+  try {
+    const userCount = await User.countDocuments();
+    if (userCount === 0) {
+      console.log('Database is empty. Seeding initial data...');
+      // Pass a flag to seeder.js to prevent process.exit() when imported
+      await importData();
+      console.log('Initial data seeded successfully.');
+    } else {
+      console.log('Database already contains data. Skipping seeding.');
+    }
+  } catch (error) {
+    console.error('Error during auto-seeding:', error);
+    // Do not exit process, let the server continue if possible
+  }
+};
+
+// Run seeding logic immediately after DB connection in development
+if (env.NODE_ENV === 'development') {
+  seedDatabase();
+}
+
 
 // Middleware
 app.use(express.json()); 
