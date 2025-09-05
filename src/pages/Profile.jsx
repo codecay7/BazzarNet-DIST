@@ -200,7 +200,11 @@ const Profile = () => {
     }
 
     try {
-      const updatedUser = await api.userProfile.updateProfile(profileData);
+      // Create a copy of profileData and remove profileImage before sending
+      const dataToUpdate = { ...profileData };
+      delete dataToUpdate.profileImage; // Exclude profileImage from this update
+
+      const updatedUser = await api.userProfile.updateProfile(dataToUpdate);
       updateUserInContext(updatedUser); // Use the new function to update context
       toast.success('Profile updated successfully!');
       setIsEditing(false);
