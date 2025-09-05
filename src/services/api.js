@@ -9,7 +9,9 @@ const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || 'http://localhost:5000
 // --- Helper Functions ---
 const getAuthToken = () => {
   const user = JSON.parse(localStorage.getItem('user'));
-  return user?.token || null;
+  const token = user?.token || null;
+  console.log('Frontend: getAuthToken returning:', token ? 'Token present' : 'No token');
+  return token;
 };
 
 const buildQuery = (params = {}) => {

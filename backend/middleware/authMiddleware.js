@@ -11,9 +11,11 @@ const protect = asyncHandler(async (req, res, next) => {
     try {
       // Get token from header
       token = req.headers.authorization.split(' ')[1];
+      console.log('Backend: Token received:', token ? 'Token present' : 'No token');
 
       // Verify token
       const decoded = jwt.verify(token, env.JWT_SECRET);
+      console.log('Backend: Token decoded successfully for user ID:', decoded.id);
 
       // Find user by ID from the token payload and attach to request
       // Exclude password and other sensitive fields
@@ -26,7 +28,7 @@ const protect = asyncHandler(async (req, res, next) => {
 
       next();
     } catch (error) {
-      console.error(error);
+      console.error('Backend: JWT verification error:', error.message); // Log the specific JWT error
       res.status(401);
       throw new Error('Not authorized, token failed');
     }
