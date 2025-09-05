@@ -13,6 +13,7 @@ import useAdminProducts from '../hooks/useAdminProducts';
 import useAdminStores from '../hooks/useAdminStores';
 import useCoupons from '../hooks/useCoupons'; // New: Import useCoupons hook
 import * as api from '../services/api'; // Still needed for direct API calls in some places
+import toast from 'react-hot-toast'; // NEW: Import toast for notifications
 
 export const AppContext = createContext();
 
