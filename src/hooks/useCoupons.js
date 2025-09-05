@@ -1,10 +1,9 @@
-import { useState, useEffect, useCallback, useContext } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import toast from 'react-hot-toast';
 import * as api from '../services/api';
-import { AppContext } from '../context/AppContext'; // To access user and isLoggedIn
 
-const useCoupons = () => {
-  const { user, isLoggedIn, orders } = useContext(AppContext); // Need user for new user check, orders for history
+// The hook now accepts user, isLoggedIn, and orders as arguments
+const useCoupons = (user, isLoggedIn, orders) => {
   const [availableCoupons, setAvailableCoupons] = useState([]);
   const [appliedCoupon, setAppliedCoupon] = useState(null); // Stores the validated coupon object
   const [discountAmount, setDiscountAmount] = useState(0);
@@ -20,7 +19,8 @@ const useCoupons = () => {
       
       // Client-side filter for new user coupons if user has orders
       const filteredCoupons = coupons.filter(coupon => {
-        if (coupon.isNewUserOnly && orders.length > 0) {
+        // Check if orders array is available and has items
+        if (coupon.isNewUserOnly && orders && orders.length > 0) {
           return false; // Hide new user coupon if user has existing orders
         }
         return true;

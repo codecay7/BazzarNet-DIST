@@ -118,7 +118,7 @@ export const AppProvider = ({ children }) => {
     adminDeleteStore,
   } = useAdminStores(isLoggedIn, isAdmin, fetchAppStores, appStoresMeta, fetchAllProducts);
 
-  // New: Coupon Hook
+  // New: Coupon Hook - now receives user, isLoggedIn, and orders as arguments
   const {
     availableCoupons,
     appliedCoupon,
@@ -128,7 +128,7 @@ export const AppProvider = ({ children }) => {
     removeCoupon,
     setAppliedCoupon,
     setDiscountAmount,
-  } = useCoupons(); // Pass orders to useCoupons
+  } = useCoupons(user, isLoggedIn, orders); // Pass the necessary values here
 
   // --- User Profile Update in Context ---
   const updateUserInContext = useCallback((updatedUserData) => {
