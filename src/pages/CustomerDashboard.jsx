@@ -94,6 +94,12 @@ const CustomerDashboard = () => {
 
   return (
     <div className="w-full max-w-[1200px] mx-auto my-10">
+      {/* DYAD DIAGNOSTIC BANNER: IF YOU SEE THIS, CHANGES ARE RENDERING! */}
+      <div className="bg-red-500 text-white text-center p-4 text-2xl font-bold mb-8">
+        DYAD DIAGNOSTIC BANNER: IF YOU SEE THIS, CHANGES ARE RENDERING!
+      </div>
+      {/* END DYAD DIAGNOSTIC BANNER */}
+
       <div className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-8 mx-4">
         {loading ? (
           <>
@@ -172,7 +178,7 @@ const CustomerDashboard = () => {
                     const discount = calculateDiscount(product.price, product.originalPrice);
                     return (
                       <div key={product._id} className={`bg-black/10 border border-white/10 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col ${isOutOfStock ? 'grayscale' : ''}`} role="listitem" aria-label={`Product: ${product.name}`}>
-                        <Link to={`/products/${product._id}`} className="flex-grow flex flex-col" aria-label={`View details for ${product.name}`}>
+                        <Link to={`/products/${product._id}`} className="flex-grow" aria-label={`View details for ${product.name}`}>
                           <div className="relative">
                             <img
                               src={getFullImageUrl(product.image)}
