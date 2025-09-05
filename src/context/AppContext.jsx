@@ -128,7 +128,7 @@ export const AppProvider = ({ children }) => {
     removeCoupon,
     setAppliedCoupon,
     setDiscountAmount,
-    setAvailableCoupons, // <--- Added this line
+    // Removed setAvailableCoupons from here as it's not exposed by the hook
   } = useCoupons(user, isLoggedIn, orders); // Pass the necessary values here
 
   // --- User Profile Update in Context ---
@@ -214,9 +214,9 @@ export const AppProvider = ({ children }) => {
       setAllAppUsersMeta({ page: 1, pages: 1, count: 0 });
       setAppliedCoupon(null); // New: Clear applied coupon
       setDiscountAmount(0); // New: Clear discount amount
-      setAvailableCoupons([]); // New: Clear available coupons
+      // Removed setAvailableCoupons([]) from here as it's not exposed by the hook
     }
-  }, [isLoggedIn, user, isAdmin, isVendor, fetchAllProducts, fetchAppStores, fetchCart, fetchWishlist, fetchOrders, fetchAllUsers, fetchVendorProducts, fetchAvailableCoupons, setCart, setWishlist, setAllAppProducts, setAllAppProductsMeta, setAppStores, setAppStoresMeta, setOrders, setOrdersMeta, setAllAppUsers, setAllAppUsersMeta, setVendorProducts, setVendorProductsMeta, setAppliedCoupon, setDiscountAmount, setAvailableCoupons]);
+  }, [isLoggedIn, user, isAdmin, isVendor, fetchAllProducts, fetchAppStores, fetchCart, fetchWishlist, fetchOrders, fetchAllUsers, fetchVendorProducts, fetchAvailableCoupons, setCart, setWishlist, setAllAppProducts, setAllAppProductsMeta, setAppStores, setAppStoresMeta, setOrders, setOrdersMeta, setAllAppUsers, setAllAppUsersMeta, setVendorProducts, setVendorProductsMeta, setAppliedCoupon, setDiscountAmount]); // Removed setAvailableCoupons from dependencies
 
 
   const value = {
