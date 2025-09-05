@@ -84,14 +84,6 @@ const CustomerDashboard = () => {
     return stars;
   };
 
-  // Filtered recommended products based on selected category
-  const filteredRecommendedProducts = useMemo(() => {
-    if (selectedBrowseCategory === 'all') { // Use selectedBrowseCategory for recommended filter
-      return recommendedProducts;
-    }
-    return recommendedProducts.filter(product => product.category === selectedBrowseCategory);
-  }, [recommendedProducts, selectedBrowseCategory]); // Dependency on selectedBrowseCategory
-
   // Helper component to render a product card
   const ProductCard = ({ product }) => {
     const isOutOfStock = product.stock === 0;
@@ -250,7 +242,7 @@ const CustomerDashboard = () => {
               {/* Category Filter Section for Browse All Products */}
               <div className="mb-6">
                 <h3 className="text-lg font-semibold mb-3">Select a Category:</h3>
-                <div className="flex gap-3 pb-2 overflow-x-auto whitespace-nowrap scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
+                <div className="flex gap-4 px-2 pb-2 overflow-x-auto whitespace-nowrap scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
                   {categories.map(cat => (
                     <motion.button
                       key={cat}
