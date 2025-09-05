@@ -3,9 +3,9 @@ import { AppContext } from '../context/AppContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import toast from 'react-hot-toast';
-import { ChevronDown } from 'lucide-react';
+import { ChevronDown, Eye, EyeOff } from 'lucide-react'; // Import Lucide icons
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSpinner } from '@fortawesome/free-solid-svg-icons'; // Import faSpinner
+import { faSpinner } from '@fortawesome/free-solid-svg-icons';
 
 const indianStates = [
   "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
@@ -38,7 +38,8 @@ const VendorRegistrationForm = () => {
     password: '',
   });
   const [errors, setErrors] = useState({});
-  const [isLoading, setIsLoading] = useState(false); // New loading state
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // New state
 
   const categories = [
     'Groceries', 'Bakery', 'Butcher', 'Cafe', 'Electronics', 
@@ -135,9 +136,8 @@ const VendorRegistrationForm = () => {
   const handleRegistration = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-      setIsLoading(true); // Set loading true
+      setIsLoading(true);
       try {
-        // Ensure GST is sent, even if empty, to match backend schema
         const vendorData = {
           name: formData.fullName,
           email: formData.email,
@@ -147,14 +147,14 @@ const VendorRegistrationForm = () => {
           category: formData.category,
           phone: formData.phone,
           pan: formData.pan,
-          gst: formData.gst || '', // Ensure GST is an empty string if not provided
+          gst: formData.gst || '',
           address: formData.address,
         };
         if (await registerVendor(vendorData)) {
           navigate('/dashboard');
         }
       } finally {
-        setIsLoading(false); // Set loading false
+        setIsLoading(false);
       }
     } else {
       toast.error('Please correct the errors in the form.');
@@ -379,23 +379,34 @@ const VendorRegistrationForm = () => {
       </div>
       <div>
         <label htmlFor="vendorPassword" className="text-sm font-medium">Password</label>
-        <input 
-          type="password" 
-          id="vendorPassword"
-          name="password" 
-          value={formData.password} 
-          onChange={handleChange} 
-          className={inputClasses} 
-          aria-invalid={!!errors.password}
-          aria-describedby={errors.password ? "vendorPassword-error" : undefined}
-          disabled={isLoading}
-        />
+        <div className="relative w-full">
+          <input 
+            type={showPassword ? 'text' : 'password'}
+            id="vendorPassword"
+            name="password" 
+            value={formData.password} 
+            onChange={handleChange} 
+            className={`${inputClasses} pr-10`} 
+            aria-invalid={!!errors.password}
+            aria-describedby={errors.password ? "vendorPassword-error" : undefined}
+            disabled={isLoading}
+          />
+          <button
+            type="button"
+            onClick={() => setShowPassword(!showPassword)}
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text)] opacity-70 hover:opacity-100"
+            aria-label={showPassword ? 'Hide password' : 'Show password'}
+            aria-pressed={showPassword}
+          >
+            {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+          </button>
+        </div>
         {errors.password && <p id="vendorPassword-error" className="text-red-400 text-xs mt-1">{errors.password}</p>}
       </div>
       <button 
         type="submit" 
         className="bg-[var(--accent)] text-white border-none py-3 px-6 rounded-lg flex items-center justify-center w-full gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300 mt-4"
-        disabled={isLoading} // Disable when loading
+        disabled={isLoading}
       >
         {isLoading ? <FontAwesomeIcon icon={faSpinner} spin className="mr-2" /> : 'Register Business'}
       </button>

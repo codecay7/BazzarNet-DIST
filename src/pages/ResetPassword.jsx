@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faLock, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import * as api from '../services/api';
+import { Eye, EyeOff } from 'lucide-react'; // Import Lucide icons
 
 const ResetPassword = () => {
   const { token } = useParams();
@@ -13,6 +14,8 @@ const ResetPassword = () => {
   const [confirmPassword, setConfirmPassword] = useState('');
   const [errors, setErrors] = useState({});
   const [resetSuccess, setResetSuccess] = useState(false);
+  const [showNewPassword, setShowNewPassword] = useState(false); // New state
+  const [showConfirmPassword, setShowConfirmPassword] = useState(false); // New state
 
   const validateForm = () => {
     let newErrors = {};
@@ -95,29 +98,51 @@ const ResetPassword = () => {
         
         <form onSubmit={handleSubmit} className="flex flex-col">
           <label htmlFor="newPassword" className="sr-only">New Password</label>
-          <input
-            type="password"
-            id="newPassword"
-            value={password}
-            onChange={(e) => setPassword(e.target.value)}
-            placeholder="New Password"
-            className={inputClasses}
-            aria-invalid={!!errors.password}
-            aria-describedby={errors.password ? "newPassword-error" : undefined}
-          />
+          <div className="relative w-full">
+            <input
+              type={showNewPassword ? 'text' : 'password'}
+              id="newPassword"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              placeholder="New Password"
+              className={`${inputClasses} pr-10`}
+              aria-invalid={!!errors.password}
+              aria-describedby={errors.password ? "newPassword-error" : undefined}
+            />
+            <button
+              type="button"
+              onClick={() => setShowNewPassword(!showNewPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text)] opacity-70 hover:opacity-100"
+              aria-label={showNewPassword ? 'Hide new password' : 'Show new password'}
+              aria-pressed={showNewPassword}
+            >
+              {showNewPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
+          </div>
           {errors.password && <p id="newPassword-error" className="text-red-400 text-xs text-left -mt-1 mb-2">{errors.password}</p>}
 
           <label htmlFor="confirmNewPassword" className="sr-only">Confirm New Password</label>
-          <input
-            type="password"
-            id="confirmNewPassword"
-            value={confirmPassword}
-            onChange={(e) => setConfirmPassword(e.target.value)}
-            placeholder="Confirm New Password"
-            className={inputClasses}
-            aria-invalid={!!errors.confirmPassword}
-            aria-describedby={errors.confirmPassword ? "confirmNewPassword-error" : undefined}
-          />
+          <div className="relative w-full">
+            <input
+              type={showConfirmPassword ? 'text' : 'password'}
+              id="confirmNewPassword"
+              value={confirmPassword}
+              onChange={(e) => setConfirmPassword(e.target.value)}
+              placeholder="Confirm New Password"
+              className={`${inputClasses} pr-10`}
+              aria-invalid={!!errors.confirmPassword}
+              aria-describedby={errors.confirmPassword ? "confirmNewPassword-error" : undefined}
+            />
+            <button
+              type="button"
+              onClick={() => setShowConfirmPassword(!showConfirmPassword)}
+              className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text)] opacity-70 hover:opacity-100"
+              aria-label={showConfirmPassword ? 'Hide confirmed password' : 'Show confirmed password'}
+              aria-pressed={showConfirmPassword}
+            >
+              {showConfirmPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+            </button>
+          </div>
           {errors.confirmPassword && <p id="confirmNewPassword-error" className="text-red-400 text-xs text-left -mt-1 mb-2">{errors.confirmPassword}</p>}
 
           <button

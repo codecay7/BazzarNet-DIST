@@ -3,8 +3,9 @@ import { AppContext } from '../context/AppContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faUserPlus, faSpinner } from '@fortawesome/free-solid-svg-icons'; // Import faSpinner
+import { faUserPlus, faSpinner } from '@fortawesome/free-solid-svg-icons';
 import toast from 'react-hot-toast';
+import { Eye, EyeOff } from 'lucide-react'; // Import Lucide icons
 
 const UserSignupForm = () => {
   const { registerUser } = useContext(AppContext);
@@ -13,7 +14,8 @@ const UserSignupForm = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [errors, setErrors] = useState({});
-  const [isLoading, setIsLoading] = useState(false); // New loading state
+  const [isLoading, setIsLoading] = useState(false);
+  const [showPassword, setShowPassword] = useState(false); // New state
 
   const validateForm = () => {
     let newErrors = {};
@@ -41,15 +43,14 @@ const UserSignupForm = () => {
   const handleSignup = async (e) => {
     e.preventDefault();
     if (validateForm()) {
-      setIsLoading(true); // Set loading true
+      setIsLoading(true);
       try {
-        // Include optional fields with default empty values to match backend schema
         const userData = {
           name,
           email,
           password,
-          phone: '', // Default empty phone
-          address: { // Default empty address object
+          phone: '',
+          address: {
             houseNo: '',
             landmark: '',
             city: '',
@@ -61,7 +62,7 @@ const UserSignupForm = () => {
           navigate('/dashboard');
         }
       } finally {
-        setIsLoading(false); // Set loading false
+        setIsLoading(false);
       }
     } else {
       toast.error('Please correct the errors in the form.');
@@ -113,23 +114,34 @@ const UserSignupForm = () => {
       {errors.email && <p id="email-error" className="text-red-400 text-xs mb-3">{errors.email}</p>}
       
       <label htmlFor="password" className="mb-1 text-sm font-medium">Password</label>
-      <input 
-        type="password" 
-        id="password"
-        value={password} 
-        onChange={(e) => setPassword(e.target.value)} 
-        placeholder="••••••••" 
-        className="w-full p-3 mb-1 text-[var(--text)] border border-white/30 rounded-lg bg-white/10 focus:outline-none focus:ring-2 focus:ring-[var(--accent)]" 
-        aria-invalid={!!errors.password}
-        aria-describedby={errors.password ? "password-error" : undefined}
-        disabled={isLoading}
-      />
+      <div className="relative w-full">
+        <input 
+          type={showPassword ? 'text' : 'password'}
+          id="password"
+          value={password} 
+          onChange={(e) => setPassword(e.target.value)} 
+          placeholder="••••••••" 
+          className="w-full p-3 mb-1 text-[var(--text)] border border-white/30 rounded-lg bg-white/10 focus:outline-none focus:ring-2 focus:ring-[var(--accent)] pr-10" 
+          aria-invalid={!!errors.password}
+          aria-describedby={errors.password ? "password-error" : undefined}
+          disabled={isLoading}
+        />
+        <button
+          type="button"
+          onClick={() => setShowPassword(!showPassword)}
+          className="absolute right-3 top-1/2 -translate-y-1/2 text-[var(--text)] opacity-70 hover:opacity-100"
+          aria-label={showPassword ? 'Hide password' : 'Show password'}
+          aria-pressed={showPassword}
+        >
+          {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+        </button>
+      </div>
       {errors.password && <p id="password-error" className="text-red-400 text-xs mb-3">{errors.password}</p>}
       
       <button 
         type="submit" 
         className="bg-[var(--accent)] text-white border-none py-3 px-6 rounded-lg flex items-center justify-center w-full gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300 mt-4"
-        disabled={isLoading} // Disable when loading
+        disabled={isLoading}
       >
         {isLoading ? <FontAwesomeIcon icon={faSpinner} spin className="mr-2" /> : <FontAwesomeIcon icon={faUserPlus} aria-hidden="true" />}
         {isLoading ? 'Signing Up...' : 'Sign Up'}
