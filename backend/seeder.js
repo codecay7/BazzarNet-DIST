@@ -115,8 +115,8 @@ const sampleVendors = [
       houseNo: '1, Market Road',
       landmark: 'Opposite Bus Stand',
       city: 'Bengaluru',
-      state: 'Karnataka',
-      pinCode: '560001',
+      state: 'Jharkhand', // Changed state to match pincode region
+      pinCode: '825301', // Updated pincode
     },
     profileImage: 'https://via.placeholder.com/150?text=FreshMart',
   },
@@ -134,9 +134,9 @@ const sampleVendors = [
     address: {
       houseNo: '15, Bakery Lane',
       landmark: 'Next to Cafe',
-      city: 'Mumbai',
-      state: 'Maharashtra',
-      pinCode: '400001',
+      city: 'Ramgarh', // Changed city to match pincode region
+      state: 'Jharkhand', // Changed state to match pincode region
+      pinCode: '825301', // Updated pincode
     },
     profileImage: 'https://via.placeholder.com/150?text=SweetDelights',
   },
@@ -154,9 +154,9 @@ const sampleVendors = [
     address: {
       houseNo: '20, Tech Park',
       landmark: 'Near IT Tower',
-      city: 'Delhi',
-      state: 'Delhi',
-      pinCode: '110001',
+      city: 'Hazaribagh', // Changed city to match pincode region
+      state: 'Jharkhand', // Changed state to match pincode region
+      pinCode: '825301', // Updated pincode
     },
     profileImage: 'https://via.placeholder.com/150?text=TechGadget',
   },
@@ -174,9 +174,9 @@ const sampleVendors = [
     address: {
       houseNo: '5, Fashion Street',
       landmark: 'Opposite Cinema',
-      city: 'Chennai',
-      state: 'Tamil Nadu',
-      pinCode: '600001',
+      city: 'Bokaro', // Changed city to match pincode region
+      state: 'Jharkhand', // Changed state to match pincode region
+      pinCode: '825301', // Updated pincode
     },
     profileImage: 'https://via.placeholder.com/150?text=FashionTrends',
   },
@@ -194,9 +194,9 @@ const sampleVendors = [
     address: {
       houseNo: '12, Decor Avenue',
       landmark: 'Near Art Gallery',
-      city: 'Kolkata',
-      state: 'West Bengal',
-      pinCode: '700001',
+      city: 'Dhanbad', // Changed city to match pincode region
+      state: 'Jharkhand', // Changed state to match pincode region
+      pinCode: '825301', // Updated pincode
     },
     profileImage: 'https://via.placeholder.com/150?text=HomeDecor',
   },
