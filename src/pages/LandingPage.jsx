@@ -5,7 +5,7 @@ import { useNavigate, Link } from 'react-router-dom';
 import { motion } from 'framer-motion';
 
 const LandingPage = () => {
-  const [deliveryTime, setDeliveryTime] = useState(30);
+  // Removed deliveryTime state as the component is being removed
   const [pageLoaded, setPageLoaded] = useState(false);
   const navigate = useNavigate();
 
@@ -17,9 +17,7 @@ const LandingPage = () => {
     return () => clearTimeout(timer);
   }, []);
 
-  const updateDeliveryTime = (e) => {
-    setDeliveryTime(parseInt(e.target.value));
-  };
+  // Removed updateDeliveryTime function
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -236,52 +234,6 @@ const LandingPage = () => {
           </motion.div>
         </div>
       </div>
-
-      {/* Delivery Time Estimator */}
-      <motion.div
-        className="bg-[var(--card-bg)] w-full max-w-6xl mx-auto py-20 px-8 md:px-12 shadow-[0_8px_40px_var(--shadow)] flex flex-col justify-between hover:-translate-y-1 transition-transform duration-300 ease-in-out relative z-10"
-        variants={cardVariants}
-        whileInView="visible"
-        initial="hidden"
-        viewport={{ once: true, amount: 0.5 }}
-      >
-        <h2 className="text-3xl md:text-4xl font-extrabold mb-8 text-[var(--accent)] text-center">
-          Delivery Time Estimator
-        </h2>
-        <div className="space-y-8">
-          <div>
-            <label htmlFor="delivery-slider" className="block text-base md:text-lg font-medium mb-2 text-[var(--text)]">
-              Distance to Store (km): <span className="font-semibold">{(deliveryTime / 10).toFixed(1)}</span>
-            </label>
-            <input
-              id="delivery-slider"
-              type="range"
-              min="10"
-              max="50"
-              value={deliveryTime}
-              onChange={updateDeliveryTime}
-              className="w-full h-2 rounded-lg appearance-none bg-[var(--accent)] cursor-pointer"
-            />
-          </div>
-        </div>
-        <div className="flex flex-col items-center gap-4 mt-10">
-          <div
-            className="w-[150px] h-[150px] rounded-full flex items-center justify-center shadow-[0_4px_30px_var(--accent)] relative transition-all duration-500"
-            style={{
-              background: `conic-gradient(var(--accent) ${deliveryTime}%, rgba(255,255,255,0.08) ${deliveryTime}% 100%)`,
-            }}
-            role="img"
-            aria-label={`Estimated Delivery Time: ${deliveryTime} minutes`}
-          >
-            <div className="w-[115px] h-[115px] bg-[var(--bg)] rounded-full flex items-center justify-center shadow-inner">
-              <span className="text-2xl font-bold text-[var(--accent)]">{deliveryTime} min</span>
-            </div>
-          </div>
-          <p className="text-base md:text-lg font-medium text-[var(--text)]">
-            Estimated delivery in <span className="font-semibold">{deliveryTime} minutes</span>
-          </p>
-        </div>
-      </motion.div>
 
       {/* Call to Action Section */}
       <motion.div
