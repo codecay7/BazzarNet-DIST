@@ -12,6 +12,7 @@ import CheckoutSteps from '../components/checkout/CheckoutSteps';
 import ShippingAddressForm from '../components/checkout/ShippingAddressForm';
 import OrderSummary from '../components/checkout/OrderSummary';
 import QrPaymentForm from '../components/checkout/QrPaymentForm'; // NEW: Import QrPaymentForm
+import CouponSection from '../components/checkout/CouponSection'; // NEW: Import CouponSection
 
 const VALID_PINCODE = '825301'; // Define the valid pincode
 
