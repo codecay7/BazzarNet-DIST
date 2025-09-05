@@ -1,5 +1,7 @@
 import asyncHandler from '../middleware/asyncHandler.js';
 import Product from '../models/Product.js';
+import Review from '../models/Review.js'; // Import Review model
+import Order from '../models/Order.js'; // Import Order model to check purchases
 import mongoose from 'mongoose'; // Import mongoose
 
 // @desc    Fetch all products (public)
@@ -69,7 +71,7 @@ const getRecommendedProducts = asyncHandler(async (req, res) => {
   // In a real app, this would involve recommendation logic
   const products = await Product.aggregate([
     { $sample: { size: 6 } }, // Get 6 random products
-    { $project: { name: 1, image: 1, price: 1, originalPrice: 1, store: 1, unit: 1 } } // Select relevant fields including unit
+    { $project: { name: 1, image: 1, price: 1, originalPrice: 1, store: 1, unit: 1, category: 1, rating: 1, numReviews: 1 } } // Select relevant fields including unit and review data
   ]);
   res.json(products);
 });
@@ -163,11 +165,85 @@ const deleteProduct = asyncHandler(async (req, res) => {
   res.json({ message: 'Product removed' });
 });
 
+// @desc    Create new review for a product
+// @route   POST /api/products/:id/reviews
+// @access  Private/Customer
+const createProductReview = asyncHandler(async (req, res) => {
+  const { rating, comment } = req.body;
+  const { id: productId } = req.params;
+
+  const product = await Product.findById(productId);
+
+  if (!product) {
+    res.status(404);
+    throw new Error('Product not found');
+  }
+
+  // 1. Check if user has purchased this product (from a delivered order)
+  const hasPurchased = await Order.exists({
+    user: req.user._id,
+    'items.product': productId,
+    orderStatus: 'Delivered',
+  });
+
+  if (!hasPurchased) {
+    res.status(403);
+    throw new Error('You can only review products you have purchased and received.');
+  }
+
+  // 2. Check if user has already reviewed this product
+  const alreadyReviewed = await Review.exists({
+    user: req.user._id,
+    product: productId,
+  });
+
+  if (alreadyReviewed) {
+    res.status(400);
+    throw new Error('You have already reviewed this product.');
+  }
+
+  // 3. Create the new review
+  const review = new Review({
+    user: req.user._id,
+    product: productId,
+    rating,
+    comment,
+  });
+
+  await review.save();
+
+  // 4. Recalculate product's average rating and number of reviews
+  const reviews = await Review.find({ product: productId });
+  const totalRating = reviews.reduce((acc, item) => item.rating + acc, 0);
+  product.rating = totalRating / reviews.length;
+  product.numReviews = reviews.length;
+
+  await product.save();
+
+  res.status(201).json({ message: 'Review added successfully', review });
+});
+
+// @desc    Get all reviews for a product
+// @route   GET /api/products/:id/reviews
+// @access  Public
+const getProductReviews = asyncHandler(async (req, res) => {
+  const { id: productId } = req.params;
+
+  const reviews = await Review.find({ product: productId })
+    .populate('user', 'name profileImage') // Populate user's name and profile image
+    .sort({ createdAt: -1 }); // Latest reviews first
+
+  res.json(reviews);
+});
+
+
 export {
   getAllProducts,
   getProductById,
-  getRecommendedProducts, // Export new function
+  getRecommendedProducts,
   createProduct,
   updateProduct,
   deleteProduct,
+  createProductReview, // Export new function
+  getProductReviews, // Export new function
 };

@@ -115,6 +115,9 @@ export const customer = {
   placeOrder: (orderData) => apiRequest('/orders', { method: 'POST', body: JSON.stringify(orderData) }),
   getOrders: (userId, params = {}) => apiRequest(`/orders/user/${userId}${buildQuery(params)}`),
   getOrderById: (orderId) => apiRequest(`/orders/${orderId}`),
+  createProductReview: (productId, reviewData) => apiRequest(`/products/${productId}/reviews`, { method: 'POST', body: JSON.stringify(reviewData) }), // New
+  getProductReviews: (productId) => apiRequest(`/products/${productId}/reviews`), // New
+  getPendingReviews: () => apiRequest('/users/me/pending-reviews'), // New
 };
 
 // --- Admin ---

@@ -1,15 +1,46 @@
-import React, { useContext } from 'react';
+import React, { useContext, useState, useEffect, useCallback } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCartPlus, faHeart, faStar, faStarHalfAlt } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
 import placeholderImage from '../assets/placeholder.png'; // Import placeholder image
 import { getFullImageUrl } from '../utils/imageUtils'; // Import utility
+import ReviewForm from '../components/reviews/ReviewForm'; // Import ReviewForm
+import ProductReviews from '../components/reviews/ProductReviews'; // Import ProductReviews
+import * as api from '../services/api'; // Import API service
+import toast from 'react-hot-toast';
 
 const ProductDetail = () => {
-  const { addToCart, addToWishlist, allAppProducts } = useContext(AppContext);
+  const { addToCart, addToWishlist, allAppProducts, user, isLoggedIn } = useContext(AppContext);
   const { id } = useParams();
   const product = allAppProducts.find(p => p._id === id); // Find product using _id
+  const [canReview, setCanReview] = useState(false);
+  const [reviewRefreshTrigger, setReviewRefreshTrigger] = useState(0); // To trigger review list refresh
+
+  // Function to check if user can review this product
+  const checkCanReview = useCallback(async () => {
+    if (!isLoggedIn || !user || user.role !== 'customer' || !product) {
+      setCanReview(false);
+      return;
+    }
+    try {
+      const pendingReviews = await api.customer.getPendingReviews();
+      const isPending = pendingReviews.some(p => p._id === product._id);
+      setCanReview(isPending);
+    } catch (error) {
+      console.error('Failed to check pending reviews:', error);
+      setCanReview(false);
+    }
+  }, [isLoggedIn, user, product]);
+
+  useEffect(() => {
+    checkCanReview();
+  }, [checkCanReview, reviewRefreshTrigger]); // Re-check if review status might have changed
+
+  const handleReviewSubmitted = () => {
+    setReviewRefreshTrigger(prev => prev + 1); // Increment to trigger refresh
+    checkCanReview(); // Re-check if user can review (should become false)
+  };
 
   if (!product) {
     return (
@@ -30,6 +61,10 @@ const ProductDetail = () => {
     if (halfStar) {
       stars.push(<FontAwesomeIcon key="half" icon={faStarHalfAlt} className="text-yellow-400" aria-hidden="true" />);
     }
+    // Fill remaining with regular stars
+    for (let i = stars.length; i < 5; i++) {
+      stars.push(<FontAwesomeIcon key={`empty-${i}`} icon={faStar} className="text-gray-400" aria-hidden="true" />);
+    }
     return stars;
   };
 
@@ -49,9 +84,9 @@ const ProductDetail = () => {
           </div>
           <div>
             <h2 className="text-3xl md:text-4xl font-bold mb-2">{product.name}</h2>
-            <div className="flex items-center gap-2 mb-4" aria-label={`Rating: ${product.rating} out of 5 stars, based on ${product.reviews} reviews`}>
+            <div className="flex items-center gap-2 mb-4" aria-label={`Rating: ${product.rating} out of 5 stars, based on ${product.numReviews} reviews`}>
               <div className="flex">{renderStars(product.rating)}</div>
-              <span className="text-sm text-[var(--text)] opacity-80">({product.reviews} reviews)</span>
+              <span className="text-sm text-[var(--text)] opacity-80">({product.numReviews} reviews)</span>
             </div>
             <p className="text-2xl font-semibold text-[var(--accent)] mb-4">₹{product.price.toFixed(2)} / {product.unit}</p> {/* Display unit */}
             
@@ -83,6 +118,16 @@ const ProductDetail = () => {
               </button>
             </div>
           </div>
+        </div>
+
+        {/* Review Section */}
+        <div className="mt-12 pt-8 border-t border-white/20">
+          {isLoggedIn && user?.role === 'customer' && canReview && (
+            <div className="mb-8">
+              <ReviewForm productId={product._id} onReviewSubmitted={handleReviewSubmitted} />
+            </div>
+          )}
+          <ProductReviews productId={product._id} refreshTrigger={reviewRefreshTrigger} />
         </div>
       </div>
     </section>

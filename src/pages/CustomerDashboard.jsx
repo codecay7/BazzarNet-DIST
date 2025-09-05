@@ -1,6 +1,6 @@
 import React, { useContext, useState, useEffect, useMemo } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faShoppingBag, faHeart, faReceipt, faCartPlus, faStar, faStarHalfAlt } from '@fortawesome/free-solid-svg-icons';
+import { faShoppingBag, faHeart, faReceipt, faCartPlus, faStar, faStarHalfAlt, faPenFancy } from '@fortawesome/free-solid-svg-icons'; // Added faPenFancy
 import { AppContext } from '../context/AppContext';
 import { useNavigate, Link } from 'react-router-dom';
 import SkeletonText from '../components/SkeletonText';
@@ -11,12 +11,14 @@ import { getFullImageUrl } from '../utils/imageUtils'; // Import utility
 import { motion } from 'framer-motion'; // Import motion for animations
 
 const CustomerDashboard = () => {
-  const { user, cart, wishlist, orders, addToCart, addToWishlist, allAppProducts, appStores } = useContext(AppContext);
+  const { user, cart, wishlist, orders, addToCart, addToWishlist, allAppProducts, appStores, isLoggedIn } = useContext(AppContext);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [recommendedProducts, setRecommendedProducts] = useState([]);
   const [recommendedLoading, setRecommendedLoading] = useState(true);
   const [selectedBrowseCategory, setSelectedBrowseCategory] = useState('all'); // State for category filter in 'Browse All Products' section
+  const [pendingReviews, setPendingReviews] = useState([]); // New state for pending reviews
+  const [pendingReviewsLoading, setPendingReviewsLoading] = useState(true); // New loading state
 
   const categories = [ // Define categories for the filter and for separate sections
     'all', 'Groceries', 'Bakery', 'Butcher', 'Cafe', 'Electronics', 
@@ -46,6 +48,29 @@ const CustomerDashboard = () => {
     };
     fetchRecommended();
   }, []);
+
+  // Fetch pending reviews
+  useEffect(() => {
+    const fetchPendingReviews = async () => {
+      if (!isLoggedIn || user?.role !== 'customer') {
+        setPendingReviews([]);
+        setPendingReviewsLoading(false);
+        return;
+      }
+      setPendingReviewsLoading(true);
+      try {
+        const fetchedPendingReviews = await api.customer.getPendingReviews();
+        setPendingReviews(fetchedPendingReviews);
+      } catch (error) {
+        console.error('Failed to fetch pending reviews:', error);
+        setPendingReviews([]);
+      } finally {
+        setPendingReviewsLoading(false);
+      }
+    };
+    fetchPendingReviews();
+  }, [isLoggedIn, user]);
+
 
   // Dynamically find the latest order for the logged-in user (still needed for stats)
   const latestOrder = useMemo(() => {
@@ -121,7 +146,7 @@ const CustomerDashboard = () => {
             </div>
             <div className="flex items-center gap-1 text-xs mb-1">
               <div className="flex">{renderStars(product.rating)}</div>
-              <span className="opacity-80">({product.reviews})</span>
+              <span className="opacity-80">({product.numReviews})</span> {/* Display numReviews */}
             </div>
             {product.stock > 0 ? (
               <p className="text-xs opacity-80 text-green-400">In Stock: {product.stock}</p>
@@ -154,11 +179,9 @@ const CustomerDashboard = () => {
   // Memoize sorted categories to render available ones first
   const sortedCategories = useMemo(() => {
     const allCategoriesExceptAll = categories.filter(cat => cat !== 'all');
-    const categoriesWithProducts = allCategoriesExceptAll.filter(cat => 
-      allAppProducts.some(p => p.category === cat)
-    );
+    const categoriesWithProducts = allAppProducts.filter(p => p.stock > 0).map(p => p.category).filter((value, index, self) => self.indexOf(value) === index); // Get unique categories with stock
     const categoriesWithoutProducts = allCategoriesExceptAll.filter(cat => 
-      !allAppProducts.some(p => p.category === cat)
+      !categoriesWithProducts.includes(cat)
     );
     return [...categoriesWithProducts, ...categoriesWithoutProducts];
   }, [categories, allAppProducts]);
@@ -295,6 +318,53 @@ const CustomerDashboard = () => {
                 </div>
               )}
             </div>
+
+            {/* Products to Review Section */}
+            {isLoggedIn && user?.role === 'customer' && (
+              <div className="bg-black/10 p-6 rounded-xl mt-8">
+                <h2 className="text-2xl font-bold mb-4 flex items-center gap-3">
+                  <FontAwesomeIcon icon={faPenFancy} className="text-[var(--accent)]" /> Products to Review
+                </h2>
+                {pendingReviewsLoading ? (
+                  <div className="flex gap-4 overflow-x-auto pb-2">
+                    {[...Array(3)].map((_, index) => (
+                      <div key={index} className="flex-shrink-0 w-[180px] sm:w-[200px] md:w-[220px] lg:w-[250px]">
+                        <SkeletonCard />
+                      </div>
+                    ))}
+                  </div>
+                ) : pendingReviews.length > 0 ? (
+                  <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
+                    {pendingReviews.map(product => (
+                      <div key={product._id} className="bg-black/10 border border-white/10 rounded-2xl overflow-hidden shadow-lg flex-shrink-0 w-[180px] sm:w-[200px] md:w-[220px] lg:w-[250px] flex flex-col">
+                        <Link to={`/products/${product._id}`} className="flex-grow flex flex-col">
+                          <img 
+                            src={getFullImageUrl(product.image)} 
+                            alt={product.name} 
+                            className="w-full h-32 sm:h-40 object-cover" 
+                            onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }}
+                          />
+                          <div className="p-3 flex-grow">
+                            <h3 className="text-base sm:text-lg font-semibold mb-1 truncate">{product.name}</h3>
+                            <p className="text-xs opacity-80">Purchased: {product.unit}</p>
+                          </div>
+                        </Link>
+                        <div className="p-3 pt-0">
+                          <Link 
+                            to={`/products/${product._id}`} 
+                            className="bg-[var(--accent)] text-white border-none py-1.5 px-2 rounded-lg flex items-center justify-center gap-1 text-sm font-medium hover:bg-[var(--accent-dark)] transition-all duration-300 w-full"
+                          >
+                            <FontAwesomeIcon icon={faPenFancy} /> Leave Review
+                          </Link>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-center text-lg opacity-80 py-4">No products awaiting your review. Happy shopping!</p>
+                )}
+              </div>
+            )}
           </>
         )}
       </div>

@@ -51,15 +51,14 @@ const productSchema = new mongoose.Schema({
     required: true,
     index: true, // Added index
   },
-  rating: {
+  rating: { // Average rating
     type: Number,
     min: 0,
     max: 5,
     default: 0,
   },
-  reviews: {
+  numReviews: { // Number of reviews
     type: Number,
-    min: 0,
     default: 0,
   },
   isActive: {

@@ -1,6 +1,8 @@
 import asyncHandler from '../middleware/asyncHandler.js';
 import User from '../models/User.js';
 import Store from '../models/Store.js'; // Import Store model
+import Order from '../models/Order.js'; // Import Order model
+import Review from '../models/Review.js'; // Import Review model
 import { updateCustomerProfileSchema, updateVendorProfileSchema } from '../validators/userValidator.js'; // Import validators
 
 // @desc    Get current user profile
@@ -185,4 +187,53 @@ const updateUserProfileImage = asyncHandler(async (req, res) => {
   }
 });
 
-export { getMe, updateUserProfile, updateUserProfileImage };
+// @desc    Get products user has purchased and can review
+// @route   GET /api/users/me/pending-reviews
+// @access  Private/Customer
+const getPendingReviews = asyncHandler(async (req, res) => {
+  // Find all delivered orders for the current user
+  const deliveredOrders = await Order.find({
+    user: req.user._id,
+    orderStatus: 'Delivered',
+  }).select('items.product items.name items.image items.unit');
+
+  // Collect all unique product IDs from these orders
+  const purchasedProductIds = new Set();
+  deliveredOrders.forEach(order => {
+    order.items.forEach(item => {
+      purchasedProductIds.add(item.product.toString());
+    });
+  });
+
+  // Find products that the user has already reviewed
+  const reviewedProducts = await Review.find({
+    user: req.user._id,
+    product: { $in: Array.from(purchasedProductIds) },
+  }).select('product');
+
+  const reviewedProductIds = new Set(reviewedProducts.map(review => review.product.toString()));
+
+  // Filter out products that have already been reviewed
+  const productsToReview = [];
+  deliveredOrders.forEach(order => {
+    order.items.forEach(item => {
+      if (!reviewedProductIds.has(item.product.toString())) {
+        // Add product details to the list if not already reviewed
+        // Ensure uniqueness in the final list, as a product might appear in multiple orders
+        if (!productsToReview.some(p => p._id.toString() === item.product.toString())) {
+          productsToReview.push({
+            _id: item.product,
+            name: item.name,
+            image: item.image,
+            unit: item.unit,
+          });
+        }
+      }
+    });
+  });
+
+  res.json(productsToReview);
+});
+
+
+export { getMe, updateUserProfile, updateUserProfileImage, getPendingReviews };
