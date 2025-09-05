@@ -16,6 +16,11 @@ const env = {
   ADMIN_EMAIL: process.env.ADMIN_EMAIL, // New: Admin email for support requests
 };
 
+// --- DEBUGGING START ---
+console.log('DEBUG: process.env.NODE_ENV in env.js:', process.env.NODE_ENV);
+console.log('DEBUG: process.env.MONGO_URI in env.js:', process.env.MONGO_URI ? 'Set' : 'Not Set');
+// --- DEBUGGING END ---
+
 // Basic validation to ensure critical variables are set
 const requiredEnvVars = ['MONGO_URI', 'JWT_SECRET', 'EMAIL_HOST', 'EMAIL_USER', 'EMAIL_PASS', 'FRONTEND_URL', 'ADMIN_EMAIL'];
 for (const key of requiredEnvVars) {
