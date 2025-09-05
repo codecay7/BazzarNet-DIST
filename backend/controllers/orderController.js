@@ -14,18 +14,22 @@ const placeOrder = asyncHandler(async (req, res) => {
   console.log('Backend: placeOrder controller reached.'); // NEW LOG
   const { items, shippingAddress, paymentMethod, totalPrice, appliedCoupon } = req.body; // New: Get appliedCoupon
 
-  // In a real app, you'd validate items, check stock, process payment, etc.
-  // For now, we'll create a simplified order.
-
-  // Assuming all items in the cart belong to a single store for simplicity
-  // You might need more complex logic if a single order can span multiple stores
   if (!items || items.length === 0) {
     res.status(400);
     throw new Error('No items in order.');
   }
 
-  // Find the store ID from the first item (assuming single store per order)
-  const firstItemProduct = await Product.findById(items[0].product);
+  // Extract product IDs from the incoming items
+  const productIds = items.map(item => item.product);
+
+  // Fetch all products in one go to avoid N+1 queries
+  const productsInOrder = await Product.find({ _id: { $in: productIds } });
+
+  // Create a map for quick lookup
+  const productMap = new Map(productsInOrder.map(p => [p._id.toString(), p]));
+
+  // Validate and get store ID from the first item
+  const firstItemProduct = productMap.get(items[0].product);
   if (!firstItemProduct) {
     res.status(400);
     throw new Error('Product not found for the first item.');
@@ -47,7 +51,7 @@ const placeOrder = asyncHandler(async (req, res) => {
   // --- Stock Validation and Decrement ---
   const productsToUpdate = [];
   for (const item of items) {
-    const product = await Product.findById(item.product);
+    const product = productMap.get(item.product); // Get product from map
     if (!product) {
       res.status(404);
       throw new Error(`Product with ID ${item.product} not found.`);
