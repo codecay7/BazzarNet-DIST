@@ -1,38 +1,14 @@
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faShoppingBag, faStore, faCartPlus, faTruck, faUser, faQuoteLeft, faArrowRight, faTags, faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
 import LoadingSpinner3D from '../components/LoadingSpinner3D'; // Import the new 3D loader
+import { BubbleBackground } from '../components/BubbleBackground'; // Import the new BubbleBackground
 
 const LandingPage = () => {
   const [isLoading, setIsLoading] = useState(true); // New state for loading screen
   const navigate = useNavigate();
-  const [currentGradientClass, setCurrentGradientClass] = useState('from-violet-900 to-blue-900');
-
-  const gradientClasses = [
-    'from-violet-900 to-blue-900',
-    'from-emerald-700 to-cyan-800',
-    'from-rose-700 to-purple-800',
-    'from-amber-700 to-orange-800',
-  ];
-
-  const handleScroll = useCallback(() => {
-    const scrollY = window.scrollY;
-    const pageHeight = document.documentElement.scrollHeight - window.innerHeight;
-    const scrollProgress = scrollY / pageHeight;
-
-    // Define thresholds for changing gradients
-    if (scrollProgress < 0.25) {
-      setCurrentGradientClass(gradientClasses[0]);
-    } else if (scrollProgress < 0.5) {
-      setCurrentGradientClass(gradientClasses[1]);
-    } else if (scrollProgress < 0.75) {
-      setCurrentGradientClass(gradientClasses[2]);
-    } else {
-      setCurrentGradientClass(gradientClasses[3]);
-    }
-  }, []);
 
   useEffect(() => {
     // Simulate a loading delay for the 3D spinner
@@ -40,13 +16,8 @@ const LandingPage = () => {
       setIsLoading(false);
     }, 2000); // Show loader for 2 seconds
 
-    window.addEventListener('scroll', handleScroll);
-
-    return () => {
-      clearTimeout(loaderTimer);
-      window.removeEventListener('scroll', handleScroll);
-    };
-  }, [handleScroll]);
+    return () => clearTimeout(loaderTimer);
+  }, []);
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -87,17 +58,13 @@ const LandingPage = () => {
       ) : (
         <motion.section
           key="landing-content"
-          className={`w-full max-w-[1200px] mx-auto my-10 relative overflow-hidden bg-gradient-to-br ${currentGradientClass} transition-colors duration-1000`}
+          className="w-full max-w-[1200px] mx-auto my-10 relative overflow-hidden"
           variants={containerVariants}
           initial="hidden"
           animate="visible"
           exit="hidden" // Animate out when navigating away
         >
-          {/* Background Blobs / Premium Look */}
-          <div className="absolute top-10 left-10 w-72 h-72 bg-[var(--accent)] rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob z-[-1]"></div>
-          <div className="absolute top-10 right-10 w-72 h-72 bg-blue-500 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-2000 z-[-1]"></div>
-          <div className="absolute bottom-10 left-10 w-72 h-72 bg-purple-500 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-4000 z-[-1]"></div>
-          <div className="absolute top-1/2 right-10 -translate-y-1/2 w-72 h-72 bg-pink-500 rounded-full mix-blend-multiply filter blur-xl opacity-30 animate-blob animation-delay-1000 z-[-1]"></div>
+          <BubbleBackground interactive={true} className="absolute inset-0 -z-20" /> {/* Apply BubbleBackground here */}
 
           {/* Hero Section */}
           <motion.div
@@ -233,7 +200,7 @@ const LandingPage = () => {
                 <p className="text-[var(--text)] text-lg">Get your goods delivered quickly.</p>
               </motion.div>
               <motion.div
-                className="bg-[var(--card-bg)] backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-[0_8px_40px_var(--shadow)] hover:-translate-y-1 transition-transform duration-300 flex flex-col items-center text-center"
+                className="bg-[var(--card-bg)] backdrop-blur-md border border-white/20 rounded-3xl p-8 shadow-[0_8px_40px_var(--shadow)] hover:-translate-y-1 transition-transform duration-300"
                 variants={cardVariants}
                 whileInView="visible"
                 initial="hidden"
