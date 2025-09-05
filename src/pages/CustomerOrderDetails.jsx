@@ -28,6 +28,17 @@ const CustomerOrderDetails = () => {
   // Determine which order object to use: localOrder if fetched, otherwise from context
   const currentOrder = localOrder || orders.find(o => o._id === orderId);
 
+  // Move useMemo here, before any conditional returns
+  const steps = useMemo(() => {
+    const currentStatus = currentOrder?.orderStatus || ''; // Use currentOrder
+    return [
+      { name: 'Ordered', completed: true, icon: faBox },
+      { name: 'Processing', completed: ['Processing', 'Shipped', 'Delivered', 'Refunded'].includes(currentStatus), icon: faBox },
+      { name: 'Shipped', completed: ['Shipped', 'Delivered', 'Refunded'].includes(currentStatus), icon: faTruck },
+      { name: 'Delivered', completed: currentStatus === 'Delivered', icon: faHome },
+    ];
+  }, [currentOrder?.orderStatus]); // Dependency on currentOrder.orderStatus
+
   useEffect(() => {
     console.log(`Frontend: CustomerOrderDetails mounted for orderId: ${orderId}`);
     const fetchSpecificOrder = async () => {
@@ -78,16 +89,6 @@ const CustomerOrderDetails = () => {
       </section>
     );
   }
-
-  const steps = useMemo(() => {
-    const currentStatus = currentOrder?.orderStatus || ''; // Use currentOrder
-    return [
-      { name: 'Ordered', completed: true, icon: faBox },
-      { name: 'Processing', completed: ['Processing', 'Shipped', 'Delivered', 'Refunded'].includes(currentStatus), icon: faBox },
-      { name: 'Shipped', completed: ['Shipped', 'Delivered', 'Refunded'].includes(currentStatus), icon: faTruck },
-      { name: 'Delivered', completed: currentStatus === 'Delivered', icon: faHome },
-    ];
-  }, [currentOrder?.orderStatus]); // Dependency on currentOrder.orderStatus
 
   const getStatusClasses = (status) => {
     switch (status) {
