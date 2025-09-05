@@ -11,6 +11,7 @@ import env from '../config/env.js'; // Import env to use FRONTEND_URL
 // @route   POST /api/orders
 // @access  Private/Customer
 const placeOrder = asyncHandler(async (req, res) => {
+  console.log('Backend: placeOrder controller reached.'); // NEW LOG
   const { items, shippingAddress, paymentMethod, totalPrice, appliedCoupon } = req.body; // New: Get appliedCoupon
 
   // In a real app, you'd validate items, check stock, process payment, etc.
