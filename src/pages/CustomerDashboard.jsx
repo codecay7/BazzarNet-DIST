@@ -11,14 +11,14 @@ import { getFullImageUrl } from '../utils/imageUtils'; // Import utility
 import { motion } from 'framer-motion'; // Import motion for animations
 
 const CustomerDashboard = () => {
-  const { user, cart, wishlist, orders, addToCart, addToWishlist } = useContext(AppContext);
+  const { user, cart, wishlist, orders, addToCart, addToWishlist, allAppProducts, appStores } = useContext(AppContext);
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [recommendedProducts, setRecommendedProducts] = useState([]);
   const [recommendedLoading, setRecommendedLoading] = useState(true);
-  const [selectedCategory, setSelectedCategory] = useState('all'); // State for category filter
+  const [selectedCategory, setSelectedCategory] = useState('all'); // State for category filter in recommended section
 
-  const categories = [ // Define categories for the filter
+  const categories = [ // Define categories for the filter and for separate sections
     'all', 'Groceries', 'Bakery', 'Butcher', 'Cafe', 'Electronics', 
     'Furniture', 'Decor', 'Clothing', 'Other'
   ];
@@ -92,6 +92,73 @@ const CustomerDashboard = () => {
     return recommendedProducts.filter(product => product.category === selectedCategory);
   }, [recommendedProducts, selectedCategory]);
 
+  // Helper component to render a product card
+  const ProductCard = ({ product }) => {
+    const isOutOfStock = product.stock === 0;
+    const discount = calculateDiscount(product.price, product.originalPrice);
+    const storeName = appStores.find(store => store._id === product.store?._id)?.name || 'N/A';
+
+    return (
+      <div key={product._id} className={`bg-black/10 border border-white/10 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex-shrink-0 w-[180px] sm:w-[200px] md:w-[220px] lg:w-[250px] flex flex-col ${isOutOfStock ? 'grayscale' : ''}`} role="listitem" aria-label={`Product: ${product.name}`}>
+        <Link to={`/products/${product._id}`} className="flex-grow flex flex-col" aria-label={`View details for ${product.name}`}>
+          <div className="relative">
+            <img
+              src={getFullImageUrl(product.image)}
+              alt={product.name}
+              className="w-full h-32 sm:h-40 object-cover"
+              onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }} // Fallback image
+            />
+            {discount > 0 && (
+              <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded" aria-label={`${Math.round(discount)} percent off`}>{Math.round(discount)}% OFF</span>
+            )}
+            {isOutOfStock && (
+              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                <span className="text-white text-sm font-bold">OUT OF STOCK</span>
+              </div>
+            )}
+          </div>
+          <div className="p-3 flex-grow flex-col">
+            <h3 className="text-base sm:text-lg font-semibold mb-1 truncate">{product.name}</h3>
+            <p className="text-xs opacity-80 mb-1 truncate">From: {storeName}</p>
+            <div className="flex items-baseline gap-1 mb-1">
+              <p className="text-sm sm:text-base font-bold text-[var(--accent)]">₹{product.price.toFixed(2)} / {product.unit}</p>
+              {product.originalPrice && discount > 0 && (
+                <p className="text-xs text-gray-400 line-through">₹{product.originalPrice.toFixed(2)}</p>
+              )}
+            </div>
+            <div className="flex items-center gap-1 text-xs mb-1">
+              <div className="flex">{renderStars(product.rating)}</div>
+              <span className="opacity-80">({product.reviews})</span>
+            </div>
+            {product.stock > 0 ? (
+              <p className="text-xs opacity-80 text-green-400">In Stock: {product.stock}</p>
+            ) : (
+              <p className="text-xs opacity-80 text-red-400">Out of Stock</p>
+            )}
+          </div>
+        </Link>
+        <div className="flex gap-2 mt-auto p-3 pt-0">
+          <button
+            className="flex-1 bg-[var(--accent)] text-white border-none py-1.5 px-2 rounded-lg flex items-center justify-center gap-1 text-sm font-medium hover:bg-[var(--accent-dark)] transition-all duration-300"
+            onClick={() => addToCart(product)}
+            aria-label={`Add ${product.name} to cart`}
+            disabled={product.stock === 0}
+          >
+            <FontAwesomeIcon icon={faCartPlus} aria-hidden="true" /> Cart
+          </button>
+          <button
+            className="bg-white/10 text-[var(--text)] border-none py-1.5 px-2 rounded-lg flex items-center justify-center gap-1 text-sm font-medium hover:bg-white/20 transition-all duration-300"
+            onClick={() => addToWishlist(product)}
+            aria-label={`Add ${product.name} to wishlist`}
+          >
+            <FontAwesomeIcon icon={faHeart} aria-hidden="true" />
+          </button>
+        </div>
+      </div>
+    );
+  };
+
+
   return (
     <div className="w-full max-w-[1200px] mx-auto my-10">
       <div className="bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-8 mx-4">
@@ -113,9 +180,11 @@ const CustomerDashboard = () => {
             {/* Recommended Products Skeleton */}
             <div className="bg-black/10 p-6 rounded-xl animate-pulse">
               <SkeletonText width="60%" height="1.5rem" className="mb-4" />
-              <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4"> {/* Adjusted for mobile */}
+              <div className="flex gap-4 overflow-x-auto pb-2"> {/* Horizontal scroll for skeleton */}
                 {[...Array(6)].map((_, index) => (
-                  <SkeletonCard key={index} />
+                  <div key={index} className="flex-shrink-0 w-[180px] sm:w-[200px] md:w-[220px] lg:w-[250px]">
+                    <SkeletonCard />
+                  </div>
                 ))}
               </div>
             </div>
@@ -139,12 +208,12 @@ const CustomerDashboard = () => {
             </div>
 
             {/* Recommended Products Section */}
-            <div className="bg-black/10 p-6 rounded-xl">
+            <div className="bg-black/10 p-6 rounded-xl mb-8">
               <h2 className="text-2xl font-bold mb-4">Recommended Products</h2>
               
-              {/* Category Filter Section - Redesigned as horizontal scrollable cards */}
+              {/* Category Filter Section for Recommended Products */}
               <div className="mb-6">
-                <h3 className="text-lg font-semibold mb-3">Browse by Category:</h3>
+                <h3 className="text-lg font-semibold mb-3">Filter Recommended by Category:</h3>
                 <div className="flex gap-3 pb-2 overflow-x-auto whitespace-nowrap scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
                   {categories.map(cat => (
                     <motion.button
@@ -158,7 +227,7 @@ const CustomerDashboard = () => {
                       whileHover={{ scale: 1.05 }}
                       whileTap={{ scale: 0.95 }}
                       aria-pressed={selectedCategory === cat}
-                      aria-label={`Filter by ${cat === 'all' ? 'All Categories' : cat}`}
+                      aria-label={`Filter recommended by ${cat === 'all' ? 'All Categories' : cat}`}
                     >
                       {cat === 'all' ? 'All Categories' : cat}
                     </motion.button>
@@ -167,80 +236,41 @@ const CustomerDashboard = () => {
               </div>
 
               {recommendedLoading ? (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4"> {/* Adjusted for mobile */}
+                <div className="flex gap-4 overflow-x-auto pb-2">
                   {[...Array(6)].map((_, index) => (
-                    <SkeletonCard key={index} />
+                    <div key={index} className="flex-shrink-0 w-[180px] sm:w-[200px] md:w-[220px] lg:w-[250px]">
+                      <SkeletonCard />
+                    </div>
                   ))}
                 </div>
               ) : filteredRecommendedProducts.length > 0 ? (
-                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-4"> {/* Adjusted for mobile */}
-                  {filteredRecommendedProducts.map(product => {
-                    const isOutOfStock = product.stock === 0;
-                    const discount = calculateDiscount(product.price, product.originalPrice);
-                    return (
-                      <div key={product._id} className={`bg-black/10 border border-white/10 rounded-2xl overflow-hidden shadow-lg hover:shadow-xl hover:-translate-y-1 transition-all duration-300 flex flex-col ${isOutOfStock ? 'grayscale' : ''}`} role="listitem" aria-label={`Product: ${product.name}`}>
-                        <Link to={`/products/${product._id}`} className="flex-grow flex flex-col" aria-label={`View details for ${product.name}`}>
-                          <div className="relative">
-                            <img
-                              src={getFullImageUrl(product.image)}
-                              alt={product.name}
-                              className="w-full h-48 object-cover"
-                              onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }} // Fallback image
-                            />
-                            {discount > 0 && (
-                              <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded" aria-label={`${Math.round(discount)} percent off`}>{Math.round(discount)}% OFF</span>
-                            )}
-                            {isOutOfStock && (
-                              <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
-                                <span className="text-white text-xl font-bold">OUT OF STOCK</span>
-                              </div>
-                            )}
-                          </div>
-                          <div className="p-4 flex-grow flex-col">
-                            <h3 className="text-xl font-semibold mb-2">{product.name}</h3>
-                            <p className="text-sm opacity-80 mb-1">Category: {product.category}</p> {/* Display Category */}
-                            <div className="flex items-baseline gap-2 mb-2">
-                              <p className="text-lg font-bold text-[var(--accent)]">₹{product.price.toFixed(2)} / {product.unit}</p>
-                              {product.originalPrice && discount > 0 && (
-                                <p className="text-sm text-gray-400 line-through">₹{product.originalPrice.toFixed(2)}</p>
-                              )}
-                            </div>
-                            <div className="flex items-center gap-2 text-sm mb-2">
-                              <div className="flex">{renderStars(product.rating)}</div>
-                              <span className="opacity-80">({product.reviews})</span>
-                            </div>
-                            {/* Stock information */}
-                            {product.stock > 0 ? (
-                              <p className="text-sm opacity-80 text-green-400">In Stock: {product.stock}</p>
-                            ) : (
-                              <p className="text-sm opacity-80 text-red-400">Out of Stock</p>
-                            )}
-                          </div>
-                        </Link>
-                        <div className="flex gap-2 mt-4 p-4 pt-0">
-                          <button
-                            className="flex-1 bg-[var(--accent)] text-white border-none py-2 px-4 rounded-lg flex items-center justify-center gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300"
-                            onClick={() => addToCart(product)}
-                            aria-label={`Add ${product.name} to cart`}
-                            disabled={product.stock === 0} // Disable button if out of stock
-                          >
-                            <FontAwesomeIcon icon={faCartPlus} aria-hidden="true" /> Cart
-                          </button>
-                          <button
-                            className="bg-white/10 text-[var(--text)] border-none py-2 px-4 rounded-lg flex items-center justify-center gap-2 font-medium hover:bg-white/20 transition-all duration-300"
-                            onClick={() => addToWishlist(product)}
-                            aria-label={`Add ${product.name} to wishlist`}
-                          >
-                            <FontAwesomeIcon icon={faHeart} aria-hidden="true" />
-                          </button>
-                        </div>
-                      </div>
-                    );
-                  })}
+                <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
+                  {filteredRecommendedProducts.map(product => (
+                    <ProductCard key={product._id} product={product} />
+                  ))}
                 </div>
               ) : (
                 <p className="text-center text-lg opacity-80 py-10">No recommended products available for this category.</p>
               )}
+            </div>
+
+            {/* Browse All Products by Category Section */}
+            <div className="bg-black/10 p-6 rounded-xl">
+              <h2 className="text-2xl font-bold mb-6">Browse All Products by Category</h2>
+              {categories.filter(cat => cat !== 'all').map(category => (
+                <div key={category} className="mb-8 last:mb-0">
+                  <h3 className="text-xl font-semibold mb-4 border-b border-white/20 pb-2">{category}</h3>
+                  {allAppProducts.filter(p => p.category === category).length > 0 ? (
+                    <div className="flex gap-4 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-700 scrollbar-track-gray-900">
+                      {allAppProducts.filter(p => p.category === category).map(product => (
+                        <ProductCard key={product._id} product={product} />
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-center text-base opacity-80 py-4">No products found in the {category} category.</p>
+                  )}
+                </div>
+              ))}
             </div>
           </>
         )}
