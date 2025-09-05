@@ -157,7 +157,7 @@ const Checkout = () => {
             image: item.image,
             price: item.price,
             quantity: item.quantity,
-            unit: item.unit,
+            unit: item.unit, // ADDED: Include the unit here
           })),
           shippingAddress: shippingAddress,
           paymentMethod: 'UPI QR Payment', // NEW: Set payment method
