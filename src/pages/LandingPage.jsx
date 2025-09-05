@@ -69,38 +69,34 @@ const LandingPage = () => {
       filter: "hue-rotate(0deg)",
     },
     glitch: {
-      x: [0, -2, 2, -2, 2, 0], // Small horizontal shifts
+      x: [0, -1, 1, 0], // Smaller horizontal shifts
       textShadow: [
-        "1px 0px 0px rgba(255,0,0,0.7), -1px 0px 0px rgba(0,0,255,0.7)", // Shift 1
-        "-1px 0px 0px rgba(255,0,0,0.7), 1px 0px 0px rgba(0,0,255,0.7)", // Shift 2
-        "0px 0px 0px rgba(255,0,0,0), 0px 0px 0px rgba(0,0,255,0)",     // Reset
-        "2px 0px 0px rgba(255,0,0,0.7), -2px 0px 0px rgba(0,0,255,0.7)", // Shift 3
-        "-2px 0px 0px rgba(255,0,0,0.7), 2px 0px 0px rgba(0,0,255,0.7)", // Shift 4
+        "0.5px 0px 0px rgba(255,0,0,0.2), -0.5px 0px 0px rgba(0,0,255,0.2)", // Subtle shift 1
+        "-0.5px 0px 0px rgba(255,0,0,0.2), 0.5px 0px 0px rgba(0,0,255,0.2)", // Subtle shift 2
         "0px 0px 0px rgba(255,0,0,0), 0px 0px 0px rgba(0,0,255,0)",     // Reset
       ],
       filter: [
         "hue-rotate(0deg)",
-        "hue-rotate(10deg)",
+        "hue-rotate(3deg)", // Smaller hue rotation
         "hue-rotate(0deg)",
-        "hue-rotate(-10deg)",
-        "hue-rotate(0deg)",
+        "hue-rotate(-3deg)",
         "hue-rotate(0deg)",
       ],
       transition: {
         x: {
-          duration: 0.05, // Faster shifts
+          duration: 0.08, // Slightly slower shifts
           repeat: Infinity,
           repeatType: "mirror",
           ease: "easeInOut",
         },
         textShadow: {
-          duration: 0.05, // Faster shifts
+          duration: 0.08, // Slightly slower shifts
           repeat: Infinity,
           repeatType: "mirror",
           ease: "easeInOut",
         },
         filter: {
-          duration: 0.05, // Faster shifts
+          duration: 0.08, // Slightly slower shifts
           repeat: Infinity,
           repeatType: "mirror",
           ease: "easeInOut",
@@ -130,12 +126,12 @@ const LandingPage = () => {
             animate="visible"
           >
             <motion.h1
-              className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl xl:text-9xl font-black leading-tight md:leading-snug mb-4 tracking-tight break-words"
+              className=" font-black leading-tight md:leading-snug mb-4 tracking-tight break-words"
             >
-              <motion.span variants={textChildVariants} className="inline-block">Shop Locally, Delivered Fast with</motion.span>
-              <motion.span 
-                variants={textChildVariants} 
-                className="inline-block ml-2 px-2 py-1 bg-[var(--accent)] text-white rounded-md shadow-md text-[1.8em] font-black"
+              <motion.span variants={textChildVariants} className="inline-block text-5xl sm:text-5xl md:text-6xl lg:text-7xl xl:text-9xl font-black">Shop Locally, Delivered Fast </motion.span>
+              <motion.span
+                variants={textChildVariants}
+                className="inline-block ml-2  px-2 py-1 bg-[var(--accent)] text-white rounded-md shadow-md text-[1.8em] font-black"
               >
                 <motion.span
                   variants={glitchVariants}
@@ -146,7 +142,7 @@ const LandingPage = () => {
                 </motion.span>
               </motion.span>
             </motion.h1>
-            <motion.p className="text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl font-medium mb-5" variants={textChildVariants}>
+            <motion.p className="text-s sm:text-lg md:text-xl lg:text-xl xl:text-2xl font-medium mb-5" variants={textChildVariants}>
               Support your favorite local stores with quick doorstep delivery.
             </motion.p>
           </motion.div>
@@ -162,7 +158,7 @@ const LandingPage = () => {
                 initial="hidden"
                 viewport={{ once: true, amount: 0.5 }}
               >
-                <motion.div 
+                <motion.div
                   whileHover={{ scale: 1.1, rotate: 5 }}
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
                   className="mb-4"
@@ -179,7 +175,7 @@ const LandingPage = () => {
                 initial="hidden"
                 viewport={{ once: true, amount: 0.5 }}
               >
-                <motion.div 
+                <motion.div
                   whileHover={{ scale: 1.1, rotate: 5 }}
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
                   className="mb-4"
@@ -196,7 +192,7 @@ const LandingPage = () => {
                 initial="hidden"
                 viewport={{ once: true, amount: 0.5 }}
               >
-                <motion.div 
+                <motion.div
                   whileHover={{ scale: 1.1, rotate: 5 }}
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
                   className="mb-4"
@@ -213,7 +209,7 @@ const LandingPage = () => {
                 initial="hidden"
                 viewport={{ once: true, amount: 0.5 }}
               >
-                <motion.div 
+                <motion.div
                   whileHover={{ scale: 1.1, rotate: 5 }}
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
                   className="mb-4"
@@ -237,7 +233,7 @@ const LandingPage = () => {
                 initial="hidden"
                 viewport={{ once: true, amount: 0.5 }}
               >
-                <motion.div 
+                <motion.div
                   whileHover={{ scale: 1.1, rotate: 5 }}
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
                   className="mb-4"
@@ -254,7 +250,7 @@ const LandingPage = () => {
                 initial="hidden"
                 viewport={{ once: true, amount: 0.5 }}
               >
-                <motion.div 
+                <motion.div
                   whileHover={{ scale: 1.1, rotate: 5 }}
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
                   className="mb-4"
@@ -271,7 +267,7 @@ const LandingPage = () => {
                 initial="hidden"
                 viewport={{ once: true, amount: 0.5 }}
               >
-                <motion.div 
+                <motion.div
                   whileHover={{ scale: 1.1, rotate: 5 }}
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
                   className="mb-4"
@@ -288,7 +284,7 @@ const LandingPage = () => {
                 initial="hidden"
                 viewport={{ once: true, amount: 0.5 }}
               >
-                <motion.div 
+                <motion.div
                   whileHover={{ scale: 1.1, rotate: 5 }}
                   transition={{ type: "spring", stiffness: 400, damping: 10 }}
                   className="mb-4"
@@ -343,8 +339,8 @@ const LandingPage = () => {
             <h2 className="text-4xl md:text-5xl font-extrabold mb-4 leading-tight">Join the BazzarNet Community!</h2>
             <p className="text-xl md:text-2xl mb-8 opacity-90">Whether you're a customer looking for convenience or a business ready to grow, BazzarNet is for you.</p>
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <LoginButton 
-                className="w-full sm:flex-1 py-3 px-8 rounded-full font-bold text-lg flex items-center justify-center" 
+              <LoginButton
+                className="w-full sm:flex-1 py-3 px-8 rounded-full font-bold text-lg flex items-center justify-center"
               />
               <Link
                 to="/products"
