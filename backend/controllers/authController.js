@@ -132,6 +132,16 @@ const login = asyncHandler(async (req, res) => {
 
   const user = await User.findOne({ email });
 
+  // --- START DEBUG LOG ---
+  console.log('DEBUG: Login attempt for email:', email);
+  if (user) {
+    console.log('DEBUG: User found. User role:', user.role, 'Is active:', user.isActive);
+    // DO NOT log user.password directly in production, it's hashed!
+  } else {
+    console.log('DEBUG: User not found for email:', email);
+  }
+  // --- END DEBUG LOG ---
+
   if (user && (await user.matchPassword(password))) {
     if (!user.isActive) {
       res.status(401);
