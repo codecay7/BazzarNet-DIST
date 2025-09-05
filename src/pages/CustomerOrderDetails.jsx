@@ -5,6 +5,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBox, faTruck, faHome } from '@fortawesome/free-solid-svg-icons';
 import placeholderImage from '../assets/placeholder.png'; // Import placeholder image
 import { getFullImageUrl } from '../utils/imageUtils'; // Import utility
+import QRCode from 'react-qr-code'; // Ensure QRCode is imported
 
 // Helper function to format ISO timestamp
 const formatTimestamp = (isoString) => {
@@ -80,7 +81,7 @@ const CustomerOrderDetails = () => {
         <div className="bg-black/10 p-6 rounded-xl">
           <h3 className="text-xl font-semibold mb-4">Items in Your Order</h3>
           <div className="space-y-4" role="list">
-            {order.items.map(item => (
+            {(order.items || []).map(item => ( {/* Added || [] for safety */}
               <div key={item.product} className="flex items-center gap-4 bg-black/10 p-3 rounded-lg" role="listitem" aria-label={`Item: ${item.name}, Quantity: ${item.quantity}, Price: ₹{(item.price * item.quantity).toFixed(2)}`}>
                 <img 
                   src={getFullImageUrl(item.image)} 
@@ -106,9 +107,9 @@ const CustomerOrderDetails = () => {
             <h3 className="text-xl font-semibold mb-4">Delivery Confirmation</h3>
             <p className="mb-4">Please show this QR code to the delivery person to confirm your order.</p>
             <div className="flex justify-center mb-4 p-2 bg-white rounded-lg">
-                <QRCode value={JSON.stringify({ orderId: order._id, deliveryOtp: order.deliveryOtp })} size={180} level="H" className="rounded-lg" aria-label={`QR code for order ${order._id} with OTP ${order.deliveryOtp}`} />
+                <QRCode value={JSON.stringify({ orderId: order._id, deliveryOtp: order.deliveryOtp || 'N/A' })} size={180} level="H" className="rounded-lg" aria-label={`QR code for order ${order._id} with OTP ${order.deliveryOtp || 'N/A'}`} /> {/* Added || 'N/A' */}
             </div>
-            <p className="text-lg font-bold">OTP: <span className="text-[var(--accent)]">{order.deliveryOtp}</span></p>
+            <p className="text-lg font-bold">OTP: <span className="text-[var(--accent)]">{order.deliveryOtp || 'N/A'}</span></p> {/* Added || 'N/A' */}
             <p className="text-sm opacity-80 mt-2">The delivery person will scan this QR or ask for the OTP.</p>
         </div>
 
