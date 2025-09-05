@@ -16,7 +16,7 @@ const formatTimestamp = (isoString) => {
 };
 
 const AdminOrderManagement = () => {
-  const { orders, ordersMeta, fetchOrders, updateOrderStatus, simulateLoading } = useContext(AppContext);
+  const { orders, ordersMeta, fetchOrders, updateOrderStatus, /* simulateLoading */ } = useContext(AppContext);
   const [searchTerm, setSearchTerm] = useState('');
   const [filterStatus, setFilterStatus] = useState('all'); // 'all', 'Pending', 'Processing', 'Shipped', 'Delivered', 'Cancelled'
   const [loading, setLoading] = useState(true);
@@ -27,7 +27,7 @@ const AdminOrderManagement = () => {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      await simulateLoading(800); // Simulate network delay
+      // await simulateLoading(800); // Simulate network delay - REMOVED
       
       const params = {
         page: currentPage,
@@ -39,7 +39,7 @@ const AdminOrderManagement = () => {
       setLoading(false);
     };
     loadData();
-  }, [searchTerm, filterStatus, currentPage, fetchOrders, simulateLoading]);
+  }, [searchTerm, filterStatus, currentPage, fetchOrders /* , simulateLoading */]); // Removed simulateLoading from dependencies
 
   const handlePageChange = (pageNumber) => {
     setCurrentPage(pageNumber);

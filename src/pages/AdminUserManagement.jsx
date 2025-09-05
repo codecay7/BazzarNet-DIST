@@ -18,7 +18,7 @@ const AdminUserManagement = () => {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      // Removed await simulateLoading(800); // Simulate network delay
+      // Removed await simulateLoading(800); // Simulate network delay - REMOVED
       
       const params = {
         page: currentPage,

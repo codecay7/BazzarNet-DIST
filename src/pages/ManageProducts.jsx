@@ -10,7 +10,7 @@ import placeholderImage from '../assets/placeholder.png'; // Import placeholder 
 import { getFullImageUrl } from '../utils/imageUtils'; // Import utility
 
 const ManageProducts = () => {
-  const { vendorProducts, vendorProductsMeta, fetchVendorProducts, addVendorProduct, editVendorProduct, deleteVendorProduct, simulateLoading, user } = useContext(AppContext);
+  const { vendorProducts, vendorProductsMeta, fetchVendorProducts, addVendorProduct, editVendorProduct, deleteVendorProduct, /* simulateLoading, */ user } = useContext(AppContext);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [editingProduct, setEditingProduct] = useState(null);
   const [searchTerm, setSearchTerm] = useState('');
@@ -21,7 +21,7 @@ const ManageProducts = () => {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      // Removed await simulateLoading(800); // Removed this line
+      // Removed await simulateLoading(800); // Removed this line - REMOVED
       
       const params = {
         page: currentPage,
@@ -35,7 +35,7 @@ const ManageProducts = () => {
     if (user?.storeId) { // Only fetch if user is a vendor and has a storeId
       loadData();
     }
-  }, [searchTerm, currentPage, fetchVendorProducts, user?.storeId]); // Removed simulateLoading from dependencies
+  }, [searchTerm, currentPage, fetchVendorProducts, user?.storeId /* , simulateLoading */]); // Removed simulateLoading from dependencies
 
   const handleOpenModal = (product = null) => {
     setEditingProduct(product);

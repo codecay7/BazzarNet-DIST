@@ -6,7 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import Pagination from '../components/Pagination';
 
 const Orders = () => {
-  const { isVendor, orders, ordersMeta, fetchOrders, simulateLoading, user } = useContext(AppContext);
+  const { isVendor, orders, ordersMeta, fetchOrders, /* simulateLoading, */ user } = useContext(AppContext);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
   const [currentPage, setCurrentPage] = useState(1);
@@ -16,7 +16,7 @@ const Orders = () => {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
-      // Removed await simulateLoading(800); // Removed this line
+      // Removed await simulateLoading(800); // Removed this line - REMOVED
       
       const params = {
         page: currentPage,

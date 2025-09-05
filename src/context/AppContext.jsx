@@ -32,7 +32,7 @@ export const AppProvider = ({ children }) => {
   } = useAuth();
 
   const { theme, toggleTheme } = useTheme();
-  const { simulateLoading, generateOtp } = useUtils();
+  const { /* simulateLoading, */ generateOtp } = useUtils(); // Removed simulateLoading
 
   // Sidebar state is still local to AppContext as it's a global UI state
   const [sidebarOpen, setSidebarOpen] = React.useState(false);
@@ -269,7 +269,7 @@ export const AppProvider = ({ children }) => {
     fetchOrders,
     updateOrderStatus,
     confirmDeliveryWithOtp,
-    simulateLoading,
+    // simulateLoading, // Removed
     generateOtp,
     appStores,
     appStoresMeta,

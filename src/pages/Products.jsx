@@ -19,6 +19,7 @@ const Products = () => {
   useEffect(() => {
     const loadData = async () => {
       setLoading(true);
+      // Removed await simulateLoading(800); // REMOVED
       
       const params = {
         page: currentPage,
