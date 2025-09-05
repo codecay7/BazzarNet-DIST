@@ -6,7 +6,7 @@
   "main": "server.js",
   "scripts": {
     "start": "node server.js",
-    "dev": "NODE_ENV=development nodemon server.js",
+    "dev": "NODE_ENV=development node -r dotenv/config server.js",
     "seed": "node seeder.js",
     "destroy": "node seeder.js -d"
   },
