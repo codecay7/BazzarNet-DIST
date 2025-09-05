@@ -1,4 +1,5 @@
 {
+  "type": "module",
   "dependencies": {
     "bcryptjs": "^2.4.3",
     "cors": "^2.8.5",
@@ -13,11 +14,5 @@
   },
   "devDependencies": {
     "nodemon": "^3.1.10"
-  },
-  "scripts": {
-    "start": "NODE_ENV=production node server.js",
-    "dev": "NODE_ENV=development nodemon server.js",
-    "data:import": "node --experimental-modules ./seeder.js",
-    "data:destroy": "node --experimental-modules ./seeder.js -d"
   }
 }

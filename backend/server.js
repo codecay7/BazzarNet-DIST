@@ -1,3 +1,6 @@
+import dotenv from 'dotenv'; // NEW: Import dotenv
+dotenv.config(); // NEW: Load environment variables as early as possible
+
 import express from "express";
 import cors from "cors";
 import morgan from "morgan";
