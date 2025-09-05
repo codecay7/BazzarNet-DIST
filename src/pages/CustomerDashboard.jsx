@@ -84,6 +84,14 @@ const CustomerDashboard = () => {
     return stars;
   };
 
+  // Filtered recommended products based on selected category
+  const filteredRecommendedProducts = useMemo(() => {
+    if (selectedBrowseCategory === 'all') { // Use selectedBrowseCategory for recommended filter
+      return recommendedProducts;
+    }
+    return recommendedProducts.filter(product => product.category === selectedBrowseCategory);
+  }, [recommendedProducts, selectedBrowseCategory]); // Dependency on selectedBrowseCategory
+
   // Helper component to render a product card
   const ProductCard = ({ product }) => {
     const isOutOfStock = product.stock === 0;
@@ -150,6 +158,18 @@ const CustomerDashboard = () => {
       </div>
     );
   };
+
+  // Memoize sorted categories to render available ones first
+  const sortedCategories = useMemo(() => {
+    const allCategoriesExceptAll = categories.filter(cat => cat !== 'all');
+    const categoriesWithProducts = allCategoriesExceptAll.filter(cat => 
+      allAppProducts.some(p => p.category === cat)
+    );
+    const categoriesWithoutProducts = allCategoriesExceptAll.filter(cat => 
+      !allAppProducts.some(p => p.category === cat)
+    );
+    return [...categoriesWithProducts, ...categoriesWithoutProducts];
+  }, [categories, allAppProducts]);
 
 
   return (
@@ -252,8 +272,8 @@ const CustomerDashboard = () => {
               </div>
 
               {selectedBrowseCategory === 'all' ? (
-                // Display all categories separately if 'all' is selected
-                categories.filter(cat => cat !== 'all').map(category => (
+                // Display all categories separately if 'all' is selected, sorted by availability
+                sortedCategories.map(category => (
                   <div key={category} className="mb-8 last:mb-0">
                     <h3 className="text-xl font-semibold mb-4 border-b border-white/20 pb-2">{category}</h3>
                     {allAppProducts.filter(p => p.category === category).length > 0 ? (
@@ -263,7 +283,7 @@ const CustomerDashboard = () => {
                         ))}
                       </div>
                     ) : (
-                      <p className="text-center text-base opacity-80 py-4">No products found in the {category} category.</p>
+                      <p className="text-center text-base opacity-80 py-4">Stock coming soon.</p>
                     )}
                   </div>
                 ))
@@ -278,7 +298,7 @@ const CustomerDashboard = () => {
                       ))}
                     </div>
                   ) : (
-                    <p className="text-center text-base opacity-80 py-4">No products found in the {selectedBrowseCategory} category.</p>
+                    <p className="text-center text-base opacity-80 py-4">Stock coming soon.</p>
                   )}
                 </div>
               )}
