@@ -1,12 +1,13 @@
 import asyncHandler from '../middleware/asyncHandler.js';
 import Wishlist from '../models/Wishlist.js';
 import Product from '../models/Product.js';
+import mongoose from 'mongoose'; // Import mongoose for ObjectId validation
 
 // @desc    Get user's wishlist
 // @route   GET /api/wishlist
 // @access  Private
 const getWishlist = asyncHandler(async (req, res) => {
-  const wishlist = await Wishlist.findOne({ user: req.user._id }).populate('items.product', 'name price image');
+  const wishlist = await Wishlist.findOne({ user: req.user._id }).populate('items.product', 'name price image stock unit');
 
   if (wishlist) {
     res.json(wishlist.items);
@@ -52,7 +53,7 @@ const addItemToWishlist = asyncHandler(async (req, res) => {
   }
 
   await wishlist.save();
-  const updatedWishlist = await Wishlist.findById(wishlist._id).populate('items.product', 'name price image');
+  const updatedWishlist = await Wishlist.findById(wishlist._id).populate('items.product', 'name price image stock unit');
   res.status(201).json(updatedWishlist.items);
 });
 
@@ -61,6 +62,13 @@ const addItemToWishlist = asyncHandler(async (req, res) => {
 // @access  Private
 const removeItemFromWishlist = asyncHandler(async (req, res) => {
   const { id: productId } = req.params; // Product ID to remove
+  console.log('Backend: removeItemFromWishlist - Received productId:', productId);
+
+  // Validate productId format
+  if (!mongoose.Types.ObjectId.isValid(productId)) {
+    res.status(400);
+    throw new Error('Invalid product ID format.');
+  }
 
   let wishlist = await Wishlist.findOne({ user: req.user._id });
 
@@ -69,9 +77,15 @@ const removeItemFromWishlist = asyncHandler(async (req, res) => {
     throw new Error('Wishlist not found');
   }
 
+  console.log('Backend: removeItemFromWishlist - Current wishlist items before filter:', wishlist.items.map(item => item.product.toString()));
+
   const initialLength = wishlist.items.length;
   wishlist.items = wishlist.items.filter(
-    (item) => item.product.toString() !== productId
+    (item) => {
+      const itemProductId = item.product.toString();
+      console.log(`  Comparing item.product (${itemProductId}) with received productId (${productId})`);
+      return itemProductId !== productId;
+    }
   );
 
   if (wishlist.items.length === initialLength) {
@@ -80,7 +94,7 @@ const removeItemFromWishlist = asyncHandler(async (req, res) => {
   }
 
   await wishlist.save();
-  const updatedWishlist = await Wishlist.findById(wishlist._id).populate('items.product', 'name price image');
+  const updatedWishlist = await Wishlist.findById(wishlist._id).populate('items.product', 'name price image stock unit');
   res.json(updatedWishlist.items);
 });
 
