@@ -6,6 +6,7 @@ import { Link } from 'react-router-dom';
 import { ChevronDown } from 'lucide-react';
 import SkeletonCard from '../components/SkeletonCard';
 import Pagination from '../components/Pagination';
+import placeholderImage from '../assets/placeholder.png'; // Import placeholder image
 
 const Products = () => {
   const { addToCart, addToWishlist, simulateLoading, allAppProducts, allAppProductsMeta, fetchAllProducts, appStores } = useContext(AppContext);
@@ -159,6 +160,7 @@ const Products = () => {
                         src={product.image}
                         alt={product.name}
                         className="w-full h-48 object-cover"
+                        onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }} // Fallback image
                       />
                       {discount > 0 && (
                         <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded" aria-label={`${Math.round(discount)} percent off`}>{Math.round(discount)}% OFF</span>

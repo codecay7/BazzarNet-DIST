@@ -6,6 +6,7 @@ import { useNavigate } from 'react-router-dom';
 import SkeletonText from '../components/SkeletonText';
 import SkeletonCard from '../components/SkeletonCard';
 import * as api from '../services/api'; // Import API service
+import placeholderImage from '../assets/placeholder.png'; // Import placeholder image
 
 const CustomerDashboard = () => {
   const { user, cart, wishlist, simulateLoading, orders, addToCart } = useContext(AppContext);
@@ -113,20 +114,34 @@ const CustomerDashboard = () => {
                 </div>
               ) : recommendedProducts.length > 0 ? (
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {recommendedProducts.map(product => (
-                    <div key={product._id} className="flex flex-col bg-black/10 p-3 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300">
-                      <img src={product.image} alt={product.name} className="w-full h-32 object-cover rounded-md mb-2" />
-                      <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
-                      <p className="text-sm opacity-70 mb-2">₹{product.price.toFixed(2)} / {product.unit}</p> {/* Display unit */}
-                      <button 
-                        onClick={() => addToCart(product)} 
-                        className="bg-[var(--accent)] text-white py-2 px-3 rounded-lg text-sm flex items-center justify-center gap-2 font-medium hover:bg-[var(--accent-dark)] transition-colors mt-auto"
-                        aria-label={`Add ${product.name} to cart`}
-                      >
-                        <FontAwesomeIcon icon={faCartPlus} aria-hidden="true" /> Add to Cart
-                      </button>
-                    </div>
-                  ))}
+                  {recommendedProducts.map(product => {
+                    const isOutOfStock = product.stock === 0;
+                    return (
+                      <div key={product._id} className={`flex flex-col bg-black/10 p-3 rounded-lg shadow-md hover:shadow-lg transition-shadow duration-300 ${isOutOfStock ? 'grayscale' : ''}`}>
+                        <img 
+                          src={product.image} 
+                          alt={product.name} 
+                          className="w-full h-32 object-cover rounded-md mb-2" 
+                          onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }} // Fallback image
+                        />
+                        <h3 className="font-semibold text-lg mb-1">{product.name}</h3>
+                        <p className="text-sm opacity-70 mb-2">₹{product.price.toFixed(2)} / {product.unit}</p> {/* Display unit */}
+                        {isOutOfStock && (
+                          <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                            <span className="text-white text-xl font-bold">OUT OF STOCK</span>
+                          </div>
+                        )}
+                        <button 
+                          onClick={() => addToCart(product)} 
+                          className="bg-[var(--accent)] text-white py-2 px-3 rounded-lg text-sm flex items-center justify-center gap-2 font-medium hover:bg-[var(--accent-dark)] transition-colors mt-auto"
+                          aria-label={`Add ${product.name} to cart`}
+                          disabled={isOutOfStock}
+                        >
+                          <FontAwesomeIcon icon={faCartPlus} aria-hidden="true" /> Add to Cart
+                        </button>
+                      </div>
+                    );
+                  })}
                 </div>
               ) : (
                 <p className="text-center text-lg opacity-80 py-10">No recommended products available.</p>

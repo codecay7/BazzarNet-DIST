@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { AppContext } from '../context/AppContext';
 import toast from 'react-hot-toast';
 import { ChevronDown } from 'lucide-react';
+import placeholderImage from '../assets/placeholder.png'; // Import placeholder image
 
 // Helper function to format ISO timestamp
 const formatTimestamp = (isoString) => {
@@ -76,7 +77,15 @@ const OrderDetails = () => {
               <ul className="space-y-2" role="list">
                 {order.items.map(item => (
                   <li key={item.product} className="flex justify-between" role="listitem">
-                    <span>{item.name} (Qty: {item.quantity} {item.unit})</span> {/* Display unit */}
+                    <div className="flex items-center gap-2">
+                      <img 
+                        src={item.image} 
+                        alt={item.name} 
+                        className="w-12 h-12 object-cover rounded-md" 
+                        onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }} // Fallback image
+                      />
+                      <span>{item.name} (Qty: {item.quantity} {item.unit})</span>
+                    </div>
                     <span>₹{(item.price * item.quantity).toFixed(2)}</span>
                   </li>
                 ))}

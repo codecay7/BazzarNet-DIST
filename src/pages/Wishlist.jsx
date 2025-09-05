@@ -4,6 +4,7 @@ import { faCartPlus, faHeart } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
 import { Link } from 'react-router-dom';
 import SkeletonCard from '../components/SkeletonCard'; // Assuming you might need a skeleton for loading
+import placeholderImage from '../assets/placeholder.png'; // Import placeholder image
 
 const Wishlist = () => {
   const { wishlist, removeFromWishlist, moveToCart, simulateLoading } = useContext(AppContext);
@@ -43,7 +44,12 @@ const Wishlist = () => {
               return (
                 <div key={item.product._id} className={`bg-[var(--card-bg)] backdrop-blur-[5px] border border-white/30 rounded-2xl p-5 flex flex-col md:flex-row justify-between items-start md:items-center gap-4 ${isOutOfStock ? 'grayscale' : ''}`} role="listitem" aria-label={`Wishlist item: ${item.name}, Price: ₹${item.price.toFixed(2)}`}>
                   <div className="flex items-center gap-4">
-                    <img src={item.image} alt={item.name} className="w-20 h-20 object-cover rounded-lg" />
+                    <img 
+                      src={item.image} 
+                      alt={item.name} 
+                      className="w-20 h-20 object-cover rounded-lg" 
+                      onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }} // Fallback image
+                    />
                     <div>
                       <h3 className="text-xl font-semibold">{item.name}</h3>
                       <p className="text-base">₹{item.price.toFixed(2)}</p>

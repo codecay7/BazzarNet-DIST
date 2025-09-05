@@ -3,6 +3,7 @@ import toast from 'react-hot-toast';
 import { ChevronDown, UploadCloud } from 'lucide-react';
 import useFormValidation from '../hooks/useFormValidation';
 import * as api from '../services/api';
+import placeholderImage from '../assets/placeholder.png'; // Import placeholder image
 
 const indianStates = [
   "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
@@ -236,7 +237,12 @@ const StoreForm = ({ onSubmit, initialData = null }) => {
           aria-label="Upload store logo"
         >
           {store.logo ? (
-            <img src={store.logo} alt="Store Logo Preview" className="max-h-full max-w-full object-contain rounded-lg" />
+            <img 
+              src={store.logo} 
+              alt="Store Logo Preview" 
+              className="max-h-full max-w-full object-contain rounded-lg" 
+              onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }} // Fallback image
+            />
           ) : (
             <div className="flex flex-col items-center text-white/70">
               <UploadCloud size={32} />

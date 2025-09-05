@@ -6,6 +6,7 @@ import Pagination from '../components/Pagination';
 import Modal from '../components/Modal';
 import StoreForm from '../components/StoreForm';
 import toast from 'react-hot-toast';
+import placeholderImage from '../assets/placeholder.png'; // Import placeholder image
 
 const AdminStoreManagement = () => {
   const { appStores, appStoresMeta, fetchAppStores, adminUpdateStore, adminDeleteStore, simulateLoading } = useContext(AppContext);
@@ -134,7 +135,12 @@ const AdminStoreManagement = () => {
                   {appStores.map((store) => (
                     <tr key={store._id} className="hover:bg-black/5 transition-colors duration-200">
                       <td className="px-4 py-4 whitespace-nowrap">
-                        <img src={store.logo} alt={`${store.name} logo`} className="w-10 h-10 rounded-full object-cover" />
+                        <img 
+                          src={store.logo} 
+                          alt={`${store.name} logo`} 
+                          className="w-10 h-10 rounded-full object-cover" 
+                          onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }} // Fallback image
+                        />
                       </td>
                       <td className="px-4 py-4 whitespace-nowrap text-sm font-medium">{store.name}</td>
                       <td className="px-4 py-4 whitespace-nowrap text-sm">

@@ -1,6 +1,6 @@
 import React, { useState, useContext } from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faSignInAlt } from '@fortawesome/free-solid-svg-icons';
+import { faSignInAlt, faSpinner } from '@fortawesome/free-solid-svg-icons'; // Import faSpinner
 import { AppContext } from '../context/AppContext';
 import { useNavigate, Link } from 'react-router-dom';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -10,6 +10,7 @@ const Login = () => {
   const { loginAsUser, loginAsVendor, loginAsAdmin } = useContext(AppContext);
   const navigate = useNavigate();
   const [activeTab, setActiveTab] = useState('user');
+  const [isLoading, setIsLoading] = useState(false); // New loading state
 
   // User Login State
   const [userEmail, setUserEmail] = useState('');
@@ -22,7 +23,7 @@ const Login = () => {
   const [vendorErrors, setVendorErrors] = useState({});
 
   // Admin Login State
-  const [adminEmail, setAdminEmail] = useState(''); // Using email for admin login
+  const [adminEmail, setAdminEmail] = useState('');
   const [adminPassword, setAdminPassword] = useState('');
   const [adminErrors, setAdminErrors] = useState({});
 
@@ -60,7 +61,7 @@ const Login = () => {
 
   const validateAdminLogin = () => {
     let newErrors = {};
-    if (!adminEmail.trim()) { // Using adminEmail for validation
+    if (!adminEmail.trim()) {
       newErrors.email = 'Email is required.';
     } else if (!/\S+@\S+\.\S+/.test(adminEmail)) {
       newErrors.email = 'Email address is invalid.';
@@ -75,8 +76,13 @@ const Login = () => {
   const handleUserLogin = async (e) => {
     e.preventDefault();
     if (validateUserLogin()) {
-      if (await loginAsUser(userEmail, userPassword)) { // Pass email and password
-        navigate('/dashboard');
+      setIsLoading(true); // Set loading true
+      try {
+        if (await loginAsUser(userEmail, userPassword)) {
+          navigate('/dashboard');
+        }
+      } finally {
+        setIsLoading(false); // Set loading false
       }
     } else {
       toast.error('Please fill in all required fields.');
@@ -86,8 +92,13 @@ const Login = () => {
   const handleVendorLogin = async (e) => {
     e.preventDefault();
     if (validateVendorLogin()) {
-      if (await loginAsVendor(vendorEmail, vendorPassword)) { // Pass email and password
-        navigate('/dashboard');
+      setIsLoading(true); // Set loading true
+      try {
+        if (await loginAsVendor(vendorEmail, vendorPassword)) {
+          navigate('/dashboard');
+        }
+      } finally {
+        setIsLoading(false); // Set loading false
       }
     } else {
       toast.error('Please fill in all required fields.');
@@ -97,8 +108,13 @@ const Login = () => {
   const handleAdminLogin = async (e) => {
     e.preventDefault();
     if (validateAdminLogin()) {
-      if (await loginAsAdmin(adminEmail, adminPassword)) { // Pass email and password
-        navigate('/admin-dashboard');
+      setIsLoading(true); // Set loading true
+      try {
+        if (await loginAsAdmin(adminEmail, adminPassword)) {
+          navigate('/admin-dashboard');
+        }
+      } finally {
+        setIsLoading(false); // Set loading false
       }
     } else {
       toast.error('Please fill in all required fields.');
@@ -194,8 +210,10 @@ const Login = () => {
               <button
                 type="submit"
                 className="bg-[var(--accent)] text-white border-none py-3 px-6 rounded-lg flex items-center justify-center w-full gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300 mt-4"
+                disabled={isLoading} // Disable when loading
               >
-                <FontAwesomeIcon icon={faSignInAlt} aria-hidden="true" /> Sign in as User
+                {isLoading ? <FontAwesomeIcon icon={faSpinner} spin className="mr-2" /> : <FontAwesomeIcon icon={faSignInAlt} aria-hidden="true" />}
+                {isLoading ? 'Signing In...' : 'Sign in as User'}
               </button>
             </motion.form>
           )}
@@ -241,8 +259,10 @@ const Login = () => {
               <button
                 type="submit"
                 className="bg-[var(--accent)] text-white border-none py-3 px-6 rounded-lg flex items-center justify-center w-full gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300 mt-4"
+                disabled={isLoading} // Disable when loading
               >
-                <FontAwesomeIcon icon={faSignInAlt} aria-hidden="true" /> Sign in as Vendor
+                {isLoading ? <FontAwesomeIcon icon={faSpinner} spin className="mr-2" /> : <FontAwesomeIcon icon={faSignInAlt} aria-hidden="true" />}
+                {isLoading ? 'Signing In...' : 'Sign in as Vendor'}
               </button>
             </motion.form>
           )}
@@ -288,8 +308,10 @@ const Login = () => {
               <button
                 type="submit"
                 className="bg-[var(--accent)] text-white border-none py-3 px-6 rounded-lg flex items-center justify-center w-full gap-2 font-medium hover:bg-[var(--accent-dark)] transition-all duration-300 mt-4"
+                disabled={isLoading} // Disable when loading
               >
-                <FontAwesomeIcon icon={faSignInAlt} aria-hidden="true" /> Sign in as Admin
+                {isLoading ? <FontAwesomeIcon icon={faSpinner} spin className="mr-2" /> : <FontAwesomeIcon icon={faSignInAlt} aria-hidden="true" />}
+                {isLoading ? 'Signing In...' : 'Sign in as Admin'}
               </button>
             </motion.form>
           )}

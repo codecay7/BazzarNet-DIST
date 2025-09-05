@@ -3,6 +3,7 @@ import toast from 'react-hot-toast';
 import { ChevronDown, UploadCloud } from 'lucide-react'; // Added UploadCloud icon
 import useFormValidation from '../hooks/useFormValidation'; // Import the custom hook
 import * as api from '../services/api'; // Import API service for uploads
+import placeholderImage from '../assets/placeholder.png'; // Import placeholder image
 
 const ProductForm = ({ onSubmit, initialData = null }) => {
   const [product, setProduct] = useState({
@@ -177,7 +178,12 @@ const ProductForm = ({ onSubmit, initialData = null }) => {
         {errors.image && <p id="productImage-error" className="text-red-400 text-xs mt-1">{errors.image}</p>}
         {product.image && (
           <div className="mt-2 w-32 h-32 border border-white/30 rounded-lg overflow-hidden flex items-center justify-center">
-            <img src={product.image} alt="Image Preview" className="max-w-full max-h-full object-contain" />
+            <img 
+              src={product.image} 
+              alt="Image Preview" 
+              className="max-w-full max-h-full object-contain" 
+              onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }} // Fallback image
+            />
           </div>
         )}
       </div>

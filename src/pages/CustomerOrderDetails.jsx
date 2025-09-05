@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { AppContext } from '../context/AppContext';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faBox, faTruck, faHome } from '@fortawesome/free-solid-svg-icons';
+import placeholderImage from '../assets/placeholder.png'; // Import placeholder image
 
 // Helper function to format ISO timestamp
 const formatTimestamp = (isoString) => {
@@ -80,7 +81,12 @@ const CustomerOrderDetails = () => {
           <div className="space-y-4" role="list">
             {order.items.map(item => (
               <div key={item.product} className="flex items-center gap-4 bg-black/10 p-3 rounded-lg" role="listitem" aria-label={`Item: ${item.name}, Quantity: ${item.quantity}, Price: ₹{(item.price * item.quantity).toFixed(2)}`}>
-                <img src={item.image} alt={item.name} className="w-16 h-16 object-cover rounded-md" />
+                <img 
+                  src={item.image} 
+                  alt={item.name} 
+                  className="w-16 h-16 object-cover rounded-md" 
+                  onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }} // Fallback image
+                />
                 <div className="flex-grow">
                   <p className="font-semibold">{item.name}</p>
                   <p className="text-sm opacity-80">Quantity: {item.quantity} {item.unit}</p> {/* Display unit */}

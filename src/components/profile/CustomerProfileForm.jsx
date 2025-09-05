@@ -1,10 +1,11 @@
 import React, { useCallback, useRef } from 'react';
 import toast from 'react-hot-toast';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faPen } from '@fortawesome/free-solid-svg-icons';
+import { faPen, faUser } from '@fortawesome/free-solid-svg-icons'; // Import faUser
 import { Mail, Phone, CreditCard, Landmark, ChevronDown, UploadCloud } from 'lucide-react';
 import useFormValidation from '../../hooks/useFormValidation';
 import * as api from '../../services/api';
+import placeholderImage from '../../assets/placeholder.png'; // Import placeholder image
 
 const indianStates = [
   "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
@@ -25,7 +26,12 @@ const CustomerProfileForm = ({ profileData, setProfileData, isEditing, handleIma
       <div className="flex flex-col items-center text-center max-w-lg mx-auto mb-8">
         <div className="relative w-24 h-24 mb-4">
           {profileData.profileImage ? (
-            <img src={profileData.profileImage} alt="User Profile" className="w-24 h-24 rounded-full object-cover border-4 border-white/30 shadow-lg" />
+            <img 
+              src={profileData.profileImage} 
+              alt="User Profile" 
+              className="w-24 h-24 rounded-full object-cover border-4 border-white/30 shadow-lg" 
+              onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }} // Fallback image
+            />
           ) : (
             <div className="w-24 h-24 bg-[var(--accent)] rounded-full flex items-center justify-center border-4 border-white/30 shadow-lg" role="img" aria-label="Default user profile image">
               <FontAwesomeIcon icon={faUser} className="text-white text-4xl" aria-hidden="true" />

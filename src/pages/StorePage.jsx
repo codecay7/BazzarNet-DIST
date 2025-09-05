@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCartPlus, faHeart, faStar, faStarHalfAlt } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
+import placeholderImage from '../assets/placeholder.png'; // Import placeholder image
 
 const StorePage = () => {
   const { addToCart, addToWishlist, allAppProducts, appStores } = useContext(AppContext);
@@ -59,7 +60,12 @@ const StorePage = () => {
                 <div key={product._id} className={`bg-black/10 border border-white/10 rounded-2xl overflow-hidden shadow-lg flex flex-col ${isOutOfStock ? 'grayscale' : ''}`} role="listitem">
                   <Link to={`/products/${product._id}`} className="flex-grow" aria-label={`View details for ${product.name}`}>
                     <div className="relative">
-                      <img src={product.image} alt={product.name} className="w-full h-48 object-cover" />
+                      <img 
+                        src={product.image} 
+                        alt={product.name} 
+                        className="w-full h-48 object-cover" 
+                        onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }} // Fallback image
+                      />
                       {discount > 0 && (
                         <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded" aria-label={`${discount} percent off`}>{discount}% OFF</span>
                       )}

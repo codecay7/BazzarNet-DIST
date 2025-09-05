@@ -7,6 +7,7 @@ import ProductForm from '../components/ProductForm';
 import SkeletonCard from '../components/SkeletonCard';
 import Pagination from '../components/Pagination';
 import { Search, Store, Tag, ChevronDown } from 'lucide-react';
+import placeholderImage from '../assets/placeholder.png'; // Import placeholder image
 
 const AdminProductManagement = () => {
   const { allAppProducts, allAppProductsMeta, fetchAllProducts, adminEditProduct, adminDeleteProduct, simulateLoading, appStores } = useContext(AppContext);
@@ -143,12 +144,17 @@ const AdminProductManagement = () => {
                 return (
                   <div key={product._id} className="bg-black/10 border border-white/10 rounded-2xl overflow-hidden shadow-lg flex flex-col" role="listitem" aria-label={`Product: ${product.name}`}>
                     <div className="relative">
-                      <img src={product.image} alt={product.name} className="w-full h-48 object-cover" />
+                      <img 
+                        src={product.image} 
+                        alt={product.name} 
+                        className="w-full h-48 object-cover" 
+                        onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }} // Fallback image
+                      />
                       {discount > 0 && (
                         <span className="absolute top-2 left-2 bg-red-500 text-white text-xs font-bold px-2 py-1 rounded" aria-label={`${discount} percent off`}>{discount}% OFF</span>
                       )}
                     </div>
-                    <div className="p-4 flex-grow flex flex-col">
+                    <div className="p-4 flex-grow flex-col">
                       <h3 className="text-xl font-semibold mb-2">{product.name}</h3>
                       <p className="text-sm opacity-80 mb-1">Store: {storeName}</p>
                       <div className="flex items-baseline gap-2 mb-2">

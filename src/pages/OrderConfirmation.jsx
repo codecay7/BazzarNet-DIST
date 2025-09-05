@@ -4,6 +4,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faCheckCircle } from '@fortawesome/free-solid-svg-icons';
 import { AppContext } from '../context/AppContext';
 import QRCode from 'react-qr-code';
+import placeholderImage from '../assets/placeholder.png'; // Import placeholder image
 
 // Helper function to format ISO timestamp
 const formatTimestamp = (isoString) => {
@@ -54,7 +55,15 @@ const OrderConfirmation = () => {
                 <ul role="list">
                     {items.map(item => (
                         <li key={item.product} className="flex justify-between py-1" role="listitem">
-                            <span>{item.name} x {item.quantity} {item.unit}</span> {/* Display unit */}
+                            <div className="flex items-center gap-2">
+                                <img 
+                                  src={item.image} 
+                                  alt={item.name} 
+                                  className="w-8 h-8 object-cover rounded-md" 
+                                  onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }} // Fallback image
+                                />
+                                <span>{item.name} x {item.quantity} {item.unit}</span>
+                            </div>
                             <span>₹{(item.price * item.quantity).toFixed(2)}</span>
                         </li>
                     ))}

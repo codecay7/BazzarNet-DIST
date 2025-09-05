@@ -5,6 +5,7 @@ import { faPen, faStore } from '@fortawesome/free-solid-svg-icons';
 import { Building2, Mail, Phone, Landmark, ChevronDown, FileText, UploadCloud } from 'lucide-react';
 import useFormValidation from '../../hooks/useFormValidation';
 import * as api from '../../services/api';
+import placeholderImage from '../../assets/placeholder.png'; // Import placeholder image
 
 const indianStates = [
   "Andhra Pradesh", "Arunachal Pradesh", "Assam", "Bihar", "Chhattisgarh",
@@ -31,7 +32,12 @@ const VendorProfileForm = ({ profileData, setProfileData, isEditing, handleImage
         <div className="flex items-center gap-6">
           <div className="relative w-24 h-24 flex-shrink-0">
             {profileData.profileImage ? (
-              <img src={profileData.profileImage} alt="Store Logo" className="w-24 h-24 rounded-full object-cover border-4 border-white/30 shadow-lg" />
+              <img 
+                src={profileData.profileImage} 
+                alt="Store Logo" 
+                className="w-24 h-24 rounded-full object-cover border-4 border-white/30 shadow-lg" 
+                onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }} // Fallback image
+              />
             ) : (
               <div className="w-24 h-24 bg-[var(--accent)] rounded-full flex items-center justify-center border-4 border-white/30 shadow-lg" role="img" aria-label="Default store logo">
                 <FontAwesomeIcon icon={faStore} className="text-white text-4xl" aria-hidden="true" />

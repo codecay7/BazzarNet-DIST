@@ -6,6 +6,7 @@ import StatCard from './StatCard';
 import { useNavigate } from 'react-router-dom';
 import SkeletonText from './SkeletonText';
 import * as api from '../services/api'; // Import API service
+import placeholderImage from '../assets/placeholder.png'; // Import placeholder image
 
 const VendorDashboard = () => {
   const { user, simulateLoading } = useContext(AppContext);
@@ -183,7 +184,12 @@ const VendorDashboard = () => {
                       onClick={() => navigate('/manage-products')} 
                       className="flex items-center gap-4 cursor-pointer hover:bg-white/10 p-2 rounded-lg transition-colors"
                     >
-                      <img src={product.image} alt={product.name} className="w-12 h-12 object-cover rounded-lg" />
+                      <img 
+                        src={product.image} 
+                        alt={product.name} 
+                        className="w-12 h-12 object-cover rounded-lg" 
+                        onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }} // Fallback image
+                      />
                       <div className="flex-1">
                         <p className="font-semibold">{product.name}</p>
                         <p className="text-sm opacity-70">{product.sales} units sold</p>

@@ -1,6 +1,7 @@
 import React from 'react';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faChevronLeft, faChevronRight } from '@fortawesome/free-solid-svg-icons';
+import placeholderImage from '../assets/placeholder.png'; // Import placeholder image
 
 const OrderSummary = ({ cart, subtotal, total, shippingAddress, appliedCoupon, discountAmount, onEditAddress, onNextStep, onPreviousStep }) => {
   const displayAddress = (address) => {
@@ -22,7 +23,12 @@ const OrderSummary = ({ cart, subtotal, total, shippingAddress, appliedCoupon, d
           {cart.map(item => (
             <li key={item.product._id} className="flex justify-between items-center" role="listitem">
               <div className="flex items-center gap-3">
-                <img src={item.image} alt={item.name} className="w-12 h-12 object-cover rounded-md" />
+                <img 
+                  src={item.image} 
+                  alt={item.name} 
+                  className="w-12 h-12 object-cover rounded-md" 
+                  onError={(e) => { e.target.onerror = null; e.target.src = placeholderImage; }} // Fallback image
+                />
                 <div>
                   <p className="font-medium">{item.name}</p>
                   <p className="text-sm opacity-70">Qty: {item.quantity} {item.unit}</p> {/* Display unit */}
